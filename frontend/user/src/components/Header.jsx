@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { Icon } from "@iconify/react";
 
 export default function Header({ isDark = false, onThemeToggle = () => {} }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -138,12 +139,13 @@ export default function Header({ isDark = false, onThemeToggle = () => {} }) {
 
           <div className="flex items-center gap-6">
             <button
-              className={`hidden lg:block text-sm tracking-wide transition ${
+              className={`hidden lg:flex items-center gap-2 text-sm tracking-wide transition ${
                 isDark
                   ? "text-gray-400 hover:text-white"
                   : "text-gray-600 hover:text-black"
               }`}
             >
+              <Icon icon="teenyicons:search-outline" width={16} />
               Search
             </button>
 
@@ -151,12 +153,13 @@ export default function Header({ isDark = false, onThemeToggle = () => {} }) {
             {!isLoggedIn ? (
               <a
                 href="/login"
-                className={`text-sm tracking-wide transition ${
+                className={`flex items-center gap-2 text-sm tracking-wide transition ${
                   isDark
                     ? "text-gray-400 hover:text-white"
                     : "text-gray-600 hover:text-black"
                 }`}
               >
+                <Icon icon="teenyicons:user-outline" width={16} />
                 Đăng nhập
               </a>
             ) : (
@@ -205,22 +208,24 @@ export default function Header({ isDark = false, onThemeToggle = () => {} }) {
                     <div className="py-2">
                       <a
                         href="/profile"
-                        className={`block px-4 py-2 text-sm transition ${
+                        className={`flex items-center gap-2 px-4 py-2 text-sm transition ${
                           isDark
                             ? "text-gray-300 hover:bg-white/5"
                             : "text-gray-700 hover:bg-black/5"
                         }`}
                       >
+                        <Icon icon="teenyicons:user-circle-outline" width={16} />
                         Tài khoản của tôi
                       </a>
                       <a
                         href="/orders"
-                        className={`block px-4 py-2 text-sm transition ${
+                        className={`flex items-center gap-2 px-4 py-2 text-sm transition ${
                           isDark
                             ? "text-gray-300 hover:bg-white/5"
                             : "text-gray-700 hover:bg-black/5"
                         }`}
                       >
+                        <Icon icon="teenyicons:box-outline" width={16} />
                         Đơn hàng của tôi
                       </a>
                     </div>
@@ -232,12 +237,13 @@ export default function Header({ isDark = false, onThemeToggle = () => {} }) {
                     >
                       <button
                         onClick={handleLogout}
-                        className={`w-full text-left px-4 py-2 text-sm transition ${
+                        className={`w-full text-left px-4 py-2 text-sm flex items-center gap-2 transition ${
                           isDark
                             ? "text-red-400 hover:bg-white/5"
                             : "text-red-600 hover:bg-black/5"
                         }`}
                       >
+                        <Icon icon="teenyicons:logout-outline" width={16} />
                         Đăng xuất
                       </button>
                     </div>
@@ -247,12 +253,13 @@ export default function Header({ isDark = false, onThemeToggle = () => {} }) {
             )}
 
             <button
-              className={`px-6 py-3 text-sm tracking-wider font-normal transition ${
+              className={`px-6 py-3 text-sm tracking-wider font-normal transition flex items-center gap-2 ${
                 isDark
                   ? "bg-white text-black hover:bg-gray-100"
                   : "bg-black text-white hover:bg-gray-900"
               }`}
             >
+              <Icon icon="teenyicons:cart-outline" width={16} />
               CART (0)
             </button>
             <button
@@ -262,8 +269,12 @@ export default function Header({ isDark = false, onThemeToggle = () => {} }) {
                   ? "bg-white/10 hover:bg-white/20 text-white"
                   : "bg-black/5 hover:bg-black/10 text-black"
               }`}
+              aria-label="Toggle theme"
             >
-              {isDark ? "☀" : "☾"}
+              <Icon
+                icon={isDark ? "teenyicons:sun-outline" : "teenyicons:moon-outline"}
+                width={16}
+              />
             </button>
           </div>
         </div>

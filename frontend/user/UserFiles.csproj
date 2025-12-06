@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <EnableDefaultItems>false</EnableDefaultItems>
+    <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="src\**\*.*" />
+    <None Include="public\**\*.*" />
+    <None Include="package.json" />
+    <None Include="package-lock.json" />
+    <None Include="vite.config.js" />
+    <None Include="tailwind.config.js" />
+    <None Include="postcss.config.js" />
+    <None Include=".env.local" />
+    <None Include=".env.example" />
+  </ItemGroup>
+</Project>

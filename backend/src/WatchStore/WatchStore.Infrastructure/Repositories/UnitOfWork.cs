@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore.Storage;
+using WatchStore.Domain.Entities;
 using WatchStore.Domain.Interfaces;
 using WatchStore.Infrastructure.Data;
 
@@ -9,12 +10,20 @@ namespace WatchStore.Infrastructure.Repositories
         private readonly WatchStoreDbContext _context;
         private IDbContextTransaction? _transaction;
         private readonly Dictionary<Type, object> _repositories;
+        private IRepository<OtpVerification>? _otpVerifications;
+        private IRepository<RefreshToken>? _refreshTokens;
 
         public UnitOfWork(WatchStoreDbContext context)
         {
             _context = context;
             _repositories = new Dictionary<Type, object>();
         }
+
+        public IRepository<OtpVerification> OtpVerifications =>
+            _otpVerifications ??= GetRepository<OtpVerification>();
+
+        public IRepository<RefreshToken> RefreshTokens =>
+            _refreshTokens ??= GetRepository<RefreshToken>();
 
         public IRepository<T> GetRepository<T>() where T : class
         {

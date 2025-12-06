@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import Header from "../components/Header";
 
 const categories = [
   { name: "Automatic", icon: "⚙️", desc: "Máy cơ tự động" },
@@ -86,111 +87,7 @@ export default function Home() {
         isDark ? "bg-neutral-950 text-neutral-50" : "bg-stone-50 text-stone-900"
       }`}
     >
-      {/* Header */}
-      <header
-        className={`sticky top-0 z-50 backdrop-blur-md ${
-          isDark
-            ? "bg-black/90 border-b border-white/10"
-            : "bg-white/95 border-b border-black/5 shadow-sm"
-        }`}
-      >
-        <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
-          <div className="flex items-center justify-between h-24">
-            <a href="/" className="flex items-center gap-3 group">
-              <div className="w-10 h-10 rounded-md bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center">
-                <span className="text-white font-black text-xl">W</span>
-              </div>
-              <div
-                className={`text-xl font-light tracking-[0.2em] uppercase ${
-                  isDark ? "text-white" : "text-black"
-                }`}
-              >
-                Watchstore
-              </div>
-            </a>
-
-            <nav
-              className={`hidden lg:flex items-center gap-10 text-sm font-normal tracking-wide ${
-                isDark ? "text-gray-400" : "text-gray-600"
-              }`}
-            >
-              <a
-                className={`transition hover:text-amber-600 uppercase ${
-                  isDark ? "hover:text-amber-400" : ""
-                }`}
-                href="#collections"
-              >
-                Bộ sưu tập
-              </a>
-              <a
-                className={`transition hover:text-amber-600 uppercase ${
-                  isDark ? "hover:text-amber-400" : ""
-                }`}
-                href="/products"
-              >
-                Sản phẩm
-              </a>
-              <a
-                className={`transition hover:text-amber-600 uppercase ${
-                  isDark ? "hover:text-amber-400" : ""
-                }`}
-                href="#brands"
-              >
-                Thương hiệu
-              </a>
-              <a
-                className={`transition hover:text-amber-600 uppercase ${
-                  isDark ? "hover:text-amber-400" : ""
-                }`}
-                href="#about"
-              >
-                Giới thiệu
-              </a>
-            </nav>
-
-            <div className="flex items-center gap-6">
-              <button
-                className={`hidden lg:block text-sm tracking-wide transition ${
-                  isDark
-                    ? "text-gray-400 hover:text-white"
-                    : "text-gray-600 hover:text-black"
-                }`}
-              >
-                Search
-              </button>
-              <a
-                href="/login"
-                className={`text-sm tracking-wide transition ${
-                  isDark
-                    ? "text-gray-400 hover:text-white"
-                    : "text-gray-600 hover:text-black"
-                }`}
-              >
-                Đăng nhập
-              </a>
-              <button
-                className={`px-6 py-3 text-sm tracking-wider font-normal transition ${
-                  isDark
-                    ? "bg-white text-black hover:bg-gray-100"
-                    : "bg-black text-white hover:bg-gray-900"
-                }`}
-              >
-                CART (0)
-              </button>
-              <button
-                onClick={toggleTheme}
-                className={`w-10 h-10 rounded-full flex items-center justify-center transition ${
-                  isDark
-                    ? "bg-white/10 hover:bg-white/20 text-white"
-                    : "bg-black/5 hover:bg-black/10 text-black"
-                }`}
-              >
-                {isDark ? "☀" : "☾"}
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
+      <Header isDark={isDark} onThemeToggle={toggleTheme} />
 
       <main>
         {/* Hero */}

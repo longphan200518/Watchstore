@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using WatchStore.Application.Features.Auth;
+using WatchStore.Application.Interfaces;
 using WatchStore.Domain.Entities;
 using WatchStore.Domain.Interfaces;
 using WatchStore.Infrastructure.Data;
@@ -14,8 +16,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new() 
-    { 
+    c.SwaggerDoc("v1", new()
+    {
         Title = "Plonggg's Watch Store API",
         Version = "v1",
         Description = "Watch E-commerce API - Developed by Plonggg"
@@ -64,12 +66,21 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
-        policy.WithOrigins("http://localhost:6868").AllowAnyMethod().AllowAnyHeader());
+        policy.WithOrigins(
+            "http://localhost:6868",
+            "http://localhost:5173",
+            "http://localhost:3000"
+        )
+        .AllowAnyMethod()
+        .AllowAnyHeader());
 });
 
 // Services
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IJwtService, JwtService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 var app = builder.Build();
 
@@ -79,14 +90,14 @@ using (var scope = app.Services.CreateScope())
     var context = scope.ServiceProvider.GetRequiredService<WatchStoreDbContext>();
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<Role>>();
-    
+
     await context.Database.MigrateAsync();
-    
+
     if (!await roleManager.RoleExistsAsync("Admin"))
         await roleManager.CreateAsync(new Role { Name = "Admin" });
     if (!await roleManager.RoleExistsAsync("User"))
         await roleManager.CreateAsync(new Role { Name = "User" });
-    
+
     var adminEmail = "admin@gmail.com";
     if (await userManager.FindByEmailAsync(adminEmail) == null)
     {
@@ -108,7 +119,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+// Avoid https redirect during local dev to prevent CORS preflight redirects
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 app.UseCors("AllowFrontend");
 app.UseAuthentication();
 app.UseAuthorization();

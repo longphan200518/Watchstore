@@ -21,6 +21,7 @@
 ### ✨ Tính năng nổi bật
 
 #### User Website:
+
 - 🎭 Dark/Light mode với localStorage persistence
 - 🎨 Giao diện luxury editorial với typography tinh tế
 - 📱 Responsive design hoàn hảo trên mọi thiết bị
@@ -32,6 +33,7 @@
 - 🏆 Brand showcase
 
 #### Admin Dashboard:
+
 - 📊 Thống kê tổng quan dashboard
 - 📦 Quản lý sản phẩm (CRUD)
 - 🛒 Quản lý đơn hàng
@@ -39,6 +41,7 @@
 - 🏷️ Quản lý thương hiệu
 
 #### Backend API:
+
 - 🔐 JWT Authentication & Authorization
 - 📝 Clean Architecture với DDD
 - 🗄️ Entity Framework Core + SQL Server
@@ -140,12 +143,14 @@ dotnet ef database update --project WatchStore.Infrastructure --startup-project 
 ### 3️⃣ Cài đặt Frontend
 
 **User Website:**
+
 ```bash
 cd frontend/user
 npm install
 ```
 
 **Admin Dashboard:**
+
 ```bash
 cd frontend/admin
 npm install
@@ -154,6 +159,7 @@ npm install
 ### 4️⃣ Cấu hình
 
 **Backend** - `backend/src/WatchStore/WatchStore.API/appsettings.json`:
+
 ```json
 {
   "ConnectionStrings": {
@@ -168,6 +174,7 @@ npm install
 ```
 
 **Frontend** - Tạo file `.env.local`:
+
 ```bash
 VITE_API_BASE_URL=http://localhost:5221/api
 ```
@@ -175,18 +182,21 @@ VITE_API_BASE_URL=http://localhost:5221/api
 ### 5️⃣ Chạy ứng dụng
 
 **Backend API:**
+
 ```bash
 cd backend/src/WatchStore/WatchStore.API
 dotnet run
 ```
 
 **User Website:**
+
 ```bash
 cd frontend/user
 npm run dev
 ```
 
 **Admin Dashboard:**
+
 ```bash
 cd frontend/admin
 npm run dev
@@ -196,11 +206,11 @@ npm run dev
 
 ## 🌐 URLs & Ports
 
-| Application | URL | Port |
-|------------|-----|------|
-| 🖥️ Backend API | http://localhost:5221 | 5221 |
-| 🎨 User Website | http://localhost:3000 | 3000 |
-| 🔧 Admin Dashboard | http://localhost:3001 | 3001 |
+| Application         | URL                           | Port |
+| ------------------- | ----------------------------- | ---- |
+| 🖥️ Backend API      | http://localhost:5221         | 5221 |
+| 🎨 User Website     | http://localhost:3000         | 3000 |
+| 🔧 Admin Dashboard  | http://localhost:3001         | 3001 |
 | 📚 Swagger API Docs | http://localhost:5221/swagger | 5221 |
 
 ---
@@ -208,6 +218,7 @@ npm run dev
 ## 🛠️ Tech Stack
 
 ### Backend
+
 - **Framework**: .NET 8.0
 - **ORM**: Entity Framework Core 8.0
 - **Database**: SQL Server 2022
@@ -216,6 +227,7 @@ npm run dev
 - **Documentation**: Swagger/OpenAPI
 
 ### Frontend
+
 - **Library**: React 18
 - **Build Tool**: Vite 5.4
 - **Styling**: Tailwind CSS 3.4
@@ -224,6 +236,7 @@ npm run dev
 - **Icons**: Lucide React
 
 ### DevOps
+
 - **Containerization**: Docker & Docker Compose
 - **Version Control**: Git & GitHub
 - **IDE**: Visual Studio 2022, VS Code
@@ -247,18 +260,21 @@ npm run dev
 ## 🎨 Design System
 
 ### Typography
+
 - **Font**: System font stack (sans-serif)
 - **Weights**: extralight (200), light (300), normal (400), semibold (600)
 - **Sizes**: text-xs → text-8xl
 - **Letter Spacing**: tracking-tight → tracking-[0.3em]
 
 ### Colors
+
 - **Primary**: Amber (400, 600)
 - **Dark Mode**: Neutral (900, 950), Black
 - **Light Mode**: Zinc (50, 100), White
 - **Accent**: Gray (400-600)
 
 ### Layout
+
 - **Max Width**: 1400px - 1600px
 - **Padding**: px-8 lg:px-16
 - **Spacing**: space-y-4 → space-y-10
@@ -268,6 +284,7 @@ npm run dev
 ## 📝 API Endpoints
 
 ### Authentication
+
 ```
 POST   /api/auth/register      # Đăng ký
 POST   /api/auth/login         # Đăng nhập
@@ -275,6 +292,7 @@ POST   /api/auth/refresh       # Refresh token
 ```
 
 ### Watches
+
 ```
 GET    /api/watches            # Lấy danh sách
 GET    /api/watches/{id}       # Chi tiết sản phẩm
@@ -284,6 +302,7 @@ DELETE /api/watches/{id}       # Xóa (Admin)
 ```
 
 ### Orders
+
 ```
 GET    /api/orders             # Danh sách đơn hàng
 GET    /api/orders/{id}        # Chi tiết đơn hàng
@@ -292,6 +311,7 @@ PUT    /api/orders/{id}/status # Cập nhật trạng thái
 ```
 
 ### Brands
+
 ```
 GET    /api/brands             # Danh sách thương hiệu
 POST   /api/brands             # Tạo thương hiệu (Admin)
@@ -320,6 +340,7 @@ This project is licensed under the MIT License.
 ## 👨‍💻 Author
 
 **Long Phan**
+
 - GitHub: [@longphan200518](https://github.com/longphan200518)
 - Repository: [Watchstore](https://github.com/longphan200518/Watchstore)
 

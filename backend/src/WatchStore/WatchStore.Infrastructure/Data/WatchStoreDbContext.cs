@@ -15,6 +15,8 @@ namespace WatchStore.Infrastructure.Data
         public DbSet<WatchImage> WatchImages { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderItem> OrderItems { get; set; }
+        public DbSet<OtpVerification> OtpVerifications { get; set; }
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -82,6 +84,26 @@ namespace WatchStore.Infrastructure.Data
                       .HasForeignKey(e => e.WatchId)
                       .OnDelete(DeleteBehavior.Restrict);
                 entity.HasQueryFilter(e => !e.IsDeleted);
+            });
+
+            // OtpVerification configuration
+            builder.Entity<OtpVerification>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Email).IsRequired().HasMaxLength(255);
+                entity.Property(e => e.Otp).IsRequired().HasMaxLength(10);
+                entity.Property(e => e.Type).IsRequired().HasMaxLength(50);
+                entity.HasIndex(e => e.Email);
+                entity.HasIndex(e => new { e.Email, e.Type });
+            });
+
+            // RefreshToken configuration
+            builder.Entity<RefreshToken>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Token).IsRequired().HasMaxLength(512);
+                entity.HasIndex(e => e.Token).IsUnique();
+                entity.HasIndex(e => e.UserId);
             });
 
         }

@@ -1,31 +1,31 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useState } from "react";
+import { Link } from "react-router-dom";
 
 export default function AdminLogin() {
-  const [formData, setFormData] = useState({ email: '', password: '' })
-  const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setError('')
-    setLoading(true)
+    e.preventDefault();
+    setError("");
+    setLoading(true);
 
     try {
       // TODO: Gọi API đăng nhập admin
-      console.log('Admin Login:', formData)
+      console.log("Admin Login:", formData);
       // Giả lập API call
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       // Sau khi đăng nhập thành công
-      localStorage.setItem('adminToken', 'demo-admin-token')
-      window.location.href = '/'
+      localStorage.setItem("adminToken", "demo-admin-token");
+      window.location.href = "/";
     } catch (err) {
-      setError(err.message || 'Đăng nhập thất bại')
+      setError(err.message || "Đăng nhập thất bại");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center p-4">
@@ -47,7 +47,9 @@ export default function AdminLogin() {
         <div className="bg-white rounded-2xl shadow-2xl p-8">
           <div className="mb-6">
             <h2 className="text-2xl font-bold text-gray-900">Đăng nhập</h2>
-            <p className="text-sm text-gray-600 mt-1">Truy cập bảng điều khiển quản trị</p>
+            <p className="text-sm text-gray-600 mt-1">
+              Truy cập bảng điều khiển quản trị
+            </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
@@ -65,7 +67,9 @@ export default function AdminLogin() {
                 type="email"
                 required
                 value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, email: e.target.value })
+                }
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="admin@watchstore.vn"
               />
@@ -79,7 +83,9 @@ export default function AdminLogin() {
                 type="password"
                 required
                 value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, password: e.target.value })
+                }
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="••••••••"
               />
@@ -87,7 +93,10 @@ export default function AdminLogin() {
 
             <div className="flex items-center justify-between text-sm">
               <label className="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" />
+                <input
+                  type="checkbox"
+                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                />
                 <span className="text-gray-600">Ghi nhớ đăng nhập</span>
               </label>
             </div>
@@ -97,7 +106,7 @@ export default function AdminLogin() {
               disabled={loading}
               className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
             >
-              {loading ? 'Đang xử lý...' : 'Đăng nhập'}
+              {loading ? "Đang xử lý..." : "Đăng nhập"}
             </button>
           </form>
 
@@ -110,11 +119,14 @@ export default function AdminLogin() {
 
         {/* Back to site */}
         <div className="text-center mt-6">
-          <a href="http://localhost:3000" className="text-sm text-gray-400 hover:text-white transition">
+          <a
+            href="http://localhost:3000"
+            className="text-sm text-gray-400 hover:text-white transition"
+          >
             ← Quay lại trang chủ
           </a>
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -1,26 +1,50 @@
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation } from "react-router-dom";
 
 const orders = [
-  { code: '#WS-1092', customer: 'Lê Minh Tuấn', total: '₫152.000.000', status: 'Đang giao', date: 'Hôm nay, 10:15' },
-  { code: '#WS-1089', customer: 'Trần Khánh Linh', total: '₫92.500.000', status: 'Đã giao', date: 'Hôm qua, 16:40' },
-  { code: '#WS-1083', customer: 'Nguyễn Hoàng', total: '₫68.200.000', status: 'Đã xác nhận', date: '02/12, 11:05' },
-  { code: '#WS-1077', customer: 'Phạm Quang Huy', total: '₫214.800.000', status: 'Đã hủy', date: '30/11, 09:50' },
-]
+  {
+    code: "#WS-1092",
+    customer: "Lê Minh Tuấn",
+    total: "₫152.000.000",
+    status: "Đang giao",
+    date: "Hôm nay, 10:15",
+  },
+  {
+    code: "#WS-1089",
+    customer: "Trần Khánh Linh",
+    total: "₫92.500.000",
+    status: "Đã giao",
+    date: "Hôm qua, 16:40",
+  },
+  {
+    code: "#WS-1083",
+    customer: "Nguyễn Hoàng",
+    total: "₫68.200.000",
+    status: "Đã xác nhận",
+    date: "02/12, 11:05",
+  },
+  {
+    code: "#WS-1077",
+    customer: "Phạm Quang Huy",
+    total: "₫214.800.000",
+    status: "Đã hủy",
+    date: "30/11, 09:50",
+  },
+];
 
 const statusColor = {
-  'Đang giao': 'bg-amber-50 text-amber-700 border border-amber-100',
-  'Đã giao': 'bg-green-50 text-green-700 border border-green-100',
-  'Đã xác nhận': 'bg-blue-50 text-blue-700 border border-blue-100',
-  'Đã hủy': 'bg-red-50 text-red-700 border border-red-100',
-}
+  "Đang giao": "bg-amber-50 text-amber-700 border border-amber-100",
+  "Đã giao": "bg-green-50 text-green-700 border border-green-100",
+  "Đã xác nhận": "bg-blue-50 text-blue-700 border border-blue-100",
+  "Đã hủy": "bg-red-50 text-red-700 border border-red-100",
+};
 
 export default function Orders() {
-  const location = useLocation()
+  const location = useLocation();
   const navItems = [
-    { label: 'Dashboard', path: '/' },
-    { label: 'Quản lý sản phẩm', path: '/products' },
-    { label: 'Quản lý đơn hàng', path: '/orders' },
-  ]
+    { label: "Dashboard", path: "/" },
+    { label: "Quản lý sản phẩm", path: "/products" },
+    { label: "Quản lý đơn hàng", path: "/orders" },
+  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
@@ -28,23 +52,27 @@ export default function Orders() {
       <aside className="fixed left-0 top-0 w-64 h-screen bg-primary text-white shadow-2xl/40 shadow-black/30">
         <div className="p-6 border-b border-white/10">
           <h1 className="text-2xl font-bold tracking-wide">Watchstore Admin</h1>
-          <p className="text-sm text-white/70 mt-1">Luxury watch control center</p>
+          <p className="text-sm text-white/70 mt-1">
+            Luxury watch control center
+          </p>
         </div>
         <nav className="mt-4">
           {navItems.map((item) => {
-            const active = location.pathname === item.path
+            const active = location.pathname === item.path;
             return (
               <Link
                 key={item.path}
                 to={item.path}
                 className={`flex items-center gap-3 px-6 py-3 text-sm font-medium transition ${
-                  active ? 'bg-secondary text-white' : 'text-white/80 hover:bg-white/10'
+                  active
+                    ? "bg-secondary text-white"
+                    : "text-white/80 hover:bg-white/10"
                 }`}
               >
                 <span className="inline-block w-1.5 h-1.5 rounded-full bg-white/70" />
                 {item.label}
               </Link>
-            )
+            );
           })}
         </nav>
       </aside>
@@ -73,10 +101,14 @@ export default function Orders() {
               <span className="text-lg">🧾</span>
               <div>
                 <p className="text-sm text-gray-500">Tổng số đơn</p>
-                <p className="text-lg font-semibold text-gray-900">{orders.length} đơn</p>
+                <p className="text-lg font-semibold text-gray-900">
+                  {orders.length} đơn
+                </p>
               </div>
             </div>
-            <button className="text-sm text-secondary hover:underline">Bộ lọc nhanh</button>
+            <button className="text-sm text-secondary hover:underline">
+              Bộ lọc nhanh
+            </button>
           </div>
           <table className="min-w-full text-sm">
             <thead className="bg-gray-50 text-gray-600 uppercase text-xs">
@@ -92,12 +124,20 @@ export default function Orders() {
             <tbody className="divide-y divide-gray-100">
               {orders.map((o) => (
                 <tr key={o.code} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 font-semibold text-gray-900">{o.code}</td>
+                  <td className="px-6 py-4 font-semibold text-gray-900">
+                    {o.code}
+                  </td>
                   <td className="px-6 py-4 text-gray-800">{o.customer}</td>
-                  <td className="px-6 py-4 text-gray-900 font-semibold">{o.total}</td>
+                  <td className="px-6 py-4 text-gray-900 font-semibold">
+                    {o.total}
+                  </td>
                   <td className="px-6 py-4 text-gray-600">{o.date}</td>
                   <td className="px-6 py-4">
-                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${statusColor[o.status]}`}>
+                    <span
+                      className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                        statusColor[o.status]
+                      }`}
+                    >
                       {o.status}
                     </span>
                   </td>
@@ -116,5 +156,5 @@ export default function Orders() {
         </div>
       </main>
     </div>
-  )
+  );
 }

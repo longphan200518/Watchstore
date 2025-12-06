@@ -158,15 +158,16 @@ export default function Home() {
               >
                 Search
               </button>
-              <button
+              <a
+                href="/login"
                 className={`text-sm tracking-wide transition ${
                   isDark
                     ? "text-gray-400 hover:text-white"
                     : "text-gray-600 hover:text-black"
                 }`}
               >
-                Account
-              </button>
+                Đăng nhập
+              </a>
               <button
                 className={`px-6 py-3 text-sm tracking-wider font-normal transition ${
                   isDark

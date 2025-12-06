@@ -218,7 +218,7 @@ export default function Home() {
               <div className="space-y-4">
                 <p
                   className={`text-xs tracking-[0.3em] uppercase font-light ${
-                    isDark ? "text-gray-500" : "text-gray-500"
+                    isDark ? "text-gray-300" : "text-gray-600"
                   }`}
                 >
                   Bộ sưu tập mới 2025
@@ -230,7 +230,7 @@ export default function Home() {
               </div>
               <p
                 className={`text-base font-light leading-relaxed max-w-md ${
-                  isDark ? "text-gray-400" : "text-gray-600"
+                  isDark ? "text-gray-200" : "text-gray-700"
                 }`}
               >
                 Khám phá những chiếc đồng hồ đặc biệt từ những nhà sản xuất danh
@@ -272,7 +272,7 @@ export default function Home() {
             <div className="text-center mb-16">
               <p
                 className={`text-sm tracking-[0.3em] uppercase font-light mb-3 ${
-                  isDark ? "text-gray-500" : "text-gray-500"
+                  isDark ? "text-gray-300" : "text-gray-700"
                 }`}
               >
                 Danh mục
@@ -315,14 +315,14 @@ export default function Home() {
                     </h3>
                     <p
                       className={`text-sm font-light ${
-                        isDark ? "text-gray-500" : "text-gray-500"
+                        isDark ? "text-gray-300" : "text-gray-700"
                       }`}
                     >
                       {cat.desc}
                     </p>
                     <div
                       className={`mt-6 text-xs tracking-widest opacity-0 group-hover:opacity-100 transition-opacity ${
-                        isDark ? "text-gray-400" : "text-gray-600"
+                        isDark ? "text-gray-300" : "text-gray-700"
                       }`}
                     >
                       XEM TẤT CẢ →
@@ -343,7 +343,7 @@ export default function Home() {
             <div className="text-center mb-20">
               <p
                 className={`text-xs tracking-[0.3em] uppercase font-light mb-4 ${
-                  isDark ? "text-gray-600" : "text-gray-500"
+                  isDark ? "text-gray-300" : "text-gray-700"
                 }`}
               >
                 Sản phẩm nổi bật
@@ -392,7 +392,7 @@ export default function Home() {
                     </h3>
                     <p
                       className={`text-xs uppercase tracking-wider font-light ${
-                        isDark ? "text-gray-600" : "text-gray-500"
+                        isDark ? "text-gray-300" : "text-gray-700"
                       }`}
                     >
                       {item.specs}
@@ -424,8 +424,8 @@ export default function Home() {
                   <span
                     className={`text-xl font-light tracking-wider transition ${
                       isDark
-                        ? "text-gray-600 group-hover:text-white"
-                        : "text-gray-400 group-hover:text-black"
+                        ? "text-gray-300 group-hover:text-white"
+                        : "text-gray-600 group-hover:text-black"
                     }`}
                   >
                     {brand}
@@ -457,7 +457,7 @@ export default function Home() {
                   </h3>
                   <p
                     className={`text-sm font-light leading-relaxed ${
-                      isDark ? "text-gray-500" : "text-gray-600"
+                      isDark ? "text-gray-300" : "text-gray-700"
                     }`}
                   >
                     {story.desc}
@@ -466,8 +466,8 @@ export default function Home() {
                     href="#"
                     className={`inline-flex items-center gap-2 text-xs uppercase tracking-widest font-light transition ${
                       isDark
-                        ? "text-gray-500 hover:text-white"
-                        : "text-gray-600 hover:text-black"
+                        ? "text-gray-300 hover:text-white"
+                        : "text-gray-700 hover:text-black"
                     }`}
                   >
                     Tìm hiểu thêm
@@ -508,7 +508,7 @@ export default function Home() {
                   </h3>
                   <p
                     className={`text-sm font-light leading-relaxed pt-2 ${
-                      isDark ? "text-gray-500" : "text-gray-600"
+                      isDark ? "text-gray-200" : "text-gray-700"
                     }`}
                   >
                     Sản xuất giới hạn, đánh số trên rotor, dây da thủ công
@@ -563,7 +563,7 @@ export default function Home() {
               <div>
                 <p
                   className={`text-xs tracking-[0.3em] uppercase font-light mb-4 ${
-                    isDark ? "text-gray-600" : "text-gray-500"
+                    isDark ? "text-gray-300" : "text-gray-700"
                   }`}
                 >
                   Bản tin
@@ -573,7 +573,7 @@ export default function Home() {
                 </h3>
                 <p
                   className={`text-sm font-light ${
-                    isDark ? "text-gray-500" : "text-gray-600"
+                    isDark ? "text-gray-300" : "text-gray-700"
                   }`}
                 >
                   Nhận thông tin về sản phẩm mới và ưu đãi độc quyền. Hủy đăng
@@ -624,7 +624,7 @@ export default function Home() {
               </div>
               <p
                 className={`text-xs font-light leading-relaxed ${
-                  isDark ? "text-gray-600" : "text-gray-500"
+                  isDark ? "text-gray-300" : "text-gray-700"
                 }`}
               >
                 Sự thanh lịch vượt thời gian kết hợp kỹ thuật chính xác. Từ năm
@@ -640,8 +640,8 @@ export default function Home() {
                 href="#"
                 className={`block text-xs font-light transition ${
                   isDark
-                    ? "text-gray-600 hover:text-white"
-                    : "text-gray-500 hover:text-black"
+                    ? "text-gray-300 hover:text-white"
+                    : "text-gray-700 hover:text-black"
                 }`}
               >
                 Bộ sưu tập
@@ -650,8 +650,8 @@ export default function Home() {
                 href="#"
                 className={`block text-xs font-light transition ${
                   isDark
-                    ? "text-gray-600 hover:text-white"
-                    : "text-gray-500 hover:text-black"
+                    ? "text-gray-300 hover:text-white"
+                    : "text-gray-700 hover:text-black"
                 }`}
               >
                 Sản phẩm
@@ -660,8 +660,8 @@ export default function Home() {
                 href="#"
                 className={`block text-xs font-light transition ${
                   isDark
-                    ? "text-gray-600 hover:text-white"
-                    : "text-gray-500 hover:text-black"
+                    ? "text-gray-300 hover:text-white"
+                    : "text-gray-700 hover:text-black"
                 }`}
               >
                 Thương hiệu
@@ -676,8 +676,8 @@ export default function Home() {
                 href="#"
                 className={`block text-xs font-light transition ${
                   isDark
-                    ? "text-gray-600 hover:text-white"
-                    : "text-gray-500 hover:text-black"
+                    ? "text-gray-300 hover:text-white"
+                    : "text-gray-700 hover:text-black"
                 }`}
               >
                 Chính sách bảo hành
@@ -686,8 +686,8 @@ export default function Home() {
                 href="#"
                 className={`block text-xs font-light transition ${
                   isDark
-                    ? "text-gray-600 hover:text-white"
-                    : "text-gray-500 hover:text-black"
+                    ? "text-gray-300 hover:text-white"
+                    : "text-gray-700 hover:text-black"
                 }`}
               >
                 Giao hàng & Đổi trả
@@ -696,8 +696,8 @@ export default function Home() {
                 href="#"
                 className={`block text-xs font-light transition ${
                   isDark
-                    ? "text-gray-600 hover:text-white"
-                    : "text-gray-500 hover:text-black"
+                    ? "text-gray-300 hover:text-white"
+                    : "text-gray-700 hover:text-black"
                 }`}
               >
                 Liên hệ
@@ -710,7 +710,7 @@ export default function Home() {
               </h5>
               <p
                 className={`text-xs font-light ${
-                  isDark ? "text-gray-600" : "text-gray-500"
+                  isDark ? "text-gray-300" : "text-gray-700"
                 }`}
               >
                 Hotline:{" "}
@@ -720,7 +720,7 @@ export default function Home() {
               </p>
               <p
                 className={`text-xs font-light ${
-                  isDark ? "text-gray-600" : "text-gray-500"
+                  isDark ? "text-gray-300" : "text-gray-700"
                 }`}
               >
                 Email:{" "}
@@ -738,7 +738,7 @@ export default function Home() {
           <div className="max-w-[1600px] mx-auto px-8 lg:px-16 py-8">
             <p
               className={`text-xs font-light text-center ${
-                isDark ? "text-gray-600" : "text-gray-500"
+                isDark ? "text-gray-400" : "text-gray-700"
               }`}
             >
               © 2025 Watchstore. All rights reserved.

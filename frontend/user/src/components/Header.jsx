@@ -214,7 +214,10 @@ export default function Header({ isDark = false, onThemeToggle = () => {} }) {
                             : "text-gray-700 hover:bg-black/5"
                         }`}
                       >
-                        <Icon icon="teenyicons:user-circle-outline" width={16} />
+                        <Icon
+                          icon="teenyicons:user-circle-outline"
+                          width={16}
+                        />
                         Tài khoản của tôi
                       </a>
                       <a
@@ -272,7 +275,9 @@ export default function Header({ isDark = false, onThemeToggle = () => {} }) {
               aria-label="Toggle theme"
             >
               <Icon
-                icon={isDark ? "teenyicons:sun-outline" : "teenyicons:moon-outline"}
+                icon={
+                  isDark ? "teenyicons:sun-outline" : "teenyicons:moon-outline"
+                }
                 width={16}
               />
             </button>

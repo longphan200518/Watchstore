@@ -4,6 +4,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using WatchStore.Application.Features.Auth;
+using WatchStore.Application.Features.Watches;
+using WatchStore.Application.Features.Brands;
+using WatchStore.Application.Features.Orders;
 using WatchStore.Application.Interfaces;
 using WatchStore.Domain.Entities;
 using WatchStore.Domain.Interfaces;
@@ -81,6 +84,9 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IWatchService, WatchService>();
+builder.Services.AddScoped<IBrandService, BrandService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
 
 var app = builder.Build();
 

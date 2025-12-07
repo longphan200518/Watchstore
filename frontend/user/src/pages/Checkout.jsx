@@ -12,6 +12,7 @@ export default function Checkout() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("COD"); // COD or BANK
   const navigate = useNavigate();
   const { cart, getTotalPrice, getTotalItems, clearCart } = useCart();
   const { addToast } = useToast();
@@ -292,6 +293,130 @@ export default function Checkout() {
                     }`}
                     placeholder="Nhập địa chỉ giao hàng đầy đủ"
                   />
+                </div>
+              </div>
+
+              {/* Payment Method */}
+              <div
+                className={`rounded-lg border p-6 ${
+                  isDark
+                    ? "bg-neutral-900 border-white/10"
+                    : "bg-white border-black/5"
+                }`}
+              >
+                <h2
+                  className={`text-lg font-semibold mb-4 ${
+                    isDark ? "text-white" : "text-black"
+                  }`}
+                >
+                  Phương thức thanh toán
+                </h2>
+                <div className="space-y-3">
+                  <label
+                    className={`flex items-center gap-3 p-4 rounded-lg border cursor-pointer transition ${
+                      paymentMethod === "COD"
+                        ? isDark
+                          ? "border-amber-500 bg-amber-500/10"
+                          : "border-amber-500 bg-amber-50"
+                        : isDark
+                        ? "border-white/10 hover:border-white/20"
+                        : "border-black/10 hover:border-black/20"
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="paymentMethod"
+                      value="COD"
+                      checked={paymentMethod === "COD"}
+                      onChange={(e) => setPaymentMethod(e.target.value)}
+                      className="w-4 h-4 text-amber-600"
+                    />
+                    <div className="flex-1">
+                      <div
+                        className={`font-medium ${
+                          isDark ? "text-white" : "text-black"
+                        }`}
+                      >
+                        💵 Thanh toán khi nhận hàng (COD)
+                      </div>
+                      <div
+                        className={`text-sm ${
+                          isDark ? "text-gray-400" : "text-gray-600"
+                        }`}
+                      >
+                        Thanh toán bằng tiền mặt khi nhận hàng
+                      </div>
+                    </div>
+                  </label>
+
+                  <label
+                    className={`flex items-center gap-3 p-4 rounded-lg border cursor-pointer transition ${
+                      paymentMethod === "BANK"
+                        ? isDark
+                          ? "border-amber-500 bg-amber-500/10"
+                          : "border-amber-500 bg-amber-50"
+                        : isDark
+                        ? "border-white/10 hover:border-white/20"
+                        : "border-black/10 hover:border-black/20"
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="paymentMethod"
+                      value="BANK"
+                      checked={paymentMethod === "BANK"}
+                      onChange={(e) => setPaymentMethod(e.target.value)}
+                      className="w-4 h-4 text-amber-600"
+                    />
+                    <div className="flex-1">
+                      <div
+                        className={`font-medium ${
+                          isDark ? "text-white" : "text-black"
+                        }`}
+                      >
+                        🏦 Chuyển khoản ngân hàng
+                      </div>
+                      <div
+                        className={`text-sm ${
+                          isDark ? "text-gray-400" : "text-gray-600"
+                        }`}
+                      >
+                        Thanh toán trước qua chuyển khoản
+                      </div>
+                    </div>
+                  </label>
+
+                  {paymentMethod === "BANK" && (
+                    <div
+                      className={`p-4 rounded-lg ${
+                        isDark ? "bg-neutral-800" : "bg-gray-50"
+                      }`}
+                    >
+                      <div
+                        className={`text-sm space-y-2 ${
+                          isDark ? "text-gray-300" : "text-gray-700"
+                        }`}
+                      >
+                        <p className="font-semibold">Thông tin chuyển khoản:</p>
+                        <p>
+                          Ngân hàng: <strong>Vietcombank</strong>
+                        </p>
+                        <p>
+                          Số tài khoản: <strong>1234567890</strong>
+                        </p>
+                        <p>
+                          Chủ tài khoản: <strong>WATCHSTORE</strong>
+                        </p>
+                        <p
+                          className={
+                            isDark ? "text-amber-400" : "text-amber-600"
+                          }
+                        >
+                          Nội dung: <strong>WATCHSTORE [SĐT]</strong>
+                        </p>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 

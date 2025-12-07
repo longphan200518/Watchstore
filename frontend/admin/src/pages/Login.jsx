@@ -12,13 +12,22 @@ export default function AdminLogin() {
     setLoading(true);
 
     try {
-      // TODO: Gọi API đăng nhập admin
-      console.log("Admin Login:", formData);
-      // Giả lập API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const response = await fetch(
+        "http://localhost:5221/api/admin/auth/login",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
+        }
+      );
 
-      // Sau khi đăng nhập thành công
-      localStorage.setItem("adminToken", "demo-admin-token");
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.message || "Đăng nhập thất bại");
+      }
+
+      localStorage.setItem("admin_token", result.data.token);
       window.location.href = "/";
     } catch (err) {
       setError(err.message || "Đăng nhập thất bại");

@@ -3,20 +3,21 @@ import { useNavigate } from "react-router-dom";
 import { Icon } from "@iconify/react";
 import Header from "../components/Header";
 
+// OrderStatus enum mapping: 1=Pending, 2=Processing, 3=Shipped, 4=Delivered, 5=Cancelled
 const statusColors = {
-  Pending: "bg-yellow-100 text-yellow-700",
-  Confirmed: "bg-blue-100 text-blue-700",
-  Shipped: "bg-purple-100 text-purple-700",
-  Delivered: "bg-green-100 text-green-700",
-  Cancelled: "bg-red-100 text-red-700",
+  1: "bg-yellow-100 text-yellow-700",
+  2: "bg-blue-100 text-blue-700",
+  3: "bg-purple-100 text-purple-700",
+  4: "bg-green-100 text-green-700",
+  5: "bg-red-100 text-red-700",
 };
 
 const statusLabels = {
-  Pending: "Chờ xác nhận",
-  Confirmed: "Đã xác nhận",
-  Shipped: "Đang giao",
-  Delivered: "Đã giao",
-  Cancelled: "Đã hủy",
+  1: "Chờ xác nhận",
+  2: "Đang xử lý",
+  3: "Đang giao",
+  4: "Đã giao",
+  5: "Đã hủy",
 };
 
 export default function Orders() {
@@ -262,7 +263,7 @@ export default function Orders() {
                         }).format(order.totalAmount)}
                       </p>
                     </div>
-                    {order.status === "Pending" && (
+                    {order.status === 1 && (
                       <button
                         onClick={() => handleCancel(order.id)}
                         className={`px-4 py-2 rounded-lg text-sm transition ${

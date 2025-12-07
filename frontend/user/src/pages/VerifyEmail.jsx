@@ -179,7 +179,7 @@ export default function VerifyEmail() {
                     value={digit}
                     onChange={(e) => handleOtpChange(index, e.target.value)}
                     onKeyDown={(e) => handleKeyDown(index, e)}
-                    className="w-12 h-14 text-center text-xl font-semibold border-2 border-gray-300 rounded-lg focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200"
+                    className="w-12 h-14 text-center text-xl font-semibold border-2 border-gray-300 rounded-lg bg-white text-gray-900 focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200"
                   />
                 ))}
               </div>

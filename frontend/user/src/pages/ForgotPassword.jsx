@@ -11,14 +11,15 @@ export default function ForgotPassword() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+
+    if (!email) {
+      setError("Vui lòng nhập email");
+      return;
+    }
+
     setLoading(true);
 
     try {
-      if (!email) {
-        setError("Vui lòng nhập email");
-        return;
-      }
-
       const response = await fetch(
         "http://localhost:5221/api/auth/forgot-password",
         {
@@ -142,7 +143,8 @@ export default function ForgotPassword() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                disabled={loading}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
                 placeholder="name@example.com"
               />
               <p className="text-xs text-gray-500 mt-2">

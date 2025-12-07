@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Icon } from "@iconify/react";
+import { useCart } from "../contexts/CartContext";
 
 export default function Header({ isDark = false, onThemeToggle = () => {} }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -8,6 +9,8 @@ export default function Header({ isDark = false, onThemeToggle = () => {} }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
+  const { getTotalItems } = useCart();
+  const cartCount = getTotalItems();
 
   useEffect(() => {
     // Kiểm tra token khi component mount
@@ -256,14 +259,20 @@ export default function Header({ isDark = false, onThemeToggle = () => {} }) {
             )}
 
             <button
-              className={`px-6 py-3 text-sm tracking-wider font-normal transition flex items-center gap-2 ${
+              onClick={() => navigate("/cart")}
+              className={`relative px-6 py-3 text-sm tracking-wider font-normal transition flex items-center gap-2 ${
                 isDark
                   ? "bg-white text-black hover:bg-gray-100"
                   : "bg-black text-white hover:bg-gray-900"
               }`}
             >
               <Icon icon="teenyicons:cart-outline" width={16} />
-              CART (0)
+              CART
+              {cartCount > 0 && (
+                <span className="absolute -top-2 -right-2 w-6 h-6 bg-amber-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
+                  {cartCount}
+                </span>
+              )}
             </button>
             <button
               onClick={onThemeToggle}

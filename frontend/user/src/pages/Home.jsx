@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import Header from "../components/Header";
+import ToastContainer from "../components/ToastContainer";
 
 const categories = [
   { name: "Automatic", icon: "⚙️", desc: "Máy cơ tự động" },
@@ -88,6 +89,7 @@ export default function Home() {
       }`}
     >
       <Header isDark={isDark} onThemeToggle={toggleTheme} />
+      <ToastContainer isDark={isDark} />
 
       <main>
         {/* Hero */}

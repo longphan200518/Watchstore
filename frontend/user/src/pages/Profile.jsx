@@ -31,13 +31,15 @@ export default function Profile() {
     if (saved === "dark") setIsDark(true);
 
     // Check auth
-    const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+    const token =
+      localStorage.getItem("token") || sessionStorage.getItem("token");
     if (!token) {
       navigate("/login");
       return;
     }
 
-    const userData = localStorage.getItem("user") || sessionStorage.getItem("user");
+    const userData =
+      localStorage.getItem("user") || sessionStorage.getItem("user");
     if (userData) {
       try {
         const parsedUser = JSON.parse(userData);
@@ -81,7 +83,8 @@ export default function Profile() {
     setSaving(true);
 
     try {
-      const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+      const token =
+        localStorage.getItem("token") || sessionStorage.getItem("token");
       const response = await fetch("http://localhost:5221/api/users/profile", {
         method: "PUT",
         headers: {
@@ -97,7 +100,9 @@ export default function Profile() {
       const result = await response.json();
       if (result.success) {
         const updatedUser = { ...user, ...formData };
-        const storage = localStorage.getItem("token") ? "localStorage" : "sessionStorage";
+        const storage = localStorage.getItem("token")
+          ? "localStorage"
+          : "sessionStorage";
         (storage === "localStorage" ? localStorage : sessionStorage).setItem(
           "user",
           JSON.stringify(updatedUser)
@@ -131,18 +136,22 @@ export default function Profile() {
     setSaving(true);
 
     try {
-      const token = localStorage.getItem("token") || sessionStorage.getItem("token");
-      const response = await fetch("http://localhost:5221/api/users/change-password", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          currentPassword: passwordData.currentPassword,
-          newPassword: passwordData.newPassword,
-        }),
-      });
+      const token =
+        localStorage.getItem("token") || sessionStorage.getItem("token");
+      const response = await fetch(
+        "http://localhost:5221/api/users/change-password",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            currentPassword: passwordData.currentPassword,
+            newPassword: passwordData.newPassword,
+          }),
+        }
+      );
 
       const result = await response.json();
       if (result.success) {
@@ -165,28 +174,50 @@ export default function Profile() {
 
   if (loading) {
     return (
-      <div className={`min-h-screen ${isDark ? "bg-neutral-950 text-neutral-50" : "bg-stone-50 text-stone-900"}`}>
+      <div
+        className={`min-h-screen ${
+          isDark
+            ? "bg-neutral-950 text-neutral-50"
+            : "bg-stone-50 text-stone-900"
+        }`}
+      >
         <Header isDark={isDark} onThemeToggle={toggleTheme} />
         <main className="max-w-[1400px] mx-auto px-6 lg:px-12 py-12">
-          <p className={isDark ? "text-gray-400" : "text-gray-600"}>Đang tải...</p>
+          <p className={isDark ? "text-gray-400" : "text-gray-600"}>
+            Đang tải...
+          </p>
         </main>
       </div>
     );
   }
 
   return (
-    <div className={`min-h-screen ${isDark ? "bg-neutral-950 text-neutral-50" : "bg-stone-50 text-stone-900"}`}>
+    <div
+      className={`min-h-screen ${
+        isDark ? "bg-neutral-950 text-neutral-50" : "bg-stone-50 text-stone-900"
+      }`}
+    >
       <Header isDark={isDark} onThemeToggle={toggleTheme} />
       <ToastContainer isDark={isDark} />
 
       <main className="max-w-[1000px] mx-auto px-6 lg:px-12 py-12">
-        <h1 className={`text-4xl font-light tracking-tight mb-12 ${isDark ? "text-white" : "text-black"}`}>
+        <h1
+          className={`text-4xl font-light tracking-tight mb-12 ${
+            isDark ? "text-white" : "text-black"
+          }`}
+        >
           Tài khoản của bạn
         </h1>
 
         <div className="grid lg:grid-cols-4 gap-8">
           {/* Sidebar */}
-          <div className={`lg:col-span-1 space-y-2 h-fit ${isDark ? "bg-neutral-900" : "bg-white"} rounded-lg p-4 border ${isDark ? "border-white/10" : "border-black/5"}`}>
+          <div
+            className={`lg:col-span-1 space-y-2 h-fit ${
+              isDark ? "bg-neutral-900" : "bg-white"
+            } rounded-lg p-4 border ${
+              isDark ? "border-white/10" : "border-black/5"
+            }`}
+          >
             <button
               onClick={() => setTab("info")}
               className={`w-full text-left px-4 py-3 rounded-lg transition flex items-center gap-2 ${
@@ -222,13 +253,27 @@ export default function Profile() {
           {/* Content */}
           <div className="lg:col-span-3">
             {tab === "info" && (
-              <div className={`rounded-lg p-8 border ${isDark ? "bg-neutral-900 border-white/10" : "bg-white border-black/5"}`}>
-                <h2 className={`text-2xl font-semibold mb-6 ${isDark ? "text-white" : "text-black"}`}>
+              <div
+                className={`rounded-lg p-8 border ${
+                  isDark
+                    ? "bg-neutral-900 border-white/10"
+                    : "bg-white border-black/5"
+                }`}
+              >
+                <h2
+                  className={`text-2xl font-semibold mb-6 ${
+                    isDark ? "text-white" : "text-black"
+                  }`}
+                >
                   Thông tin cá nhân
                 </h2>
                 <form onSubmit={handleUpdateInfo} className="space-y-6">
                   <div>
-                    <label className={`block text-sm font-medium mb-2 ${isDark ? "text-gray-300" : "text-gray-700"}`}>
+                    <label
+                      className={`block text-sm font-medium mb-2 ${
+                        isDark ? "text-gray-300" : "text-gray-700"
+                      }`}
+                    >
                       Họ tên
                     </label>
                     <input
@@ -246,7 +291,11 @@ export default function Profile() {
                   </div>
 
                   <div>
-                    <label className={`block text-sm font-medium mb-2 ${isDark ? "text-gray-300" : "text-gray-700"}`}>
+                    <label
+                      className={`block text-sm font-medium mb-2 ${
+                        isDark ? "text-gray-300" : "text-gray-700"
+                      }`}
+                    >
                       Email
                     </label>
                     <input
@@ -259,13 +308,21 @@ export default function Profile() {
                           : "bg-gray-100 border-black/10 text-gray-600"
                       }`}
                     />
-                    <p className={`text-xs mt-1 ${isDark ? "text-gray-400" : "text-gray-600"}`}>
+                    <p
+                      className={`text-xs mt-1 ${
+                        isDark ? "text-gray-400" : "text-gray-600"
+                      }`}
+                    >
                       Email không thể thay đổi
                     </p>
                   </div>
 
                   <div>
-                    <label className={`block text-sm font-medium mb-2 ${isDark ? "text-gray-300" : "text-gray-700"}`}>
+                    <label
+                      className={`block text-sm font-medium mb-2 ${
+                        isDark ? "text-gray-300" : "text-gray-700"
+                      }`}
+                    >
                       Số điện thoại
                     </label>
                     <input
@@ -298,13 +355,27 @@ export default function Profile() {
             )}
 
             {tab === "password" && (
-              <div className={`rounded-lg p-8 border ${isDark ? "bg-neutral-900 border-white/10" : "bg-white border-black/5"}`}>
-                <h2 className={`text-2xl font-semibold mb-6 ${isDark ? "text-white" : "text-black"}`}>
+              <div
+                className={`rounded-lg p-8 border ${
+                  isDark
+                    ? "bg-neutral-900 border-white/10"
+                    : "bg-white border-black/5"
+                }`}
+              >
+                <h2
+                  className={`text-2xl font-semibold mb-6 ${
+                    isDark ? "text-white" : "text-black"
+                  }`}
+                >
                   Đổi mật khẩu
                 </h2>
                 <form onSubmit={handleChangePassword} className="space-y-6">
                   <div>
-                    <label className={`block text-sm font-medium mb-2 ${isDark ? "text-gray-300" : "text-gray-700"}`}>
+                    <label
+                      className={`block text-sm font-medium mb-2 ${
+                        isDark ? "text-gray-300" : "text-gray-700"
+                      }`}
+                    >
                       Mật khẩu hiện tại
                     </label>
                     <input
@@ -323,7 +394,11 @@ export default function Profile() {
                   </div>
 
                   <div>
-                    <label className={`block text-sm font-medium mb-2 ${isDark ? "text-gray-300" : "text-gray-700"}`}>
+                    <label
+                      className={`block text-sm font-medium mb-2 ${
+                        isDark ? "text-gray-300" : "text-gray-700"
+                      }`}
+                    >
                       Mật khẩu mới
                     </label>
                     <input
@@ -342,7 +417,11 @@ export default function Profile() {
                   </div>
 
                   <div>
-                    <label className={`block text-sm font-medium mb-2 ${isDark ? "text-gray-300" : "text-gray-700"}`}>
+                    <label
+                      className={`block text-sm font-medium mb-2 ${
+                        isDark ? "text-gray-300" : "text-gray-700"
+                      }`}
+                    >
                       Xác nhận mật khẩu
                     </label>
                     <input

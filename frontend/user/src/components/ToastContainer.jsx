@@ -6,7 +6,8 @@ export default function ToastContainer({ isDark = false }) {
   const { toasts, removeToast } = useToast();
 
   const getTypeStyles = (type) => {
-    const baseClass = "flex items-center gap-3 px-4 py-3 rounded-lg font-medium";
+    const baseClass =
+      "flex items-center gap-3 px-4 py-3 rounded-lg font-medium";
     switch (type) {
       case "success":
         return `${baseClass} ${
@@ -55,7 +56,9 @@ export default function ToastContainer({ isDark = false }) {
       {toasts.map((toast) => (
         <div
           key={toast.id}
-          className={`${getTypeStyles(toast.type)} animate-in fade-in slide-in-from-right-4 duration-300`}
+          className={`${getTypeStyles(
+            toast.type
+          )} animate-in fade-in slide-in-from-right-4 duration-300`}
         >
           <Icon icon={getIcon(toast.type)} width={20} />
           <span className="flex-1">{toast.message}</span>

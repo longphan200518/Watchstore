@@ -168,7 +168,11 @@ export default function Cart() {
                   <button
                     onClick={() => {
                       removeFromCart(item.id);
-                      addToast(`${item.name} đã được xóa khỏi giỏ hàng`, "info", 2000);
+                      addToast(
+                        `${item.name} đã được xóa khỏi giỏ hàng`,
+                        "info",
+                        2000
+                      );
                     }}
                     className={`w-8 h-8 rounded flex items-center justify-center transition ${
                       isDark

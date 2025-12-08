@@ -1,6 +1,23 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Icon } from "@iconify/react";
+import {
+  LineChart as RechartsLine,
+  Line,
+  AreaChart,
+  Area,
+  PieChart as RechartsPie,
+  Pie,
+  Cell,
+  BarChart as RechartsBar,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
 import { getDashboardSummary } from "../services/dashboardService";
 import { formatCurrency } from "../utils/format";
 import Sidebar from "../components/Sidebar";
@@ -45,10 +62,10 @@ export default function Dashboard() {
       <Sidebar navItems={navItems} />
 
       {/* Main content */}
-      <main className="ml-72 min-h-screen">
+      <main className="lg:ml-72 min-h-screen">
         <AdminHeader title="Dashboard" subtitle="Tổng quan & phân tích" />
 
-        <div className="px-8 pb-8 space-y-6">
+        <div className="px-4 lg:px-8 pb-8 space-y-6">
           {/* Loading / Error */}
           {loading && (
             <div className="bg-white border border-gray-100 rounded-xl p-6 text-gray-600">
@@ -211,105 +228,205 @@ function StatCard({
 
 function LineChart({ data }) {
   if (!data?.length) {
-    return <div className="text-sm text-gray-500">Chưa có dữ liệu</div>;
+    return (
+      <div className="h-64 flex items-center justify-center">
+        <div className="text-center">
+          <Icon icon="solar:chart-2-bold-duotone" className="text-5xl text-gray-300 mx-auto mb-2" />
+          <p className="text-sm text-gray-500">Chưa có dữ liệu</p>
+        </div>
+      </div>
+    );
   }
 
-  const max = Math.max(...data.map((d) => d.revenue), 1);
+  const chartData = data.map((d) => ({
+    date: new Date(d.date).toLocaleDateString("vi-VN", {
+      day: "2-digit",
+      month: "2-digit",
+    }),
+    revenue: d.revenue,
+  }));
 
   return (
-    <div className="relative h-64">
-      <svg viewBox="0 0 100 100" className="w-full h-full">
-        <polyline
-          fill="none"
-          stroke="#2563eb"
-          strokeWidth="2"
-          points={data
-            .map((d, i) => {
-              const x = (i / Math.max(data.length - 1, 1)) * 100;
-              const y = 100 - (d.revenue / max) * 90 - 5;
-              return `${x},${y}`;
-            })
-            .join(" ")}
+    <ResponsiveContainer width="100%" height={300}>
+      <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+        <defs>
+          <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
+            <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+          </linearGradient>
+        </defs>
+        <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+        <XAxis
+          dataKey="date"
+          stroke="#6b7280"
+          fontSize={12}
+          tickLine={false}
         />
-      </svg>
-      <div className="flex justify-between text-xs text-gray-500 mt-2">
-        {data.map((d, i) => (
-          <span key={i}>{new Date(d.date).toLocaleDateString()}</span>
-        ))}
-      </div>
-    </div>
+        <YAxis
+          stroke="#6b7280"
+          fontSize={12}
+          tickLine={false}
+          tickFormatter={(value) => `${(value / 1000000).toFixed(0)}M`}
+        />
+        <Tooltip
+          content={({ active, payload }) => {
+            if (active && payload && payload.length) {
+              return (
+                <div className="bg-white border border-gray-200 rounded-lg shadow-lg px-3 py-2">
+                  <p className="text-xs text-gray-500 mb-1">{payload[0].payload.date}</p>
+                  <p className="text-sm font-semibold text-blue-600">
+                    {formatCurrency(payload[0].value)}
+                  </p>
+                </div>
+              );
+            }
+            return null;
+          }}
+        />
+        <Area
+          type="monotone"
+          dataKey="revenue"
+          stroke="#3b82f6"
+          strokeWidth={2}
+          fill="url(#colorRevenue)"
+          animationDuration={1000}
+        />
+      </AreaChart>
+    </ResponsiveContainer>
   );
 }
 
 function PieChart({ data }) {
-  if (!data?.length)
-    return <div className="text-sm text-gray-500">Chưa có dữ liệu</div>;
+  if (!data?.length) {
+    return (
+      <div className="h-80 flex items-center justify-center">
+        <div className="text-center">
+          <Icon icon="solar:pie-chart-2-bold-duotone" className="text-5xl text-gray-300 mx-auto mb-2" />
+          <p className="text-sm text-gray-500">Chưa có dữ liệu</p>
+        </div>
+      </div>
+    );
+  }
 
-  const total = data.reduce((sum, d) => sum + d.count, 0) || 1;
-  let cumulative = 0;
-  const colors = ["#2563eb", "#22c55e", "#f59e0b", "#ef4444", "#9333ea"];
+  const COLORS = {
+    Pending: "#f59e0b",
+    Processing: "#3b82f6",
+    Shipped: "#8b5cf6",
+    Delivered: "#10b981",
+    Cancelled: "#ef4444",
+  };
+
+  const chartData = data.map((d) => ({
+    name: d.status,
+    value: d.count,
+  }));
 
   return (
-    <div className="flex items-center gap-4">
-      <svg viewBox="0 0 32 32" className="w-32 h-32">
-        {data.map((d, idx) => {
-          const start = (cumulative / total) * 2 * Math.PI;
-          const slice = (d.count / total) * 2 * Math.PI;
-          cumulative += d.count;
-          const x1 = 16 + 16 * Math.sin(start);
-          const y1 = 16 - 16 * Math.cos(start);
-          const x2 = 16 + 16 * Math.sin(start + slice);
-          const y2 = 16 - 16 * Math.cos(start + slice);
-          const largeArc = slice > Math.PI ? 1 : 0;
-          const pathData = `M16 16 L ${x1} ${y1} A 16 16 0 ${largeArc} 1 ${x2} ${y2} Z`;
-          return (
-            <path key={idx} d={pathData} fill={colors[idx % colors.length]} />
-          );
-        })}
-      </svg>
-      <div className="space-y-2 text-sm text-gray-700">
-        {data.map((d, idx) => (
-          <div key={idx} className="flex items-center gap-2">
-            <span
-              className="inline-block w-3 h-3 rounded-sm"
-              style={{ background: colors[idx % colors.length] }}
-            />
-            <span className="font-medium">{d.status}</span>
-            <span className="text-gray-500">{d.count}</span>
-          </div>
-        ))}
-      </div>
-    </div>
+    <ResponsiveContainer width="100%" height={320}>
+      <RechartsPie>
+        <Pie
+          data={chartData}
+          cx="50%"
+          cy="45%"
+          labelLine={false}
+          label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+          outerRadius={80}
+          fill="#8884d8"
+          dataKey="value"
+          animationDuration={1000}
+        >
+          {chartData.map((entry, index) => (
+            <Cell key={`cell-${index}`} fill={COLORS[entry.name] || "#6b7280"} />
+          ))}
+        </Pie>
+        <Tooltip
+          content={({ active, payload }) => {
+            if (active && payload && payload.length) {
+              return (
+                <div className="bg-white border border-gray-200 rounded-lg shadow-lg px-3 py-2">
+                  <p className="text-sm font-semibold text-gray-900">{payload[0].name}</p>
+                  <p className="text-xs text-gray-600">
+                    {payload[0].value} đơn hàng
+                  </p>
+                </div>
+              );
+            }
+            return null;
+          }}
+        />
+      </RechartsPie>
+    </ResponsiveContainer>
   );
 }
 
 function BarChart({ data }) {
-  if (!data?.length)
-    return <div className="text-sm text-gray-500">Chưa có dữ liệu</div>;
-  const max = Math.max(...data.map((d) => d.revenue), 1);
+  if (!data?.length) {
+    return (
+      <div className="h-80 flex items-center justify-center">
+        <div className="text-center">
+          <Icon icon="solar:chart-bold-duotone" className="text-5xl text-gray-300 mx-auto mb-2" />
+          <p className="text-sm text-gray-500">Chưa có dữ liệu</p>
+        </div>
+      </div>
+    );
+  }
+
+  const chartData = data.map((item) => ({
+    name: item.watchName.length > 20 ? item.watchName.substring(0, 20) + "..." : item.watchName,
+    fullName: item.watchName,
+    revenue: item.revenue,
+  }));
 
   return (
-    <div className="space-y-3">
-      {data.map((item, idx) => {
-        const pct = (item.revenue / max) * 100;
-        return (
-          <div key={idx}>
-            <div className="flex items-center justify-between text-sm text-gray-700">
-              <span className="font-medium">{item.watchName}</span>
-              <span className="text-gray-500">
-                {formatCurrency(item.revenue)}
-              </span>
-            </div>
-            <div className="w-full h-2.5 bg-gray-100 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-secondary rounded-full"
-                style={{ width: `${pct}%` }}
-              />
-            </div>
-          </div>
-        );
-      })}
-    </div>
+    <ResponsiveContainer width="100%" height={300}>
+      <RechartsBar data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 5 }}>
+        <defs>
+          <linearGradient id="colorBar" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.9} />
+            <stop offset="95%" stopColor="#f97316" stopOpacity={0.7} />
+          </linearGradient>
+        </defs>
+        <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+        <XAxis
+          dataKey="name"
+          stroke="#6b7280"
+          fontSize={11}
+          tickLine={false}
+          angle={-15}
+          textAnchor="end"
+          height={60}
+        />
+        <YAxis
+          stroke="#6b7280"
+          fontSize={12}
+          tickLine={false}
+          tickFormatter={(value) => `${(value / 1000000).toFixed(0)}M`}
+        />
+        <Tooltip
+          content={({ active, payload }) => {
+            if (active && payload && payload.length) {
+              return (
+                <div className="bg-white border border-gray-200 rounded-lg shadow-lg px-3 py-2 max-w-xs">
+                  <p className="text-xs font-semibold text-gray-900 mb-1">
+                    {payload[0].payload.fullName}
+                  </p>
+                  <p className="text-sm font-bold text-amber-600">
+                    {formatCurrency(payload[0].value)}
+                  </p>
+                </div>
+              );
+            }
+            return null;
+          }}
+        />
+        <Bar
+          dataKey="revenue"
+          fill="url(#colorBar)"
+          radius={[8, 8, 0, 0]}
+          animationDuration={1000}
+        />
+      </RechartsBar>
+    </ResponsiveContainer>
   );
 }
 

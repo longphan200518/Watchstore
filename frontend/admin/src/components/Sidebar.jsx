@@ -1,5 +1,6 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Icon } from "@iconify/react";
+import { useState, useEffect } from "react";
 
 const menuIcons = {
   Dashboard: "solar:graph-new-bold-duotone",
@@ -13,6 +14,19 @@ const menuIcons = {
 export default function Sidebar({ navItems }) {
   const location = useLocation();
   const navigate = useNavigate();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [location.pathname]);
+
+  useEffect(() => {
+    const handleEsc = (e) => {
+      if (e.key === "Escape") setIsMobileMenuOpen(false);
+    };
+    window.addEventListener("keydown", handleEsc);
+    return () => window.removeEventListener("keydown", handleEsc);
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("admin_token");
@@ -20,7 +34,27 @@ export default function Sidebar({ navItems }) {
   };
 
   return (
-    <aside className="fixed left-0 top-0 w-72 h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 text-white shadow-2xl flex flex-col z-50">
+    <>
+      {/* Mobile Menu Button */}
+      <button
+        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        className="fixed top-4 left-4 z-50 lg:hidden p-2 bg-slate-900 text-white rounded-lg shadow-lg"
+      >
+        <Icon icon={isMobileMenuOpen ? "solar:close-square-bold" : "solar:hamburger-menu-bold"} className="text-2xl" />
+      </button>
+
+      {/* Mobile Backdrop */}
+      {isMobileMenuOpen && (
+        <div
+          onClick={() => setIsMobileMenuOpen(false)}
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden animate-fade-in"
+        />
+      )}
+
+      {/* Sidebar */}
+      <aside className={`fixed left-0 top-0 w-72 h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 text-white shadow-2xl flex flex-col z-50 transition-transform duration-300 lg:translate-x-0 ${
+        isMobileMenuOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+      }`}>
       {/* Logo Section */}
       <div className="p-6 border-b border-white/10">
         <div className="flex items-center gap-3 mb-2">
@@ -89,7 +123,8 @@ export default function Sidebar({ navItems }) {
           />
           <span>Đăng xuất</span>
         </button>
-      </div>
-    </aside>
+      </nav>
+      </aside>
+    </>
   );
 }

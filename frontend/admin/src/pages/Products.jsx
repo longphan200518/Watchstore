@@ -47,6 +47,12 @@ export default function Products() {
   const [pagination, setPagination] = useState({ pageNumber: 1, pageSize: 20 });
   const [showModal, setShowModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
+  
+  // Search & Filter states
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterBrand, setFilterBrand] = useState("");
+  const [filterStatus, setFilterStatus] = useState("");
+  const [sortBy, setSortBy] = useState("name");
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -216,10 +222,10 @@ export default function Products() {
       <Sidebar navItems={navItems} />
 
       {/* Main content */}
-      <main className="ml-72 min-h-screen">
+      <main className="lg:ml-72 min-h-screen">
         <AdminHeader title="Quản lý sản phẩm" subtitle="Trang chủ / Sản phẩm" />
 
-        <div className="px-8 pb-8 space-y-6">
+        <div className="px-4 lg:px-8 pb-8 space-y-6">
           {/* Action Bar */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
@@ -245,6 +251,55 @@ export default function Products() {
                 />
                 Thêm sản phẩm
               </button>
+            </div>
+          </div>
+
+          {/* Search & Filter Bar */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="relative">
+                <Icon 
+                  icon="solar:magnifer-bold-duotone" 
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg"
+                />
+                <input
+                  type="text"
+                  placeholder="Tìm kiếm sản phẩm..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
+                />
+              </div>
+              <select
+                value={filterBrand}
+                onChange={(e) => setFilterBrand(e.target.value)}
+                className="px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
+              >
+                <option value="">Tất cả thương hiệu</option>
+                {brands.map((brand) => (
+                  <option key={brand.id} value={brand.id}>{brand.name}</option>
+                ))}
+              </select>
+              <select
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value)}
+                className="px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
+              >
+                <option value="">Tất cả trạng thái</option>
+                {Object.entries(statusMap).map(([key, value]) => (
+                  <option key={key} value={key}>{value.label}</option>
+                ))}
+              </select>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
+              >
+                <option value="name">Tên A-Z</option>
+                <option value="price-asc">Giá: Thấp → Cao</option>
+                <option value="price-desc">Giá: Cao → Thấp</option>
+                <option value="stock">Tồn kho</option>
+              </select>
             </div>
           </div>
 
@@ -295,7 +350,31 @@ export default function Products() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
-                  {products.map((p) => {
+                  {products
+                    .filter((p) => {
+                      // Search filter
+                      if (searchTerm && !p.name.toLowerCase().includes(searchTerm.toLowerCase())) {
+                        return false;
+                      }
+                      // Brand filter
+                      if (filterBrand && p.brandId.toString() !== filterBrand) {
+                        return false;
+                      }
+                      // Status filter
+                      if (filterStatus && p.status.toString() !== filterStatus) {
+                        return false;
+                      }
+                      return true;
+                    })
+                    .sort((a, b) => {
+                      // Sorting
+                      if (sortBy === "name") return a.name.localeCompare(b.name);
+                      if (sortBy === "price-asc") return a.price - b.price;
+                      if (sortBy === "price-desc") return b.price - a.price;
+                      if (sortBy === "stock") return b.stockQuantity - a.stockQuantity;
+                      return 0;
+                    })
+                    .map((p) => {
                     const statusInfo = statusMap[p.status] || statusMap[1];
                     return (
                       <tr

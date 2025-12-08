@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
+import { Icon } from "@iconify/react";
 import { getReviews, deleteReview } from "../services/reviewService";
 import { formatDate } from "../utils/format";
 import Sidebar from "../components/Sidebar";
+import AdminHeader from "../components/AdminHeader";
 
 export default function Reviews() {
   const navItems = [
@@ -70,87 +72,125 @@ export default function Reviews() {
     );
   };
 
+  const avgRating = reviews.length > 0 ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1) : 0;
+  const ratingCounts = [5, 4, 3, 2, 1].map(r => reviews.filter(rev => rev.rating === r).length);
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="min-h-screen bg-gray-50">
       <Sidebar navItems={navItems} />
 
-      <main className="ml-64 p-10 space-y-8">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div>
-            <p className="text-sm text-gray-500">Quản lý đánh giá sản phẩm</p>
-            <h2 className="text-3xl font-semibold text-gray-900">Đánh giá</h2>
-          </div>
-        </div>
-
-        {loading && (
-          <div className="bg-white border border-gray-100 rounded-xl p-6 text-gray-600">
-            Đang tải...
-          </div>
-        )}
-        {error && (
-          <div className="bg-red-50 border border-red-100 text-red-700 rounded-xl p-4 text-sm">
-            {error}
-          </div>
-        )}
-
-        {!loading && !error && (
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-            <div className="p-6 border-b border-gray-100">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    Danh sách đánh giá
-                  </h3>
-                  <p className="text-sm text-gray-500 mt-1">
-                    {reviews.length} đánh giá
-                  </p>
-                </div>
+      <main className="lg:ml-72 min-h-screen">
+        <AdminHeader 
+          title="Quản lý đánh giá" 
+          subtitle="Trang chủ / Đánh giá" 
+        />
+        
+        <div className="px-4 lg:px-8 pb-8 space-y-6">
+          {/* Stats Overview */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="bg-white rounded-xl border border-gray-200 p-4 hover:shadow-lg transition-shadow">
+              <div className="w-10 h-10 bg-gradient-to-br from-amber-500 to-orange-500 rounded-lg flex items-center justify-center mb-3">
+                <Icon icon="solar:star-bold-duotone" className="text-xl text-white" />
               </div>
+              <p className="text-2xl font-bold text-gray-900">{reviews.length}</p>
+              <p className="text-xs text-gray-500 mt-1">Tổng đánh giá</p>
             </div>
-            <table className="min-w-full text-sm">
-              <thead className="bg-gray-50 text-gray-600 uppercase text-xs">
-                <tr>
-                  <th className="px-6 py-3 text-left">Sản phẩm</th>
-                  <th className="px-6 py-3 text-left">Người đánh giá</th>
-                  <th className="px-6 py-3 text-left">Đánh giá</th>
-                  <th className="px-6 py-3 text-left">Tiêu đề</th>
-                  <th className="px-6 py-3 text-left">Nội dung</th>
-                  <th className="px-6 py-3 text-left">Ngày tạo</th>
-                  <th className="px-6 py-3 text-right">Hành động</th>
-                </tr>
-              </thead>
+            <div className="bg-white rounded-xl border border-gray-200 p-4 hover:shadow-lg transition-shadow">
+              <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-500 rounded-lg flex items-center justify-center mb-3">
+                <Icon icon="solar:medal-star-bold-duotone" className="text-xl text-white" />
+              </div>
+              <p className="text-2xl font-bold text-gray-900">{avgRating}</p>
+              <p className="text-xs text-gray-500 mt-1">Điểm trung bình</p>
+            </div>
+            <div className="bg-white rounded-xl border border-gray-200 p-4 hover:shadow-lg transition-shadow">
+              <div className="w-10 h-10 bg-gradient-to-br from-yellow-500 to-amber-500 rounded-lg flex items-center justify-center mb-3">
+                <Icon icon="solar:cup-star-bold-duotone" className="text-xl text-white" />
+              </div>
+              <p className="text-2xl font-bold text-gray-900">{ratingCounts[0]}</p>
+              <p className="text-xs text-gray-500 mt-1">5 sao</p>
+            </div>
+            <div className="bg-white rounded-xl border border-gray-200 p-4 hover:shadow-lg transition-shadow">
+              <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-rose-500 rounded-lg flex items-center justify-center mb-3">
+                <Icon icon="solar:danger-triangle-bold-duotone" className="text-xl text-white" />
+              </div>
+              <p className="text-2xl font-bold text-gray-900">{ratingCounts[4]}</p>
+              <p className="text-xs text-gray-500 mt-1">1 sao</p>
+            </div>
+          </div>
+
+          {loading && (
+            <div className="bg-white border border-gray-100 rounded-xl p-6 text-gray-600 flex items-center gap-3">
+              <Icon icon="svg-spinners:ring-resize" className="text-2xl text-amber-500" />
+              <span>Đang tải...</span>
+            </div>
+          )}
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl p-4 text-sm flex items-center gap-3">
+              <Icon icon="solar:danger-circle-bold" className="text-xl" />
+              {error}
+            </div>
+          )}
+
+          {!loading && !error && (
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+              <table className="min-w-full">
+                <thead className="bg-gradient-to-r from-gray-50 to-gray-100 text-gray-700">
+                  <tr>
+                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">
+                      <div className="flex items-center gap-2">
+                        <Icon icon="solar:star-bold-duotone" />
+                        Đánh giá
+                      </div>
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">Sản phẩm</th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">Người dùng</th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">Nội dung</th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">Ngày tạo</th>
+                    <th className="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider">Hành động</th>
+                  </tr>
+                </thead>
               <tbody className="divide-y divide-gray-100">
                 {reviews.map((review) => (
-                  <tr key={review.id} className="hover:bg-gray-50">
+                  <tr key={review.id} className="hover:bg-gray-50/50 transition-colors group">
                     <td className="px-6 py-4">
-                      <p className="font-medium text-gray-900">
-                        {review.watchName || "—"}
-                      </p>
-                    </td>
-                    <td className="px-6 py-4 text-gray-700">
-                      {review.userName || review.userEmail || "—"}
-                    </td>
-                    <td className="px-6 py-4">{renderStars(review.rating)}</td>
-                    <td className="px-6 py-4">
-                      <p className="font-medium text-gray-900 max-w-xs truncate">
-                        {review.title}
-                      </p>
+                      {renderStars(review.rating)}
                     </td>
                     <td className="px-6 py-4">
-                      <p className="text-gray-700 max-w-md truncate">
-                        {review.content}
-                      </p>
+                      <div className="flex items-center gap-2">
+                        <Icon icon="solar:box-bold-duotone" className="text-gray-400" />
+                        <span className="font-semibold text-gray-900">{review.watchName || "—"}</span>
+                      </div>
                     </td>
-                    <td className="px-6 py-4 text-gray-700">
-                      {formatDate(review.createdAt)}
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-xs">
+                          {(review.userName || review.userEmail || "U").charAt(0).toUpperCase()}
+                        </div>
+                        <span className="text-gray-700">{review.userName || review.userEmail || "—"}</span>
+                      </div>
                     </td>
-                    <td className="px-6 py-4 text-right space-x-2">
-                      <button
-                        onClick={() => handleDelete(review.id)}
-                        className="px-3 py-1.5 text-xs rounded border border-red-200 text-red-600 hover:bg-red-50"
-                      >
-                        Xóa
-                      </button>
+                    <td className="px-6 py-4">
+                      <div>
+                        <p className="font-semibold text-gray-900 mb-1">{review.title}</p>
+                        <p className="text-sm text-gray-600 line-clamp-2">{review.content}</p>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-2 text-gray-600">
+                        <Icon icon="solar:calendar-bold-duotone" className="text-gray-400" />
+                        <span className="text-sm">{formatDate(review.createdAt)}</span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button
+                          onClick={() => handleDelete(review.id)}
+                          className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                          title="Xóa đánh giá"
+                        >
+                          <Icon icon="solar:trash-bin-trash-bold-duotone" className="text-lg" />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -158,6 +198,7 @@ export default function Reviews() {
             </table>
           </div>
         )}
+        </div>
       </main>
     </div>
   );

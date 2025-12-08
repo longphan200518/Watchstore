@@ -12,7 +12,7 @@ export default function Checkout() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState("COD"); // COD or BANK
+  const [paymentMethod, setPaymentMethod] = useState("COD"); // COD, BANK, or VNPAY
   const navigate = useNavigate();
   const { cart, getTotalPrice, getTotalItems, clearCart } = useCart();
   const { addToast } = useToast();
@@ -98,11 +98,40 @@ export default function Checkout() {
       const result = await response.json();
 
       if (result.success) {
+        const orderId = result.data.id;
+
+        // If VNPay payment, redirect to VNPay gateway
+        if (paymentMethod === "VNPAY") {
+          try {
+            const paymentResponse = await fetch("http://localhost:5221/api/payment/create-vnpay-url", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify({ orderId }),
+            });
+
+            const paymentResult = await paymentResponse.json();
+            if (paymentResult.success) {
+              clearCart();
+              window.location.href = paymentResult.data.paymentUrl;
+              return;
+            }
+          } catch (paymentErr) {
+            console.error("VNPay error:", paymentErr);
+            setError("Không thể kết nối VNPay. Vui lòng thử lại.");
+            addToast("Lỗi thanh toán VNPay", "error", 3000);
+            setLoading(false);
+            return;
+          }
+        }
+
         setSuccess("Đặt hàng thành công!");
         addToast("✓ Đặt hàng thành công! Chuyển hướng...", "success", 3000);
         clearCart();
         setTimeout(() => {
-          navigate(`/order-confirmation?orderId=${result.data.id}`);
+          navigate(`/order-confirmation?orderId=${orderId}`);
         }, 2000);
       } else {
         setError(result.message || "Đặt hàng thất bại");
@@ -382,6 +411,43 @@ export default function Checkout() {
                         }`}
                       >
                         Thanh toán trước qua chuyển khoản
+                      </div>
+                    </div>
+                  </label>
+
+                  <label
+                    className={`flex items-center gap-3 p-4 rounded-lg border cursor-pointer transition ${
+                      paymentMethod === "VNPAY"
+                        ? isDark
+                          ? "border-amber-500 bg-amber-500/10"
+                          : "border-amber-500 bg-amber-50"
+                        : isDark
+                        ? "border-white/10 hover:border-white/20"
+                        : "border-black/10 hover:border-black/20"
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="paymentMethod"
+                      value="VNPAY"
+                      checked={paymentMethod === "VNPAY"}
+                      onChange={(e) => setPaymentMethod(e.target.value)}
+                      className="w-4 h-4 text-amber-600"
+                    />
+                    <div className="flex-1">
+                      <div
+                        className={`font-medium ${
+                          isDark ? "text-white" : "text-black"
+                        }`}
+                      >
+                        💳 VNPay
+                      </div>
+                      <div
+                        className={`text-sm ${
+                          isDark ? "text-gray-400" : "text-gray-600"
+                        }`}
+                      >
+                        Thanh toán qua cổng VNPay (ATM, Visa, MasterCard)
                       </div>
                     </div>
                   </label>

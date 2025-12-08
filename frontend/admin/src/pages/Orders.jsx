@@ -48,6 +48,10 @@ export default function Orders() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [pagination, setPagination] = useState({ pageNumber: 1, pageSize: 20 });
+  const [showStatusModal, setShowStatusModal] = useState(false);
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [newStatus, setNewStatus] = useState(1);
 
   useEffect(() => {
     fetchOrders();
@@ -72,15 +76,49 @@ export default function Orders() {
     }
   };
 
+  const handleViewDetail = (order) => {
+    setSelectedOrder(order);
+    setShowDetailModal(true);
+  };
+
+  const handleUpdateStatus = (order) => {
+    setSelectedOrder(order);
+    setNewStatus(order.status);
+    setShowStatusModal(true);
+  };
+
+  const handleSaveStatus = async () => {
+    if (!selectedOrder) return;
+    
+    try {
+      // TODO: Implement updateOrderStatus API call
+      // const response = await updateOrderStatus(selectedOrder.id, newStatus);
+      // if (response.success) {
+      //   fetchOrders();
+      //   setShowStatusModal(false);
+      //   alert("Cập nhật trạng thái thành công");
+      // }
+      
+      // Temporary: Update locally
+      setOrders(orders.map(o => 
+        o.id === selectedOrder.id ? { ...o, status: newStatus } : o
+      ));
+      setShowStatusModal(false);
+      alert("Cập nhật trạng thái thành công (demo)");
+    } catch (err) {
+      alert("Lỗi khi cập nhật trạng thái");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Sidebar navItems={navItems} />
 
       {/* Main content */}
-      <main className="ml-72 min-h-screen">
+      <main className="lg:ml-72 min-h-screen">
         <AdminHeader title="Quản lý đơn hàng" subtitle="Trang chủ / Đơn hàng" />
 
-        <div className="px-8 pb-8 space-y-6">
+        <div className="px-4 lg:px-8 pb-8 space-y-6">
           {/* Stats Overview */}
           <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
             {[
@@ -215,13 +253,23 @@ export default function Orders() {
                             {statusInfo.label}
                           </span>
                         </td>
-                        <td className="px-6 py-4 text-right space-x-2">
-                          <button className="px-3 py-1.5 text-xs rounded border border-gray-200 text-gray-700 hover:bg-white shadow-sm">
-                            Xem
-                          </button>
-                          <button className="px-3 py-1.5 text-xs rounded border border-gray-200 text-gray-700 hover:bg-white shadow-sm">
-                            Cập nhật
-                          </button>
+                        <td className="px-6 py-4 text-right">
+                          <div className="flex items-center justify-end gap-2">
+                            <button
+                              onClick={() => handleViewDetail(o)}
+                              className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                              title="Xem chi tiết"
+                            >
+                              <Icon icon="solar:eye-bold-duotone" className="text-lg" />
+                            </button>
+                            <button
+                              onClick={() => handleUpdateStatus(o)}
+                              className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                              title="Cập nhật trạng thái"
+                            >
+                              <Icon icon="solar:restart-bold-duotone" className="text-lg" />
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     );
@@ -232,6 +280,218 @@ export default function Orders() {
           )}
         </div>
       </main>
+
+      {/* Status Update Modal */}
+      {showStatusModal && selectedOrder && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-slide-up">
+            {/* Modal Header */}
+            <div className="bg-gradient-to-r from-green-500 to-emerald-500 px-6 py-5 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+                  <Icon icon="solar:restart-bold-duotone" className="text-2xl text-white" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-white">Cập nhật trạng thái</h3>
+                  <p className="text-sm text-white/80">Đơn hàng #{selectedOrder.id}</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowStatusModal(false)}
+                className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+              >
+                <Icon icon="solar:close-circle-bold" className="text-2xl text-white" />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-3">
+                  Chọn trạng thái mới:
+                </label>
+                <div className="space-y-2">
+                  {Object.entries(statusMap).map(([status, info]) => (
+                    <label
+                      key={status}
+                      className={`flex items-center gap-3 p-4 border-2 rounded-xl cursor-pointer transition-all ${
+                        newStatus === parseInt(status)
+                          ? "border-green-500 bg-green-50"
+                          : "border-gray-200 hover:border-green-300 hover:bg-gray-50"
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="status"
+                        value={status}
+                        checked={newStatus === parseInt(status)}
+                        onChange={(e) => setNewStatus(parseInt(e.target.value))}
+                        className="w-5 h-5 text-green-600"
+                      />
+                      <Icon 
+                        icon={info.icon} 
+                        className={`text-xl ${newStatus === parseInt(status) ? "text-green-600" : "text-gray-400"}`}
+                      />
+                      <span className={`font-medium ${newStatus === parseInt(status) ? "text-green-900" : "text-gray-700"}`}>
+                        {info.label}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="flex gap-3 px-6 pb-6">
+              <button
+                onClick={() => setShowStatusModal(false)}
+                className="flex-1 px-4 py-3 border-2 border-gray-300 rounded-xl text-gray-700 font-medium hover:bg-gray-50 transition-all duration-200 flex items-center justify-center gap-2"
+              >
+                <Icon icon="solar:close-circle-bold-duotone" className="text-lg" />
+                Hủy
+              </button>
+              <button
+                onClick={handleSaveStatus}
+                className="flex-1 px-4 py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl font-medium hover:from-green-600 hover:to-emerald-600 shadow-lg shadow-green-500/30 transition-all duration-200 flex items-center justify-center gap-2"
+              >
+                <Icon icon="solar:check-circle-bold-duotone" className="text-lg" />
+                Cập nhật
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Detail Modal */}
+      {showDetailModal && selectedOrder && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-hidden animate-slide-up">
+            {/* Modal Header */}
+            <div className="bg-gradient-to-r from-blue-500 to-indigo-500 px-6 py-5 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+                  <Icon icon="solar:document-text-bold-duotone" className="text-2xl text-white" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-white">Chi tiết đơn hàng</h3>
+                  <p className="text-sm text-white/80">#{selectedOrder.id}</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowDetailModal(false)}
+                className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+              >
+                <Icon icon="solar:close-circle-bold" className="text-2xl text-white" />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6 space-y-6 overflow-y-auto max-h-[calc(90vh-180px)]">
+              {/* Customer Info */}
+              <div>
+                <h4 className="text-sm font-semibold text-gray-500 uppercase mb-3 flex items-center gap-2">
+                  <Icon icon="solar:user-bold-duotone" />
+                  Thông tin khách hàng
+                </h4>
+                <div className="bg-gray-50 rounded-xl p-4 space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Họ tên:</span>
+                    <span className="font-semibold text-gray-900">{selectedOrder.customerName}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Email:</span>
+                    <span className="font-medium text-gray-900">{selectedOrder.customerEmail || "—"}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Số điện thoại:</span>
+                    <span className="font-medium text-gray-900">{selectedOrder.customerPhone || "—"}</span>
+                  </div>
+                  <div className="flex justify-between items-start">
+                    <span className="text-gray-600">Địa chỉ:</span>
+                    <span className="font-medium text-gray-900 text-right max-w-xs">
+                      {selectedOrder.shippingAddress || "—"}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Order Info */}
+              <div>
+                <h4 className="text-sm font-semibold text-gray-500 uppercase mb-3 flex items-center gap-2">
+                  <Icon icon="solar:cart-large-4-bold-duotone" />
+                  Thông tin đơn hàng
+                </h4>
+                <div className="bg-gray-50 rounded-xl p-4 space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Ngày đặt:</span>
+                    <span className="font-medium text-gray-900">{formatDate(selectedOrder.orderDate)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Trạng thái:</span>
+                    <span className={`px-3 py-1 rounded-lg text-xs font-semibold ${statusMap[selectedOrder.status]?.color}`}>
+                      {statusMap[selectedOrder.status]?.label}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-baseline">
+                    <span className="text-gray-600">Tổng tiền:</span>
+                    <span className="text-2xl font-bold text-green-600">{formatCurrency(selectedOrder.totalAmount)}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Order Items */}
+              <div>
+                <h4 className="text-sm font-semibold text-gray-500 uppercase mb-3 flex items-center gap-2">
+                  <Icon icon="solar:box-bold-duotone" />
+                  Sản phẩm ({selectedOrder.items?.length || 0})
+                </h4>
+                <div className="space-y-3">
+                  {selectedOrder.items && selectedOrder.items.length > 0 ? (
+                    selectedOrder.items.map((item, idx) => (
+                      <div key={idx} className="flex items-center gap-4 bg-gray-50 rounded-xl p-4">
+                        <div className="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center">
+                          <Icon icon="solar:watch-bold-duotone" className="text-3xl text-gray-400" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="font-semibold text-gray-900">{item.watchName || "Sản phẩm"}</p>
+                          <p className="text-sm text-gray-500">Số lượng: {item.quantity}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-bold text-gray-900">{formatCurrency(item.price)}</p>
+                          <p className="text-xs text-gray-500">x {item.quantity}</p>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-center text-gray-500 py-4">Không có sản phẩm</p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="flex gap-3 px-6 pb-6 border-t border-gray-200 pt-4">
+              <button
+                onClick={() => setShowDetailModal(false)}
+                className="flex-1 px-4 py-3 border-2 border-gray-300 rounded-xl text-gray-700 font-medium hover:bg-gray-50 transition-all duration-200 flex items-center justify-center gap-2"
+              >
+                <Icon icon="solar:close-circle-bold-duotone" className="text-lg" />
+                Đóng
+              </button>
+              <button
+                onClick={() => {
+                  setShowDetailModal(false);
+                  handleUpdateStatus(selectedOrder);
+                }}
+                className="flex-1 px-4 py-3 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-xl font-medium hover:from-blue-600 hover:to-indigo-600 shadow-lg shadow-blue-500/30 transition-all duration-200 flex items-center justify-center gap-2"
+              >
+                <Icon icon="solar:restart-bold-duotone" className="text-lg" />
+                Cập nhật trạng thái
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

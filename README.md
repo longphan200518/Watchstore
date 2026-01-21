@@ -20,6 +20,90 @@
 
 Dự án được thiết kế theo kiến trúc phân lớp rõ ràng (Clean Architecture) với separation of concerns, dễ dàng maintain, test và scale trong tương lai.
 
+---
+
+## ✅ Trạng thái Features
+
+### 🎉 Đã hoàn thành (Implemented)
+
+#### User Website
+- ✅ Authentication & Authorization (Login, Register, JWT)
+- ✅ Product Catalog (List, Detail, Search, Filter, Pagination)
+- ✅ Shopping Cart (Add, Update, Remove items)
+- ✅ Checkout Process với Coupon Code
+- ✅ VNPay Payment Integration (Online payment)
+- ✅ Order History & Order Tracking
+- ✅ Product Reviews & Ratings
+- ✅ Dark/Light Theme Switching
+- ✅ SEO Optimization (Meta tags, Open Graph)
+- ✅ Responsive Design (Mobile-first)
+- ✅ Email Notifications (Order confirmation)
+- ✅ Dynamic Website Settings từ DB
+- ✅ Brand Showcase
+- ✅ Featured Products
+- ✅ Hero Section với CTA
+- ✅ Page Transitions & Animations
+
+#### Admin Dashboard
+- ✅ Admin Authentication & Role-based Access
+- ✅ Dashboard với Statistics (Revenue, Orders, Customers)
+- ✅ Product Management (CRUD với multi-image upload)
+- ✅ Order Management (View, Update status)
+- ✅ Customer Management (View, Edit, Role assignment)
+- ✅ Brand Management (CRUD)
+- ✅ Coupon Management (Create, Edit, Delete coupons)
+- ✅ Review Management (Approve, Delete reviews)
+- ✅ Website Settings (Logo, Colors, SEO, Contact info)
+- ✅ Image Upload Service (Server-side storage)
+- ✅ Toast Notifications & Loading States
+- ✅ Error Boundaries & Error Handling
+
+#### Backend API
+- ✅ Clean Architecture (4-layer structure)
+- ✅ JWT Authentication với Refresh Tokens
+- ✅ Role-based Authorization (Admin, Customer)
+- ✅ Entity Framework Core với SQL Server
+- ✅ Repository Pattern & Unit of Work
+- ✅ FluentValidation cho DTOs
+- ✅ Global Exception Handling Middleware
+- ✅ SMTP Email Service
+- ✅ VNPay Payment Gateway Integration
+- ✅ Coupon Validation Logic
+- ✅ Database Seeding
+- ✅ Swagger API Documentation
+- ✅ CORS Configuration
+
+### 🚧 Đang phát triển (In Development)
+
+- 🚧 Product Comparison Feature
+- 🚧 Wishlist/Favorites
+- 🚧 Advanced Analytics Dashboard
+- 🚧 Customer Support Chat
+- 🚧 Multi-language Support (i18n)
+- 🚧 Product Inventory Management
+- 🚧 Export Reports (PDF, Excel)
+- 🚧 Real-time Notifications (SignalR)
+
+### 📋 Kế hoạch phát triển (Planned)
+
+- 📋 Social Login (Google, Facebook)
+- 📋 SMS Notifications
+- 📋 Product Recommendations (AI-based)
+- 📋 Advanced Search với Elasticsearch
+- 📋 Mobile App (React Native)
+- 📋 Loyalty Program & Points System
+- 📋 Flash Sales & Limited Offers
+- 📋 Blog/News Section
+- 📋 Multi-vendor Support
+- 📋 Shipping Integration (GHN, GHTK)
+- 📋 Payment Methods (MoMo, ZaloPay, COD)
+- 📋 Product Import/Export (Excel)
+- 📋 Barcode/QR Code Scanning
+- 📋 Warranty Management
+- 📋 Return & Refund Management
+
+---
+
 ### ✨ Tính năng nổi bật
 
 #### 🎨 User Website:

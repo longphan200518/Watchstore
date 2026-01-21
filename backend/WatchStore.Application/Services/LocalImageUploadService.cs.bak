@@ -1,0 +1,100 @@
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Hosting;
+using WatchStore.Application.Interfaces;
+
+namespace WatchStore.Application.Services
+{
+    public class LocalImageUploadService : IImageUploadService
+    {
+        private readonly IWebHostEnvironment _environment;
+        private readonly string _uploadPath;
+        private readonly string _baseUrl;
+
+        public LocalImageUploadService(IWebHostEnvironment environment, IConfiguration configuration)
+        {
+            _environment = environment;
+            _uploadPath = Path.Combine(_environment.WebRootPath, "uploads");
+            _baseUrl = configuration["AppSettings:BaseUrl"] ?? "http://localhost:5000";
+
+            // Create uploads directory if it doesn't exist
+            if (!Directory.Exists(_uploadPath))
+            {
+                Directory.CreateDirectory(_uploadPath);
+            }
+        }
+
+        public async Task<string> UploadImageAsync(IFormFile file, string folder = "general")
+        {
+            if (file == null || file.Length == 0)
+                throw new ArgumentException("File is empty");
+
+            // Validate file type
+            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
+            var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
+
+            if (!allowedExtensions.Contains(extension))
+                throw new ArgumentException($"Invalid file type. Allowed types: {string.Join(", ", allowedExtensions)}");
+
+            // Validate file size (max 5MB)
+            if (file.Length > 5 * 1024 * 1024)
+                throw new ArgumentException("File size must be less than 5MB");
+
+            // Create folder path
+            var folderPath = Path.Combine(_uploadPath, folder);
+            if (!Directory.Exists(folderPath))
+            {
+                Directory.CreateDirectory(folderPath);
+            }
+
+            // Generate unique filename
+            var fileName = $"{Guid.NewGuid()}{extension}";
+            var filePath = Path.Combine(folderPath, fileName);
+
+            // Save file
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            // Return URL
+            return $"{_baseUrl}/uploads/{folder}/{fileName}";
+        }
+
+        public async Task<List<string>> UploadMultipleImagesAsync(List<IFormFile> files, string folder = "general")
+        {
+            var uploadTasks = files.Select(file => UploadImageAsync(file, folder));
+            var results = await Task.WhenAll(uploadTasks);
+            return results.ToList();
+        }
+
+        public Task<bool> DeleteImageAsync(string imageUrl)
+        {
+            try
+            {
+                // Extract file path from URL
+                var uri = new Uri(imageUrl);
+                var relativePath = uri.LocalPath.TrimStart('/');
+                var filePath = Path.Combine(_environment.WebRootPath, relativePath);
+
+                if (File.Exists(filePath))
+                {
+                    File.Delete(filePath);
+                    return Task.FromResult(true);
+                }
+
+                return Task.FromResult(false);
+            }
+            catch
+            {
+                return Task.FromResult(false);
+            }
+        }
+
+        public async Task<bool> DeleteMultipleImagesAsync(List<string> imageUrls)
+        {
+            var deleteTasks = imageUrls.Select(DeleteImageAsync);
+            var results = await Task.WhenAll(deleteTasks);
+            return results.All(r => r);
+        }
+    }
+}

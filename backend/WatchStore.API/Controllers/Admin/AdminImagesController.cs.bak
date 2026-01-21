@@ -1,0 +1,148 @@
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using WatchStore.Application.Common;
+using WatchStore.Application.DTOs;
+using WatchStore.Application.Interfaces;
+
+namespace WatchStore.API.Controllers.Admin
+{
+    [Authorize(Roles = "Admin")]
+    public class AdminImagesController : BaseApiController
+    {
+        private readonly IImageUploadService _imageUploadService;
+        private readonly ILogger<AdminImagesController> _logger;
+
+        public AdminImagesController(
+            IImageUploadService imageUploadService,
+            ILogger<AdminImagesController> logger)
+        {
+            _imageUploadService = imageUploadService;
+            _logger = logger;
+        }
+
+        /// <summary>
+        /// Upload single image
+        /// </summary>
+        [HttpPost("upload")]
+        [RequestSizeLimit(5 * 1024 * 1024)] // 5MB limit
+        public async Task<ActionResult<ApiResponse<ImageUploadResponseDto>>> UploadImage(
+            [FromForm] IFormFile file,
+            [FromForm] string folder = "general")
+        {
+            try
+            {
+                if (file == null || file.Length == 0)
+                    return BadRequest(ApiResponse<ImageUploadResponseDto>.Failure("No file uploaded"));
+
+                var url = await _imageUploadService.UploadImageAsync(file, folder);
+
+                return Ok(ApiResponse<ImageUploadResponseDto>.Success(
+                    new ImageUploadResponseDto
+                    {
+                        Success = true,
+                        Url = url
+                    },
+                    "Image uploaded successfully"
+                ));
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ApiResponse<ImageUploadResponseDto>.Failure(ex.Message));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error uploading image");
+                return StatusCode(500, ApiResponse<ImageUploadResponseDto>.Failure("Failed to upload image"));
+            }
+        }
+
+        /// <summary>
+        /// Upload multiple images
+        /// </summary>
+        [HttpPost("upload-multiple")]
+        [RequestSizeLimit(20 * 1024 * 1024)] // 20MB total limit
+        public async Task<ActionResult<ApiResponse<ImageUploadResponseDto>>> UploadMultipleImages(
+            [FromForm] List<IFormFile> files,
+            [FromForm] string folder = "general")
+        {
+            try
+            {
+                if (files == null || files.Count == 0)
+                    return BadRequest(ApiResponse<ImageUploadResponseDto>.Failure("No files uploaded"));
+
+                if (files.Count > 10)
+                    return BadRequest(ApiResponse<ImageUploadResponseDto>.Failure("Maximum 10 images allowed"));
+
+                var urls = await _imageUploadService.UploadMultipleImagesAsync(files, folder);
+
+                return Ok(ApiResponse<ImageUploadResponseDto>.Success(
+                    new ImageUploadResponseDto
+                    {
+                        Success = true,
+                        Urls = urls
+                    },
+                    $"{urls.Count} images uploaded successfully"
+                ));
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ApiResponse<ImageUploadResponseDto>.Failure(ex.Message));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error uploading images");
+                return StatusCode(500, ApiResponse<ImageUploadResponseDto>.Failure("Failed to upload images"));
+            }
+        }
+
+        /// <summary>
+        /// Delete image
+        /// </summary>
+        [HttpDelete]
+        public async Task<ActionResult<ApiResponse<bool>>> DeleteImage([FromQuery] string imageUrl)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(imageUrl))
+                    return BadRequest(ApiResponse<bool>.Failure("Image URL is required"));
+
+                var result = await _imageUploadService.DeleteImageAsync(imageUrl);
+
+                if (result)
+                    return Ok(ApiResponse<bool>.Success(true, "Image deleted successfully"));
+
+                return NotFound(ApiResponse<bool>.Failure("Image not found or already deleted"));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error deleting image");
+                return StatusCode(500, ApiResponse<bool>.Failure("Failed to delete image"));
+            }
+        }
+
+        /// <summary>
+        /// Delete multiple images
+        /// </summary>
+        [HttpPost("delete-multiple")]
+        public async Task<ActionResult<ApiResponse<bool>>> DeleteMultipleImages([FromBody] List<string> imageUrls)
+        {
+            try
+            {
+                if (imageUrls == null || imageUrls.Count == 0)
+                    return BadRequest(ApiResponse<bool>.Failure("No image URLs provided"));
+
+                var result = await _imageUploadService.DeleteMultipleImagesAsync(imageUrls);
+
+                if (result)
+                    return Ok(ApiResponse<bool>.Success(true, "Images deleted successfully"));
+
+                return Ok(ApiResponse<bool>.Success(false, "Some images could not be deleted"));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error deleting images");
+                return StatusCode(500, ApiResponse<bool>.Failure("Failed to delete images"));
+            }
+        }
+    }
+}

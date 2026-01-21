@@ -9,8 +9,10 @@ import {
 import Sidebar from "../components/Sidebar";
 import AdminHeader from "../components/AdminHeader";
 import ImageUpload from "../components/ImageUpload";
+import { useToast } from "../contexts/ToastContext";
 
 export default function Brands() {
+  const { showToast } = useToast();
   const navItems = [
     { label: "Dashboard", path: "/" },
     { label: "Quản lý sản phẩm", path: "/products" },
@@ -72,12 +74,13 @@ export default function Brands() {
     try {
       const response = await deleteBrand(id);
       if (response.success) {
+        showToast("Xóa thương hiệu thành công!", "success");
         fetchBrands();
       } else {
-        alert("Không thể xóa thương hiệu");
+        showToast("Không thể xóa thương hiệu", "error");
       }
     } catch (err) {
-      alert("Lỗi khi xóa thương hiệu");
+      showToast("Lỗi khi xóa thương hiệu", "error");
     }
   };
 
@@ -89,13 +92,19 @@ export default function Brands() {
         : await createBrand(formData);
 
       if (response.success) {
+        showToast(
+          editingBrand
+            ? "Cập nhật thương hiệu thành công!"
+            : "Thêm thương hiệu thành công!",
+          "success"
+        );
         setShowModal(false);
         fetchBrands();
       } else {
-        alert(response.message || "Có lỗi xảy ra");
+        showToast(response.message || "Có lỗi xảy ra", "error");
       }
     } catch (err) {
-      alert("Lỗi khi lưu thương hiệu");
+      showToast("Lỗi khi lưu thương hiệu", "error");
     }
   };
 

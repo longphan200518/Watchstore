@@ -33,6 +33,9 @@ namespace WatchStore.Application.DTOs
         [MaxLength(500, ErrorMessage = "Address cannot exceed 500 characters")]
         public string ShippingAddress { get; set; } = string.Empty;
 
+        [Phone(ErrorMessage = "Invalid phone number format")]
+        public string? PhoneNumber { get; set; }
+
         [MaxLength(1000, ErrorMessage = "Notes cannot exceed 1000 characters")]
         public string? Notes { get; set; }
 

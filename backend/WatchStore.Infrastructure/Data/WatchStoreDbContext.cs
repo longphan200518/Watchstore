@@ -18,6 +18,9 @@ namespace WatchStore.Infrastructure.Data
         public DbSet<Review> Reviews { get; set; }
         public DbSet<OtpVerification> OtpVerifications { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
+        public DbSet<WebsiteSettings> WebsiteSettings { get; set; }
+        public DbSet<Coupon> Coupons { get; set; }
+        public DbSet<CouponUsage> CouponUsages { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -125,6 +128,53 @@ namespace WatchStore.Infrastructure.Data
                 entity.HasQueryFilter(e => !e.IsDeleted);
                 entity.HasIndex(e => e.WatchId);
                 entity.HasIndex(e => e.UserId);
+            });
+
+            // WebsiteSettings configuration
+            builder.Entity<WebsiteSettings>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Key).IsRequired().HasMaxLength(100);
+                entity.Property(e => e.Category).HasMaxLength(50);
+                entity.Property(e => e.DataType).HasMaxLength(20);
+                entity.HasIndex(e => e.Key).IsUnique();
+                entity.HasIndex(e => e.Category);
+                entity.HasQueryFilter(e => !e.IsDeleted);
+            });
+
+            // Coupon configuration
+            builder.Entity<Coupon>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Code).IsRequired().HasMaxLength(50);
+                entity.Property(e => e.Description).HasMaxLength(500);
+                entity.Property(e => e.DiscountValue).HasColumnType("decimal(18,2)");
+                entity.Property(e => e.MinimumOrderValue).HasColumnType("decimal(18,2)");
+                entity.Property(e => e.MaximumDiscountAmount).HasColumnType("decimal(18,2)");
+                entity.HasIndex(e => e.Code).IsUnique();
+                entity.HasIndex(e => e.IsActive);
+                entity.HasQueryFilter(e => !e.IsDeleted);
+            });
+
+            // CouponUsage configuration
+            builder.Entity<CouponUsage>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.DiscountAmount).HasColumnType("decimal(18,2)");
+                entity.HasOne(e => e.Coupon)
+                      .WithMany(c => c.CouponUsages)
+                      .HasForeignKey(e => e.CouponId)
+                      .OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(e => e.User)
+                      .WithMany()
+                      .HasForeignKey(e => e.UserId)
+                      .OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(e => e.Order)
+                      .WithMany()
+                      .HasForeignKey(e => e.OrderId)
+                      .OnDelete(DeleteBehavior.Restrict);
+                entity.HasIndex(e => new { e.CouponId, e.UserId });
+                entity.HasQueryFilter(e => !e.IsDeleted);
             });
 
         }

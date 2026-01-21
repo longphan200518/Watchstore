@@ -31,11 +31,16 @@ export default function PaymentFailed() {
       <main className="max-w-2xl mx-auto px-6 py-20 text-center">
         <div
           className={`rounded-2xl border p-12 ${
-            isDark ? "bg-neutral-900 border-white/10" : "bg-white border-black/5"
+            isDark
+              ? "bg-neutral-900 border-white/10"
+              : "bg-white border-black/5"
           }`}
         >
           <div className="w-24 h-24 mx-auto mb-6 bg-red-100 rounded-full flex items-center justify-center">
-            <Icon icon="solar:close-circle-bold" className="text-6xl text-red-600" />
+            <Icon
+              icon="solar:close-circle-bold"
+              className="text-6xl text-red-600"
+            />
           </div>
 
           <h1

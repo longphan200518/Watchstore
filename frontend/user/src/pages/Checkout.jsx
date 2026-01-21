@@ -103,14 +103,17 @@ export default function Checkout() {
         // If VNPay payment, redirect to VNPay gateway
         if (paymentMethod === "VNPAY") {
           try {
-            const paymentResponse = await fetch("http://localhost:5221/api/payment/create-vnpay-url", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-              },
-              body: JSON.stringify({ orderId }),
-            });
+            const paymentResponse = await fetch(
+              "http://localhost:5221/api/payment/create-vnpay-url",
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({ orderId }),
+              }
+            );
 
             const paymentResult = await paymentResponse.json();
             if (paymentResult.success) {

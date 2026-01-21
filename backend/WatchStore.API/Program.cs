@@ -11,12 +11,15 @@ using WatchStore.Application.Features.Brands;
 using WatchStore.Application.Features.Orders;
 using WatchStore.Application.Features.Reviews;
 using WatchStore.Application.Features.Dashboard;
+using WatchStore.Application.Features.WebsiteSettings;
 using Microsoft.OpenApi.Models;
 using WatchStore.Application.Interfaces;
+using WatchStore.Application.Services;
 using WatchStore.Domain.Entities;
 using WatchStore.Domain.Interfaces;
 using WatchStore.Infrastructure.Data;
 using WatchStore.Infrastructure.Repositories;
+using WatchStore.API.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -117,6 +120,20 @@ builder.Services.AddScoped<IBrandService, BrandService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
+builder.Services.AddScoped<IWebsiteSettingsService, WebsiteSettingsService>();
+builder.Services.AddScoped<ICouponService, CouponService>();
+
+// Image Upload Service (use Cloudinary or Local based on configuration)
+// TODO: Uncomment after installing CloudinaryDotNet package
+// var useCloudinary = builder.Configuration.GetValue<bool>("ImageUpload:UseCloudinary");
+// if (useCloudinary)
+// {
+//     builder.Services.AddScoped<IImageUploadService, CloudinaryImageUploadService>();
+// }
+// else
+// {
+//     builder.Services.AddScoped<IImageUploadService, LocalImageUploadService>();
+// }
 
 var app = builder.Build();
 
@@ -127,26 +144,7 @@ using (var scope = app.Services.CreateScope())
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<Role>>();
 
-    await context.Database.MigrateAsync();
-
-    if (!await roleManager.RoleExistsAsync("Admin"))
-        await roleManager.CreateAsync(new Role { Name = "Admin" });
-    if (!await roleManager.RoleExistsAsync("User"))
-        await roleManager.CreateAsync(new Role { Name = "User" });
-
-    var adminEmail = "admin@gmail.com";
-    if (await userManager.FindByEmailAsync(adminEmail) == null)
-    {
-        var admin = new User
-        {
-            UserName = adminEmail,
-            Email = adminEmail,
-            FullName = "Admin",
-            EmailConfirmed = true
-        };
-        await userManager.CreateAsync(admin, "admin123@");
-        await userManager.AddToRoleAsync(admin, "Admin");
-    }
+    await DatabaseSeeder.SeedAsync(context, userManager, roleManager);
 }
 
 if (app.Environment.IsDevelopment())

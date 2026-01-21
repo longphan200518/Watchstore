@@ -14,13 +14,15 @@ namespace WatchStore.Application.Features.Orders
         private readonly IRepository<Order> _orderRepository;
         private readonly IRepository<OrderItem> _orderItemRepository;
         private readonly IRepository<Watch> _watchRepository;
+        private readonly IEmailService _emailService;
 
-        public OrderService(IUnitOfWork unitOfWork)
+        public OrderService(IUnitOfWork unitOfWork, IEmailService emailService)
         {
             _unitOfWork = unitOfWork;
             _orderRepository = _unitOfWork.GetRepository<Order>();
             _orderItemRepository = _unitOfWork.GetRepository<OrderItem>();
             _watchRepository = _unitOfWork.GetRepository<Watch>();
+            _emailService = emailService;
         }
 
         public async Task<ApiResponse<OrderDto>> CreateAsync(CreateOrderDto dto, int userId)
@@ -64,12 +66,51 @@ namespace WatchStore.Application.Features.Orders
                 TotalAmount = totalAmount,
                 Status = OrderStatus.Pending,
                 ShippingAddress = dto.ShippingAddress,
+                PhoneNumber = dto.PhoneNumber,
                 Notes = dto.Notes,
                 OrderItems = orderItems
             };
 
             await _orderRepository.AddAsync(order);
             await _unitOfWork.SaveChangesAsync();
+
+            // Load order with full details including items, watches, images, and user
+            var orderWithDetails = await _orderRepository.GetQueryable()
+                .Include(o => o.User)
+                .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.Watch)
+                    .ThenInclude(w => w.Images)
+                .FirstOrDefaultAsync(o => o.Id == order.Id);
+
+            if (orderWithDetails == null)
+                return await GetByIdAsync(order.Id);
+
+            // Send confirmation email
+            try
+            {
+                var orderItemsList = orderWithDetails.OrderItems.Select(item => (
+                    ProductName: item.Watch.Name,
+                    Quantity: item.Quantity,
+                    Price: item.Price,
+                    ImageUrl: item.Watch.Images.FirstOrDefault()?.ImageUrl ?? "https://via.placeholder.com/60"
+                )).ToList();
+
+                await _emailService.SendOrderConfirmationEmailAsync(
+                    orderWithDetails.User.Email,
+                    orderWithDetails.User.FullName,
+                    orderWithDetails.Id,
+                    orderWithDetails.TotalAmount,
+                    orderItemsList,
+                    orderWithDetails.ShippingAddress,
+                    orderWithDetails.PhoneNumber ?? "Không có"
+                );
+                
+                Console.WriteLine($"[ORDER] Email confirmation sent to {orderWithDetails.User.Email} for order #{orderWithDetails.Id}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[ORDER] Failed to send email: {ex.Message}");
+            }
 
             return await GetByIdAsync(order.Id);
         }

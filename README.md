@@ -1,4 +1,4 @@
-﻿# 🕐 WatchStore - Luxury Watch E-Commerce Platform
+﻿# 🕐 WatchStore - Nền Tảng Thương Mại Điện Tử Đồng Hồ Cao Cấp
 
 > **Website thương mại điện tử đồng hồ cao cấp** - Nền tảng bán hàng chuyên nghiệp với giao diện hiện đại, sang trọng và trải nghiệm người dùng tuyệt vời.
 
@@ -24,83 +24,86 @@ Dự án được thiết kế theo kiến trúc phân lớp rõ ràng (Clean Ar
 
 ## ✅ Trạng thái Features
 
-### 🎉 Đã hoàn thành (Implemented)
+### 🎉 Đã hoàn thành
 
-#### User Website
-- ✅ Authentication & Authorization (Login, Register, JWT)
-- ✅ Product Catalog (List, Detail, Search, Filter, Pagination)
-- ✅ Shopping Cart (Add, Update, Remove items)
-- ✅ Checkout Process với Coupon Code
-- ✅ VNPay Payment Integration (Online payment)
-- ✅ Order History & Order Tracking
-- ✅ Product Reviews & Ratings
-- ✅ Dark/Light Theme Switching
-- ✅ SEO Optimization (Meta tags, Open Graph)
-- ✅ Responsive Design (Mobile-first)
-- ✅ Email Notifications (Order confirmation)
-- ✅ Dynamic Website Settings từ DB
-- ✅ Brand Showcase
-- ✅ Featured Products
+#### Website Người Dùng
+
+- ✅ Xác thực & Phân quyền (Đăng nhập, Đăng ký, JWT)
+- ✅ Danh mục sản phẩm (Danh sách, Chi tiết, Tìm kiếm, Lọc, Phân trang)
+- ✅ Giỏ hàng (Thêm, Cập nhật, Xóa sản phẩm)
+- ✅ Quy trình thanh toán với mã giảm giá
+- ✅ Tích hợp thanh toán VNPay (Thanh toán trực tuyến)
+- ✅ Lịch sử đơn hàng & Theo dõi đơn hàng
+- ✅ Đánh giá & Xếp hạng sản phẩm
+- ✅ Chuyển đổi giao diện Tối/Sáng
+- ✅ Tối ưu SEO (Meta tags, Open Graph)
+- ✅ Thiết kế responsive (Mobile-first)
+- ✅ Thông báo qua Email (Xác nhận đơn hàng)
+- ✅ Cài đặt website động từ cơ sở dữ liệu
+- ✅ Trưng bày thương hiệu
+- ✅ Sản phẩm nổi bật
 - ✅ Hero Section với CTA
-- ✅ Page Transitions & Animations
+- ✅ Chuyển đổi trang & Hiệu ứng động
 
-#### Admin Dashboard
-- ✅ Admin Authentication & Role-based Access
-- ✅ Dashboard với Statistics (Revenue, Orders, Customers)
-- ✅ Product Management (CRUD với multi-image upload)
-- ✅ Order Management (View, Update status)
-- ✅ Customer Management (View, Edit, Role assignment)
-- ✅ Brand Management (CRUD)
-- ✅ Coupon Management (Create, Edit, Delete coupons)
-- ✅ Review Management (Approve, Delete reviews)
-- ✅ Website Settings (Logo, Colors, SEO, Contact info)
-- ✅ Image Upload Service (Server-side storage)
-- ✅ Toast Notifications & Loading States
-- ✅ Error Boundaries & Error Handling
+#### Trang Quản Trị
 
-#### Backend API
-- ✅ Clean Architecture (4-layer structure)
-- ✅ JWT Authentication với Refresh Tokens
-- ✅ Role-based Authorization (Admin, Customer)
+- ✅ Xác thực Admin & Phân quyền truy cập
+- ✅ Dashboard với Thống kê (Doanh thu, Đơn hàng, Khách hàng)
+- ✅ Quản lý sản phẩm (CRUD với upload nhiều ảnh)
+- ✅ Quản lý đơn hàng (Xem, Cập nhật trạng thái)
+- ✅ Quản lý khách hàng (Xem, Sửa, Phân quyền)
+- ✅ Quản lý thương hiệu (CRUD)
+- ✅ Quản lý mã giảm giá (Tạo, Sửa, Xóa coupon)
+- ✅ Quản lý đánh giá (Duyệt, Xóa đánh giá)
+- ✅ Cài đặt website (Logo, Màu sắc, SEO, Thông tin liên hệ)
+- ✅ Dịch vụ upload ảnh (Lưu trữ server)
+- ✅ Thông báo Toast & Trạng thái Loading
+- ✅ Error Boundaries & Xử lý lỗi
+
+#### API Backend
+
+- ✅ Clean Architecture (Cấu trúc 4 lớp)
+- ✅ Xác thực JWT với Refresh Tokens
+- ✅ Phân quyền theo vai trò (Admin, Khách hàng)
 - ✅ Entity Framework Core với SQL Server
 - ✅ Repository Pattern & Unit of Work
 - ✅ FluentValidation cho DTOs
-- ✅ Global Exception Handling Middleware
-- ✅ SMTP Email Service
-- ✅ VNPay Payment Gateway Integration
-- ✅ Coupon Validation Logic
-- ✅ Database Seeding
-- ✅ Swagger API Documentation
-- ✅ CORS Configuration
+- ✅ Middleware xử lý lỗi toàn cục
+- ✅ Dịch vụ gửi Email SMTP
+- ✅ Tích hợp cổng thanh toán VNPay
+- ✅ Logic xác thực mã giảm giá
+- ✅ Seed dữ liệu database
+- ✅ Tài liệu API Swagger
+- ✅ Cấu hình CORS
 
-### 🚧 Đang phát triển (In Development)
+### 🚧 Đang phát triển
 
-- 🚧 Product Comparison Feature
-- 🚧 Wishlist/Favorites
-- 🚧 Advanced Analytics Dashboard
-- 🚧 Customer Support Chat
-- 🚧 Multi-language Support (i18n)
-- 🚧 Product Inventory Management
-- 🚧 Export Reports (PDF, Excel)
-- 🚧 Real-time Notifications (SignalR)
+- 🚧 Tính năng so sánh sản phẩm
+- 🚧 Danh sách yêu thích
+- 🚧 Dashboard phân tích nâng cao
+- 🚧 Chat hỗ trợ khách hàng
+- 🚧 Hỗ trợ đa ngôn ngữ (i18n)
+- 🚧 Quản lý tồn kho sản phẩm
+- 🚧 Xuất báo cáo (PDF, Excel)
+- 🚧 Thông báo thời gian thực (SignalR)
 
-### 📋 Kế hoạch phát triển (Planned)
+### 📋 Kế hoạch phát triển
 
-- 📋 Social Login (Google, Facebook)
-- 📋 SMS Notifications
-- 📋 Product Recommendations (AI-based)
-- 📋 Advanced Search với Elasticsearch
-- 📋 Mobile App (React Native)
-- 📋 Loyalty Program & Points System
-- 📋 Flash Sales & Limited Offers
-- 📋 Blog/News Section
-- 📋 Multi-vendor Support
-- 📋 Shipping Integration (GHN, GHTK)
-- 📋 Payment Methods (MoMo, ZaloPay, COD)
-- 📋 Product Import/Export (Excel)
-- 📋 Barcode/QR Code Scanning
-- 📋 Warranty Management
-- 📋 Return & Refund Management
+- 📋 Đăng nhập mạng xã hội (Google, Facebook)
+- 📋 Thông báo SMS
+- 📋 Gợi ý sản phẩm (Dựa trên AI)
+- 📋 Tìm kiếm nâng cao với Elasticsearch
+- 📋 Ứng dụng di động (React Native)
+- 📋 Chương trình khách hàng thân thiết & Hệ thống điểm
+- 📋 Flash Sales & Ưu đãi giới hạn
+- 📋 Mục Blog/Tin tức
+- 📋 Hỗ trợ nhiều nhà cung cấp
+- 📋 Tích hợp vận chuyển (GHN, GHTK)
+- 📋 Phương thức thanh toán (MoMo, ZaloPay, COD)
+- 📋 Nhập/Xuất sản phẩm (Excel)
+- 📋 Quét mã vạch/QR Code
+- 📋 Quản lý bảo hành
+- 📋 Quản lý trả hàng & Hoàn tiền
 
 ---
 
@@ -336,21 +339,21 @@ npm run dev
 
 ---
 
-## 🛠️ Tech Stack
+## 🛠️ Công Nghệ Sử Dụng
 
 ### Backend
 
 - **Framework**: .NET 8.0
 - **ORM**: Entity Framework Core 8.0
-- **Database**: SQL Server 2022
-- **Authentication**: JWT Bearer
+- **Cơ sở dữ liệu**: SQL Server 2022
+- **Xác thực**: JWT Bearer
 - **Validation**: FluentValidation
-- **Documentation**: Swagger/OpenAPI
+- **Tài liệu**: Swagger/OpenAPI
 
 ### Frontend
 
-- **Library**: React 18
-- **Build Tool**: Vite 5.4
+- **Thư viện**: React 18
+- **Công cụ Build**: Vite 5.4
 - **Styling**: Tailwind CSS 3.4
 - **HTTP Client**: Axios
 - **Routing**: React Router v6
@@ -359,66 +362,66 @@ npm run dev
 ### DevOps
 
 - **Containerization**: Docker & Docker Compose
-- **Version Control**: Git & GitHub
+- **Quản lý phiên bản**: Git & GitHub
 - **IDE**: Visual Studio 2022, VS Code
 
 ---
 
-## 📦 Database Schema
+## 📦 Sơ Đồ Cơ Sở Dữ Liệu
 
-### Entities chính:
+### Các Entity chính:
 
-- **User**: Người dùng (Admin, Customer) với authentication
+- **User**: Người dùng (Admin, Khách hàng) với xác thực
 - **Role**: Vai trò người dùng (phân quyền)
 - **Watch**: Sản phẩm đồng hồ với đầy đủ thông tin
 - **Brand**: Thương hiệu đồng hồ
-- **Order**: Đơn hàng với payment status
+- **Order**: Đơn hàng với trạng thái thanh toán
 - **OrderItem**: Chi tiết sản phẩm trong đơn hàng
-- **WatchImage**: Hình ảnh sản phẩm (multiple images)
+- **WatchImage**: Hình ảnh sản phẩm (nhiều ảnh)
 - **Review**: Đánh giá sản phẩm từ khách hàng
-- **Coupon**: Mã giảm giá (percentage/fixed amount)
-- **WebsiteSettings**: Cấu hình website động (logo, colors, SEO, contact)
+- **Coupon**: Mã giảm giá (theo % hoặc số tiền cố định)
+- **WebsiteSettings**: Cấu hình website động (logo, màu sắc, SEO, liên hệ)
 
 ---
 
-## 🎨 Design System
+## 🎨 Hệ Thống Thiết Kế
 
-### Typography
+### Typography (Kiểu chữ)
 
 - **Font**: System font stack (sans-serif)
-- **Weights**: extralight (200), light (300), normal (400), semibold (600)
-- **Sizes**: text-xs → text-8xl
-- **Letter Spacing**: tracking-tight → tracking-[0.3em]
+- **Độ đậm**: extralight (200), light (300), normal (400), semibold (600)
+- **Kích thước**: text-xs → text-8xl
+- **Khoảng cách chữ**: tracking-tight → tracking-[0.3em]
 
-### Colors
+### Màu sắc
 
-- **Primary**: Amber (400, 600)
-- **Dark Mode**: Neutral (900, 950), Black
-- **Light Mode**: Zinc (50, 100), White
-- **Accent**: Gray (400-600)
+- **Chính**: Amber (400, 600)
+- **Chế độ tối**: Neutral (900, 950), Đen
+- **Chế độ sáng**: Zinc (50, 100), Trắng
+- **Nhấn**: Gray (400-600)
 
-### Layout
+### Bố cục
 
-- **Max Width**: 1400px - 1600px
+- **Độ rộng tối đa**: 1400px - 1600px
 - **Padding**: px-8 lg:px-16
-- **Spacing**: space-y-4 → space-y-10
+- **Khoảng cách**: space-y-4 → space-y-10
 
 ---
 
-## 📝 API Endpoints
+## 📝 Các API Endpoints
 
-### Authentication
+### Xác thực
 
 ```
 POST   /api/auth/register      # Đăng ký
 POST   /api/auth/login         # Đăng nhập
-POST   /api/auth/refresh       # Refresh token
+POST   /api/auth/refresh       # Làm mới token
 ```
 
-### Watches
+### Sản phẩm đồng hồ
 
 ```
-GET    /api/watches            # Lấy danh sách (filter, search, pagination)
+GET    /api/watches            # Lấy danh sách (lọc, tìm kiếm, phân trang)
 GET    /api/watches/{id}       # Chi tiết sản phẩm
 POST   /api/watches            # Tạo mới (Admin)
 PUT    /api/watches/{id}       # Cập nhật (Admin)
@@ -426,17 +429,17 @@ DELETE /api/watches/{id}       # Xóa (Admin)
 GET    /api/watches/featured   # Sản phẩm nổi bật
 ```
 
-### Orders
+### Đơn hàng
 
 ```
 GET    /api/orders             # Danh sách đơn hàng
 GET    /api/orders/{id}        # Chi tiết đơn hàng
 POST   /api/orders             # Tạo đơn hàng
 PUT    /api/orders/{id}/status # Cập nhật trạng thái (Admin)
-GET    /api/orders/user/{id}   # Đơn hàng của user
+GET    /api/orders/user/{id}   # Đơn hàng của người dùng
 ```
 
-### Brands
+### Thương hiệu
 
 ```
 GET    /api/brands             # Danh sách thương hiệu
@@ -446,32 +449,32 @@ PUT    /api/brands/{id}        # Cập nhật (Admin)
 DELETE /api/brands/{id}        # Xóa (Admin)
 ```
 
-### Coupons
+### Mã giảm giá
 
 ```
 GET    /api/coupons            # Danh sách mã giảm giá (Admin)
-GET    /api/coupons/{code}     # Validate coupon code
-POST   /api/coupons            # Tạo coupon (Admin)
+GET    /api/coupons/{code}     # Xác thực mã giảm giá
+POST   /api/coupons            # Tạo mã giảm giá (Admin)
 PUT    /api/coupons/{id}       # Cập nhật (Admin)
 DELETE /api/coupons/{id}       # Xóa (Admin)
 ```
 
-### Payment
+### Thanh toán
 
 ```
 POST   /api/payment/create-payment-url    # Tạo URL thanh toán VNPay
 GET    /api/payment/callback              # VNPay callback
-POST   /api/payment/ipn                   # VNPay IPN notification
+POST   /api/payment/ipn                   # Thông báo IPN VNPay
 ```
 
-### Website Settings
+### Cài đặt Website
 
 ```
 GET    /api/websitesettings    # Lấy cấu hình website
 PUT    /api/websitesettings    # Cập nhật cấu hình (Admin)
 ```
 
-### Reviews
+### Đánh giá
 
 ```
 GET    /api/reviews/watch/{watchId}  # Đánh giá của sản phẩm
@@ -483,31 +486,31 @@ DELETE /api/reviews/{id}             # Xóa đánh giá (Admin)
 ### SEO
 
 ```
-GET    /api/seo/watches/{id}   # SEO data cho sản phẩm
-GET    /api/seo/brands/{id}    # SEO data cho thương hiệu
+GET    /api/seo/watches/{id}   # Dữ liệu SEO cho sản phẩm
+GET    /api/seo/brands/{id}    # Dữ liệu SEO cho thương hiệu
 ```
 
 ---
 
-## 🤝 Contributing
+## 🤝 Đóng Góp
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Chúng tôi hoan nghênh mọi đóng góp! Vui lòng tạo Pull Request.
 
-1. Fork the project
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License.
+1. Fork dự án
+2. Tạo nhánh tính năng của bạn (`git checkout -b feature/TinhNangMoi`)
+3. Commit thay đổi (`git commit -m 'Thêm tính năng mới'`)
+4. Push lên nhánh (`git push origin feature/TinhNangMoi`)
+5. Tạo Pull Request
 
 ---
 
-## 👨‍💻 Author
+## 📄 Giấy Phép
+
+Dự án này được cấp phép theo MIT License.
+
+---
+
+## 👨‍💻 Tác Giả
 
 **Long Phan**
 
@@ -516,7 +519,7 @@ This project is licensed under the MIT License.
 
 ---
 
-## 📞 Support
+## 📞 Hỗ Trợ
 
 Nếu bạn gặp vấn đề hoặc có câu hỏi, vui lòng tạo issue trên GitHub.
 

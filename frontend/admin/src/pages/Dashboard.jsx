@@ -31,6 +31,8 @@ export default function Dashboard() {
     { label: "Quản lý thương hiệu", path: "/brands" },
     { label: "Quản lý người dùng", path: "/users" },
     { label: "Quản lý đánh giá", path: "/reviews" },
+    { label: "Quản lý mã giảm giá", path: "/coupons" },
+    { label: "Cài đặt Website", path: "/website-settings" },
   ];
 
   const [data, setData] = useState(null);
@@ -231,7 +233,10 @@ function LineChart({ data }) {
     return (
       <div className="h-64 flex items-center justify-center">
         <div className="text-center">
-          <Icon icon="solar:chart-2-bold-duotone" className="text-5xl text-gray-300 mx-auto mb-2" />
+          <Icon
+            icon="solar:chart-2-bold-duotone"
+            className="text-5xl text-gray-300 mx-auto mb-2"
+          />
           <p className="text-sm text-gray-500">Chưa có dữ liệu</p>
         </div>
       </div>
@@ -248,7 +253,10 @@ function LineChart({ data }) {
 
   return (
     <ResponsiveContainer width="100%" height={300}>
-      <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+      <AreaChart
+        data={chartData}
+        margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
+      >
         <defs>
           <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
             <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
@@ -256,12 +264,7 @@ function LineChart({ data }) {
           </linearGradient>
         </defs>
         <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-        <XAxis
-          dataKey="date"
-          stroke="#6b7280"
-          fontSize={12}
-          tickLine={false}
-        />
+        <XAxis dataKey="date" stroke="#6b7280" fontSize={12} tickLine={false} />
         <YAxis
           stroke="#6b7280"
           fontSize={12}
@@ -273,7 +276,9 @@ function LineChart({ data }) {
             if (active && payload && payload.length) {
               return (
                 <div className="bg-white border border-gray-200 rounded-lg shadow-lg px-3 py-2">
-                  <p className="text-xs text-gray-500 mb-1">{payload[0].payload.date}</p>
+                  <p className="text-xs text-gray-500 mb-1">
+                    {payload[0].payload.date}
+                  </p>
                   <p className="text-sm font-semibold text-blue-600">
                     {formatCurrency(payload[0].value)}
                   </p>
@@ -301,7 +306,10 @@ function PieChart({ data }) {
     return (
       <div className="h-80 flex items-center justify-center">
         <div className="text-center">
-          <Icon icon="solar:pie-chart-2-bold-duotone" className="text-5xl text-gray-300 mx-auto mb-2" />
+          <Icon
+            icon="solar:pie-chart-2-bold-duotone"
+            className="text-5xl text-gray-300 mx-auto mb-2"
+          />
           <p className="text-sm text-gray-500">Chưa có dữ liệu</p>
         </div>
       </div>
@@ -329,14 +337,19 @@ function PieChart({ data }) {
           cx="50%"
           cy="45%"
           labelLine={false}
-          label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+          label={({ name, percent }) =>
+            `${name} ${(percent * 100).toFixed(0)}%`
+          }
           outerRadius={80}
           fill="#8884d8"
           dataKey="value"
           animationDuration={1000}
         >
           {chartData.map((entry, index) => (
-            <Cell key={`cell-${index}`} fill={COLORS[entry.name] || "#6b7280"} />
+            <Cell
+              key={`cell-${index}`}
+              fill={COLORS[entry.name] || "#6b7280"}
+            />
           ))}
         </Pie>
         <Tooltip
@@ -344,7 +357,9 @@ function PieChart({ data }) {
             if (active && payload && payload.length) {
               return (
                 <div className="bg-white border border-gray-200 rounded-lg shadow-lg px-3 py-2">
-                  <p className="text-sm font-semibold text-gray-900">{payload[0].name}</p>
+                  <p className="text-sm font-semibold text-gray-900">
+                    {payload[0].name}
+                  </p>
                   <p className="text-xs text-gray-600">
                     {payload[0].value} đơn hàng
                   </p>
@@ -364,7 +379,10 @@ function BarChart({ data }) {
     return (
       <div className="h-80 flex items-center justify-center">
         <div className="text-center">
-          <Icon icon="solar:chart-bold-duotone" className="text-5xl text-gray-300 mx-auto mb-2" />
+          <Icon
+            icon="solar:chart-bold-duotone"
+            className="text-5xl text-gray-300 mx-auto mb-2"
+          />
           <p className="text-sm text-gray-500">Chưa có dữ liệu</p>
         </div>
       </div>
@@ -372,14 +390,20 @@ function BarChart({ data }) {
   }
 
   const chartData = data.map((item) => ({
-    name: item.watchName.length > 20 ? item.watchName.substring(0, 20) + "..." : item.watchName,
+    name:
+      item.watchName.length > 20
+        ? item.watchName.substring(0, 20) + "..."
+        : item.watchName,
     fullName: item.watchName,
     revenue: item.revenue,
   }));
 
   return (
     <ResponsiveContainer width="100%" height={300}>
-      <RechartsBar data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 5 }}>
+      <RechartsBar
+        data={chartData}
+        margin={{ top: 10, right: 10, left: 0, bottom: 5 }}
+      >
         <defs>
           <linearGradient id="colorBar" x1="0" y1="0" x2="0" y2="1">
             <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.9} />

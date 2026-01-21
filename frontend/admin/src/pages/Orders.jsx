@@ -4,6 +4,7 @@ import { getOrders } from "../services/orderService";
 import { formatCurrency, formatDate } from "../utils/format";
 import Sidebar from "../components/Sidebar";
 import AdminHeader from "../components/AdminHeader";
+import { useToast } from "../contexts/ToastContext";
 
 // OrderStatus: 1=Pending, 2=Processing, 3=Shipped, 4=Delivered, 5=Cancelled
 const statusMap = {
@@ -35,6 +36,7 @@ const statusMap = {
 };
 
 export default function Orders() {
+  const { showToast } = useToast();
   const navItems = [
     { label: "Dashboard", path: "/" },
     { label: "Quản lý sản phẩm", path: "/products" },
@@ -42,6 +44,7 @@ export default function Orders() {
     { label: "Quản lý thương hiệu", path: "/brands" },
     { label: "Quản lý người dùng", path: "/users" },
     { label: "Quản lý đánh giá", path: "/reviews" },
+    { label: "Cài đặt Website", path: "/website-settings" },
   ];
 
   const [orders, setOrders] = useState([]);
@@ -89,7 +92,7 @@ export default function Orders() {
 
   const handleSaveStatus = async () => {
     if (!selectedOrder) return;
-    
+
     try {
       // TODO: Implement updateOrderStatus API call
       // const response = await updateOrderStatus(selectedOrder.id, newStatus);
@@ -98,15 +101,17 @@ export default function Orders() {
       //   setShowStatusModal(false);
       //   alert("Cập nhật trạng thái thành công");
       // }
-      
+
       // Temporary: Update locally
-      setOrders(orders.map(o => 
-        o.id === selectedOrder.id ? { ...o, status: newStatus } : o
-      ));
+      setOrders(
+        orders.map((o) =>
+          o.id === selectedOrder.id ? { ...o, status: newStatus } : o
+        )
+      );
       setShowStatusModal(false);
-      alert("Cập nhật trạng thái thành công (demo)");
+      showToast("Cập nhật trạng thái thành công!", "success");
     } catch (err) {
-      alert("Lỗi khi cập nhật trạng thái");
+      showToast("Lỗi khi cập nhật trạng thái", "error");
     }
   };
 
@@ -260,14 +265,20 @@ export default function Orders() {
                               className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                               title="Xem chi tiết"
                             >
-                              <Icon icon="solar:eye-bold-duotone" className="text-lg" />
+                              <Icon
+                                icon="solar:eye-bold-duotone"
+                                className="text-lg"
+                              />
                             </button>
                             <button
                               onClick={() => handleUpdateStatus(o)}
                               className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
                               title="Cập nhật trạng thái"
                             >
-                              <Icon icon="solar:restart-bold-duotone" className="text-lg" />
+                              <Icon
+                                icon="solar:restart-bold-duotone"
+                                className="text-lg"
+                              />
                             </button>
                           </div>
                         </td>
@@ -289,18 +300,28 @@ export default function Orders() {
             <div className="bg-gradient-to-r from-green-500 to-emerald-500 px-6 py-5 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
-                  <Icon icon="solar:restart-bold-duotone" className="text-2xl text-white" />
+                  <Icon
+                    icon="solar:restart-bold-duotone"
+                    className="text-2xl text-white"
+                  />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-white">Cập nhật trạng thái</h3>
-                  <p className="text-sm text-white/80">Đơn hàng #{selectedOrder.id}</p>
+                  <h3 className="text-lg font-bold text-white">
+                    Cập nhật trạng thái
+                  </h3>
+                  <p className="text-sm text-white/80">
+                    Đơn hàng #{selectedOrder.id}
+                  </p>
                 </div>
               </div>
               <button
                 onClick={() => setShowStatusModal(false)}
                 className="p-2 hover:bg-white/20 rounded-lg transition-colors"
               >
-                <Icon icon="solar:close-circle-bold" className="text-2xl text-white" />
+                <Icon
+                  icon="solar:close-circle-bold"
+                  className="text-2xl text-white"
+                />
               </button>
             </div>
 
@@ -328,11 +349,21 @@ export default function Orders() {
                         onChange={(e) => setNewStatus(parseInt(e.target.value))}
                         className="w-5 h-5 text-green-600"
                       />
-                      <Icon 
-                        icon={info.icon} 
-                        className={`text-xl ${newStatus === parseInt(status) ? "text-green-600" : "text-gray-400"}`}
+                      <Icon
+                        icon={info.icon}
+                        className={`text-xl ${
+                          newStatus === parseInt(status)
+                            ? "text-green-600"
+                            : "text-gray-400"
+                        }`}
                       />
-                      <span className={`font-medium ${newStatus === parseInt(status) ? "text-green-900" : "text-gray-700"}`}>
+                      <span
+                        className={`font-medium ${
+                          newStatus === parseInt(status)
+                            ? "text-green-900"
+                            : "text-gray-700"
+                        }`}
+                      >
                         {info.label}
                       </span>
                     </label>
@@ -347,14 +378,20 @@ export default function Orders() {
                 onClick={() => setShowStatusModal(false)}
                 className="flex-1 px-4 py-3 border-2 border-gray-300 rounded-xl text-gray-700 font-medium hover:bg-gray-50 transition-all duration-200 flex items-center justify-center gap-2"
               >
-                <Icon icon="solar:close-circle-bold-duotone" className="text-lg" />
+                <Icon
+                  icon="solar:close-circle-bold-duotone"
+                  className="text-lg"
+                />
                 Hủy
               </button>
               <button
                 onClick={handleSaveStatus}
                 className="flex-1 px-4 py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl font-medium hover:from-green-600 hover:to-emerald-600 shadow-lg shadow-green-500/30 transition-all duration-200 flex items-center justify-center gap-2"
               >
-                <Icon icon="solar:check-circle-bold-duotone" className="text-lg" />
+                <Icon
+                  icon="solar:check-circle-bold-duotone"
+                  className="text-lg"
+                />
                 Cập nhật
               </button>
             </div>
@@ -370,10 +407,15 @@ export default function Orders() {
             <div className="bg-gradient-to-r from-blue-500 to-indigo-500 px-6 py-5 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
-                  <Icon icon="solar:document-text-bold-duotone" className="text-2xl text-white" />
+                  <Icon
+                    icon="solar:document-text-bold-duotone"
+                    className="text-2xl text-white"
+                  />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-white">Chi tiết đơn hàng</h3>
+                  <h3 className="text-lg font-bold text-white">
+                    Chi tiết đơn hàng
+                  </h3>
                   <p className="text-sm text-white/80">#{selectedOrder.id}</p>
                 </div>
               </div>
@@ -381,7 +423,10 @@ export default function Orders() {
                 onClick={() => setShowDetailModal(false)}
                 className="p-2 hover:bg-white/20 rounded-lg transition-colors"
               >
-                <Icon icon="solar:close-circle-bold" className="text-2xl text-white" />
+                <Icon
+                  icon="solar:close-circle-bold"
+                  className="text-2xl text-white"
+                />
               </button>
             </div>
 
@@ -396,15 +441,21 @@ export default function Orders() {
                 <div className="bg-gray-50 rounded-xl p-4 space-y-2">
                   <div className="flex justify-between">
                     <span className="text-gray-600">Họ tên:</span>
-                    <span className="font-semibold text-gray-900">{selectedOrder.customerName}</span>
+                    <span className="font-semibold text-gray-900">
+                      {selectedOrder.customerName}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Email:</span>
-                    <span className="font-medium text-gray-900">{selectedOrder.customerEmail || "—"}</span>
+                    <span className="font-medium text-gray-900">
+                      {selectedOrder.customerEmail || "—"}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Số điện thoại:</span>
-                    <span className="font-medium text-gray-900">{selectedOrder.customerPhone || "—"}</span>
+                    <span className="font-medium text-gray-900">
+                      {selectedOrder.customerPhone || "—"}
+                    </span>
                   </div>
                   <div className="flex justify-between items-start">
                     <span className="text-gray-600">Địa chỉ:</span>
@@ -424,17 +475,25 @@ export default function Orders() {
                 <div className="bg-gray-50 rounded-xl p-4 space-y-2">
                   <div className="flex justify-between">
                     <span className="text-gray-600">Ngày đặt:</span>
-                    <span className="font-medium text-gray-900">{formatDate(selectedOrder.orderDate)}</span>
+                    <span className="font-medium text-gray-900">
+                      {formatDate(selectedOrder.orderDate)}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Trạng thái:</span>
-                    <span className={`px-3 py-1 rounded-lg text-xs font-semibold ${statusMap[selectedOrder.status]?.color}`}>
+                    <span
+                      className={`px-3 py-1 rounded-lg text-xs font-semibold ${
+                        statusMap[selectedOrder.status]?.color
+                      }`}
+                    >
                       {statusMap[selectedOrder.status]?.label}
                     </span>
                   </div>
                   <div className="flex justify-between items-baseline">
                     <span className="text-gray-600">Tổng tiền:</span>
-                    <span className="text-2xl font-bold text-green-600">{formatCurrency(selectedOrder.totalAmount)}</span>
+                    <span className="text-2xl font-bold text-green-600">
+                      {formatCurrency(selectedOrder.totalAmount)}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -448,22 +507,38 @@ export default function Orders() {
                 <div className="space-y-3">
                   {selectedOrder.items && selectedOrder.items.length > 0 ? (
                     selectedOrder.items.map((item, idx) => (
-                      <div key={idx} className="flex items-center gap-4 bg-gray-50 rounded-xl p-4">
+                      <div
+                        key={idx}
+                        className="flex items-center gap-4 bg-gray-50 rounded-xl p-4"
+                      >
                         <div className="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center">
-                          <Icon icon="solar:watch-bold-duotone" className="text-3xl text-gray-400" />
+                          <Icon
+                            icon="solar:watch-bold-duotone"
+                            className="text-3xl text-gray-400"
+                          />
                         </div>
                         <div className="flex-1">
-                          <p className="font-semibold text-gray-900">{item.watchName || "Sản phẩm"}</p>
-                          <p className="text-sm text-gray-500">Số lượng: {item.quantity}</p>
+                          <p className="font-semibold text-gray-900">
+                            {item.watchName || "Sản phẩm"}
+                          </p>
+                          <p className="text-sm text-gray-500">
+                            Số lượng: {item.quantity}
+                          </p>
                         </div>
                         <div className="text-right">
-                          <p className="font-bold text-gray-900">{formatCurrency(item.price)}</p>
-                          <p className="text-xs text-gray-500">x {item.quantity}</p>
+                          <p className="font-bold text-gray-900">
+                            {formatCurrency(item.price)}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            x {item.quantity}
+                          </p>
                         </div>
                       </div>
                     ))
                   ) : (
-                    <p className="text-center text-gray-500 py-4">Không có sản phẩm</p>
+                    <p className="text-center text-gray-500 py-4">
+                      Không có sản phẩm
+                    </p>
                   )}
                 </div>
               </div>
@@ -475,7 +550,10 @@ export default function Orders() {
                 onClick={() => setShowDetailModal(false)}
                 className="flex-1 px-4 py-3 border-2 border-gray-300 rounded-xl text-gray-700 font-medium hover:bg-gray-50 transition-all duration-200 flex items-center justify-center gap-2"
               >
-                <Icon icon="solar:close-circle-bold-duotone" className="text-lg" />
+                <Icon
+                  icon="solar:close-circle-bold-duotone"
+                  className="text-lg"
+                />
                 Đóng
               </button>
               <button

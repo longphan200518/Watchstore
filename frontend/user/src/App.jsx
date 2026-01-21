@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { HelmetProvider } from "react-helmet-async";
 import { useState, useEffect } from "react";
 import Home from "./pages/Home";
 import Products from "./pages/Products";
@@ -21,6 +22,7 @@ import ScrollToTop from "./components/ScrollToTop";
 import { CartProvider } from "./contexts/CartContext";
 import { ToastProvider } from "./contexts/ToastContext";
 import { WishlistProvider } from "./contexts/WishlistContext";
+import { WebsiteSettingsProvider } from "./contexts/WebsiteSettingsContext";
 
 export default function App() {
   const [isDark, setIsDark] = useState(false);
@@ -31,36 +33,40 @@ export default function App() {
   }, []);
 
   return (
-    <CartProvider>
-      <ToastProvider>
-        <WishlistProvider>
-          <Router>
-            <ScrollToTop isDark={isDark} />
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/products" element={<Products />} />
-              <Route path="/products/:id" element={<ProductDetail />} />
-              <Route path="/cart" element={<Cart />} />
-              <Route path="/checkout" element={<Checkout />} />
-              <Route
-                path="/order-confirmation"
-                element={<OrderConfirmation />}
-              />
-              <Route path="/payment-success" element={<PaymentSuccess />} />
-              <Route path="/payment-failed" element={<PaymentFailed />} />
-              <Route path="/orders" element={<Orders />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/wishlist" element={<Wishlist />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/verify-email" element={<VerifyEmail />} />
-              <Route path="/forgot-password" element={<ForgotPassword />} />
-              <Route path="/reset-password" element={<ResetPassword />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </Router>
-        </WishlistProvider>
-      </ToastProvider>
-    </CartProvider>
+    <HelmetProvider>
+      <WebsiteSettingsProvider>
+        <CartProvider>
+          <ToastProvider>
+            <WishlistProvider>
+              <Router>
+                <ScrollToTop isDark={isDark} />
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/products" element={<Products />} />
+                  <Route path="/products/:id" element={<ProductDetail />} />
+                  <Route path="/cart" element={<Cart />} />
+                  <Route path="/checkout" element={<Checkout />} />
+                  <Route
+                    path="/order-confirmation"
+                    element={<OrderConfirmation />}
+                  />
+                  <Route path="/payment-success" element={<PaymentSuccess />} />
+                  <Route path="/payment-failed" element={<PaymentFailed />} />
+                  <Route path="/orders" element={<Orders />} />
+                  <Route path="/profile" element={<Profile />} />
+                  <Route path="/wishlist" element={<Wishlist />} />
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/register" element={<Register />} />
+                  <Route path="/verify-email" element={<VerifyEmail />} />
+                  <Route path="/forgot-password" element={<ForgotPassword />} />
+                  <Route path="/reset-password" element={<ResetPassword />} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </Router>
+            </WishlistProvider>
+          </ToastProvider>
+        </CartProvider>
+      </WebsiteSettingsProvider>
+    </HelmetProvider>
   );
 }

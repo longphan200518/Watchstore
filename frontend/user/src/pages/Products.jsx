@@ -13,6 +13,7 @@ export default function Products() {
   const [brands, setBrands] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [totalPages, setTotalPages] = useState(1);
   const [isDark, setIsDark] = useState(false);
   const [language, setLanguage] = useState("vi");
   const { addToCart } = useCart();
@@ -89,6 +90,7 @@ export default function Products() {
 
         if (result.success) {
           setWatches(result.data?.items || []);
+          setTotalPages(result.data?.totalPages || 1);
           setError("");
         } else {
           setError(result.message || "Failed to load watches");
@@ -111,7 +113,10 @@ export default function Products() {
     } else {
       newParams.delete(key);
     }
-    newParams.set("page", "1"); // Reset to page 1
+    // Only reset to page 1 if NOT changing page
+    if (key !== "page") {
+      newParams.set("page", "1");
+    }
     setSearchParams(newParams);
   };
 
@@ -493,41 +498,69 @@ export default function Products() {
               ))}
             </div>
 
-            <div className="flex justify-center gap-3 mt-12">
-              {Array.from({ length: 3 }).map((_, i) => (
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex justify-center items-center gap-2 mt-12">
+                {/* Previous Button */}
                 <button
-                  key={i + 1}
-                  onClick={() => updateFilter("page", String(i + 1))}
-                  className={`w-12 h-12 border-2 font-semibold transition-all duration-300 ${
-                    page === i + 1
-                      ? "bg-amber-600 border-amber-600 text-white"
-                      : isDark
+                  onClick={() => updateFilter("page", String(page - 1))}
+                  disabled={page === 1}
+                  className={`w-10 h-10 border-2 font-semibold transition-all duration-300 flex items-center justify-center ${
+                    page === 1 ? "opacity-50 cursor-not-allowed" : ""
+                  } ${
+                    isDark
                       ? "border-gray-700 text-gray-400 hover:border-amber-600 hover:text-amber-600"
                       : "border-gray-300 text-gray-600 hover:border-amber-600 hover:text-amber-600"
                   }`}
                 >
-                  {i + 1}
+                  <Icon icon="solar:alt-arrow-left-bold" />
                 </button>
-              ))}
-            </div>
 
-            <div className="flex justify-center gap-3 mt-12">
-              {Array.from({ length: 3 }).map((_, i) => (
+                {/* Page Numbers */}
+                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                  let pageNum;
+                  if (totalPages <= 5) {
+                    pageNum = i + 1;
+                  } else if (page <= 3) {
+                    pageNum = i + 1;
+                  } else if (page >= totalPages - 2) {
+                    pageNum = totalPages - 4 + i;
+                  } else {
+                    pageNum = page - 2 + i;
+                  }
+                  return (
+                    <button
+                      key={pageNum}
+                      onClick={() => updateFilter("page", String(pageNum))}
+                      className={`w-12 h-12 border-2 font-semibold transition-all duration-300 ${
+                        page === pageNum
+                          ? "bg-amber-600 border-amber-600 text-white"
+                          : isDark
+                          ? "border-gray-700 text-gray-400 hover:border-amber-600 hover:text-amber-600"
+                          : "border-gray-300 text-gray-600 hover:border-amber-600 hover:text-amber-600"
+                      }`}
+                    >
+                      {pageNum}
+                    </button>
+                  );
+                })}
+
+                {/* Next Button */}
                 <button
-                  key={i + 1}
-                  onClick={() => updateFilter("page", String(i + 1))}
-                  className={`w-12 h-12 border-2 font-semibold transition-all duration-300 ${
-                    page === i + 1
-                      ? "bg-amber-600 border-amber-600 text-white"
-                      : isDark
+                  onClick={() => updateFilter("page", String(page + 1))}
+                  disabled={page === totalPages}
+                  className={`w-10 h-10 border-2 font-semibold transition-all duration-300 flex items-center justify-center ${
+                    page === totalPages ? "opacity-50 cursor-not-allowed" : ""
+                  } ${
+                    isDark
                       ? "border-gray-700 text-gray-400 hover:border-amber-600 hover:text-amber-600"
                       : "border-gray-300 text-gray-600 hover:border-amber-600 hover:text-amber-600"
                   }`}
                 >
-                  {i + 1}
+                  <Icon icon="solar:alt-arrow-right-bold" />
                 </button>
-              ))}
-            </div>
+              </div>
+            )}
           </>
         )}
       </main>

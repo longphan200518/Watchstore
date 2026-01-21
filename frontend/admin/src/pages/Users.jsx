@@ -4,8 +4,10 @@ import { getUsers, updateUserRoles, deleteUser } from "../services/userService";
 import { formatDate } from "../utils/format";
 import Sidebar from "../components/Sidebar";
 import AdminHeader from "../components/AdminHeader";
+import { useToast } from "../contexts/ToastContext";
 
 export default function Users() {
+  const { showToast } = useToast();
   const navItems = [
     { label: "Dashboard", path: "/" },
     { label: "Quản lý sản phẩm", path: "/products" },
@@ -13,6 +15,7 @@ export default function Users() {
     { label: "Quản lý thương hiệu", path: "/brands" },
     { label: "Quản lý người dùng", path: "/users" },
     { label: "Quản lý đánh giá", path: "/reviews" },
+    { label: "Cài đặt Website", path: "/website-settings" },
   ];
 
   const [users, setUsers] = useState([]);
@@ -60,14 +63,14 @@ export default function Users() {
     try {
       const response = await updateUserRoles(editingUser.id, selectedRoles);
       if (response.success) {
+        showToast("Cập nhật quyền thành công!", "success");
         setShowRoleModal(false);
         fetchUsers();
-        alert("Cập nhật quyền thành công");
       } else {
-        alert(response.message || "Không thể cập nhật");
+        showToast(response.message || "Không thể cập nhật", "error");
       }
     } catch (err) {
-      alert("Lỗi khi cập nhật");
+      showToast("Lỗi khi cập nhật", "error");
     }
   };
 
@@ -76,12 +79,13 @@ export default function Users() {
     try {
       const response = await deleteUser(id);
       if (response.success) {
+        showToast("Xóa người dùng thành công!", "success");
         fetchUsers();
       } else {
-        alert("Không thể xóa người dùng");
+        showToast("Không thể xóa người dùng", "error");
       }
     } catch (err) {
-      alert("Lỗi khi xóa người dùng");
+      showToast("Lỗi khi xóa người dùng", "error");
     }
   };
 
@@ -98,47 +102,73 @@ export default function Users() {
       <Sidebar navItems={navItems} />
 
       <main className="lg:ml-72 min-h-screen">
-        <AdminHeader 
-          title="Quản lý người dùng" 
-          subtitle="Trang chủ / Người dùng" 
+        <AdminHeader
+          title="Quản lý người dùng"
+          subtitle="Trang chủ / Người dùng"
         />
-        
+
         <div className="px-4 lg:px-8 pb-8 space-y-6">
           {/* Stats Overview */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="bg-white rounded-xl border border-gray-200 p-4 hover:shadow-lg transition-shadow">
               <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center mb-3">
-                <Icon icon="solar:users-group-rounded-bold-duotone" className="text-xl text-white" />
+                <Icon
+                  icon="solar:users-group-rounded-bold-duotone"
+                  className="text-xl text-white"
+                />
               </div>
               <p className="text-2xl font-bold text-gray-900">{users.length}</p>
               <p className="text-xs text-gray-500 mt-1">Tổng người dùng</p>
             </div>
             <div className="bg-white rounded-xl border border-gray-200 p-4 hover:shadow-lg transition-shadow">
               <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center mb-3">
-                <Icon icon="solar:shield-user-bold-duotone" className="text-xl text-white" />
+                <Icon
+                  icon="solar:shield-user-bold-duotone"
+                  className="text-xl text-white"
+                />
               </div>
-              <p className="text-2xl font-bold text-gray-900">{users.filter(u => u.roles?.includes('Admin')).length}</p>
+              <p className="text-2xl font-bold text-gray-900">
+                {users.filter((u) => u.roles?.includes("Admin")).length}
+              </p>
               <p className="text-xs text-gray-500 mt-1">Admin</p>
             </div>
             <div className="bg-white rounded-xl border border-gray-200 p-4 hover:shadow-lg transition-shadow">
               <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-500 rounded-lg flex items-center justify-center mb-3">
-                <Icon icon="solar:check-circle-bold-duotone" className="text-xl text-white" />
+                <Icon
+                  icon="solar:check-circle-bold-duotone"
+                  className="text-xl text-white"
+                />
               </div>
-              <p className="text-2xl font-bold text-gray-900">{users.filter(u => u.emailConfirmed).length}</p>
+              <p className="text-2xl font-bold text-gray-900">
+                {users.filter((u) => u.emailConfirmed).length}
+              </p>
               <p className="text-xs text-gray-500 mt-1">Email xác thực</p>
             </div>
             <div className="bg-white rounded-xl border border-gray-200 p-4 hover:shadow-lg transition-shadow">
               <div className="w-10 h-10 bg-gradient-to-br from-amber-500 to-orange-500 rounded-lg flex items-center justify-center mb-3">
-                <Icon icon="solar:user-bold-duotone" className="text-xl text-white" />
+                <Icon
+                  icon="solar:user-bold-duotone"
+                  className="text-xl text-white"
+                />
               </div>
-              <p className="text-2xl font-bold text-gray-900">{users.filter(u => u.roles?.includes('User') && !u.roles?.includes('Admin')).length}</p>
+              <p className="text-2xl font-bold text-gray-900">
+                {
+                  users.filter(
+                    (u) =>
+                      u.roles?.includes("User") && !u.roles?.includes("Admin")
+                  ).length
+                }
+              </p>
               <p className="text-xs text-gray-500 mt-1">Khách hàng</p>
             </div>
           </div>
 
           {loading && (
             <div className="bg-white border border-gray-100 rounded-xl p-6 text-gray-600 flex items-center gap-3">
-              <Icon icon="svg-spinners:ring-resize" className="text-2xl text-amber-500" />
+              <Icon
+                icon="svg-spinners:ring-resize"
+                className="text-2xl text-amber-500"
+              />
               <span>Đang tải...</span>
             </div>
           )}
@@ -160,38 +190,65 @@ export default function Users() {
                         Người dùng
                       </div>
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">Email</th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">Số điện thoại</th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">Quyền</th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">Trạng thái</th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">Ngày tạo</th>
-                    <th className="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider">Hành động</th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">
+                      Email
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">
+                      Số điện thoại
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">
+                      Quyền
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">
+                      Trạng thái
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">
+                      Ngày tạo
+                    </th>
+                    <th className="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider">
+                      Hành động
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
                   {users.map((user) => (
-                    <tr key={user.id} className="hover:bg-gray-50/50 transition-colors group">
+                    <tr
+                      key={user.id}
+                      className="hover:bg-gray-50/50 transition-colors group"
+                    >
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                            {user.fullName?.charAt(0).toUpperCase() || 'U'}
+                            {user.fullName?.charAt(0).toUpperCase() || "U"}
                           </div>
                           <div>
-                            <p className="font-semibold text-gray-900">{user.fullName}</p>
-                            <p className="text-xs text-gray-500">ID: {user.id}</p>
+                            <p className="font-semibold text-gray-900">
+                              {user.fullName}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              ID: {user.id}
+                            </p>
                           </div>
                         </div>
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-2">
-                          <Icon icon="solar:letter-bold-duotone" className="text-gray-400" />
+                          <Icon
+                            icon="solar:letter-bold-duotone"
+                            className="text-gray-400"
+                          />
                           <span className="text-gray-700">{user.email}</span>
                         </div>
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-2">
-                          <Icon icon="solar:phone-bold-duotone" className="text-gray-400" />
-                          <span className="text-gray-700">{user.phoneNumber || "—"}</span>
+                          <Icon
+                            icon="solar:phone-bold-duotone"
+                            className="text-gray-400"
+                          />
+                          <span className="text-gray-700">
+                            {user.phoneNumber || "—"}
+                          </span>
                         </div>
                       </td>
                       <td className="px-6 py-4">
@@ -206,13 +263,19 @@ export default function Users() {
                                     : "bg-blue-50 text-blue-700 border border-blue-200"
                                 }`}
                               >
-                                <Icon icon={role === "Admin" ? "solar:shield-user-bold" : "solar:user-bold"} />
+                                <Icon
+                                  icon={
+                                    role === "Admin"
+                                      ? "solar:shield-user-bold"
+                                      : "solar:user-bold"
+                                  }
+                                />
                                 {role}
                               </span>
-                          ))
-                        ) : (
-                          <span className="text-gray-400">—</span>
-                        )}
+                            ))
+                          ) : (
+                            <span className="text-gray-400">—</span>
+                          )}
                         </div>
                       </td>
                       <td className="px-6 py-4">
@@ -223,14 +286,27 @@ export default function Users() {
                               : "bg-yellow-50 text-yellow-700 border border-yellow-200"
                           }`}
                         >
-                          <Icon icon={user.emailConfirmed ? "solar:check-circle-bold" : "solar:close-circle-bold"} />
-                          {user.emailConfirmed ? "Đã xác thực" : "Chưa xác thực"}
+                          <Icon
+                            icon={
+                              user.emailConfirmed
+                                ? "solar:check-circle-bold"
+                                : "solar:close-circle-bold"
+                            }
+                          />
+                          {user.emailConfirmed
+                            ? "Đã xác thực"
+                            : "Chưa xác thực"}
                         </span>
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-2 text-gray-600">
-                          <Icon icon="solar:calendar-bold-duotone" className="text-gray-400" />
-                          <span className="text-sm">{formatDate(user.createdAt)}</span>
+                          <Icon
+                            icon="solar:calendar-bold-duotone"
+                            className="text-gray-400"
+                          />
+                          <span className="text-sm">
+                            {formatDate(user.createdAt)}
+                          </span>
                         </div>
                       </td>
                       <td className="px-6 py-4 text-right">
@@ -240,14 +316,20 @@ export default function Users() {
                             className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                             title="Chỉnh sửa quyền"
                           >
-                            <Icon icon="solar:shield-user-bold-duotone" className="text-lg" />
+                            <Icon
+                              icon="solar:shield-user-bold-duotone"
+                              className="text-lg"
+                            />
                           </button>
                           <button
                             onClick={() => handleDelete(user.id)}
                             className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                             title="Xóa người dùng"
                           >
-                            <Icon icon="solar:trash-bin-trash-bold-duotone" className="text-lg" />
+                            <Icon
+                              icon="solar:trash-bin-trash-bold-duotone"
+                              className="text-lg"
+                            />
                           </button>
                         </div>
                       </td>
@@ -257,9 +339,8 @@ export default function Users() {
               </table>
             </div>
           )}
-          </div>
-        </main>
-      </div>
+        </div>
+      </main>
 
       {/* Role Modal */}
       {showRoleModal && editingUser && (
@@ -269,18 +350,28 @@ export default function Users() {
             <div className="bg-gradient-to-r from-purple-500 to-pink-500 px-6 py-5 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
-                  <Icon icon="solar:shield-user-bold-duotone" className="text-2xl text-white" />
+                  <Icon
+                    icon="solar:shield-user-bold-duotone"
+                    className="text-2xl text-white"
+                  />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold text-white">Cập nhật quyền</h3>
-                  <p className="text-sm text-white/80">{editingUser.fullName}</p>
+                  <h3 className="text-lg font-bold text-white">
+                    Cập nhật quyền
+                  </h3>
+                  <p className="text-sm text-white/80">
+                    {editingUser.fullName}
+                  </p>
                 </div>
               </div>
               <button
                 onClick={() => setShowRoleModal(false)}
                 className="p-2 hover:bg-white/20 rounded-lg transition-colors"
               >
-                <Icon icon="solar:close-circle-bold" className="text-2xl text-white" />
+                <Icon
+                  icon="solar:close-circle-bold"
+                  className="text-2xl text-white"
+                />
               </button>
             </div>
 
@@ -302,11 +393,25 @@ export default function Users() {
                     className="w-5 h-5 text-purple-600 rounded focus:ring-2 focus:ring-purple-500"
                   />
                   <div className="flex items-center gap-2 flex-1">
-                    <Icon 
-                      icon={role === "Admin" ? "solar:shield-user-bold-duotone" : "solar:user-bold-duotone"} 
-                      className={`text-xl ${selectedRoles.includes(role) ? "text-purple-600" : "text-gray-400"}`}
+                    <Icon
+                      icon={
+                        role === "Admin"
+                          ? "solar:shield-user-bold-duotone"
+                          : "solar:user-bold-duotone"
+                      }
+                      className={`text-xl ${
+                        selectedRoles.includes(role)
+                          ? "text-purple-600"
+                          : "text-gray-400"
+                      }`}
                     />
-                    <span className={`font-medium ${selectedRoles.includes(role) ? "text-purple-900" : "text-gray-700"}`}>
+                    <span
+                      className={`font-medium ${
+                        selectedRoles.includes(role)
+                          ? "text-purple-900"
+                          : "text-gray-700"
+                      }`}
+                    >
                       {role}
                     </span>
                   </div>
@@ -320,14 +425,20 @@ export default function Users() {
                 onClick={() => setShowRoleModal(false)}
                 className="flex-1 px-4 py-3 border-2 border-gray-300 rounded-xl text-gray-700 font-medium hover:bg-gray-50 transition-all duration-200 flex items-center justify-center gap-2"
               >
-                <Icon icon="solar:close-circle-bold-duotone" className="text-lg" />
+                <Icon
+                  icon="solar:close-circle-bold-duotone"
+                  className="text-lg"
+                />
                 Hủy
               </button>
               <button
                 onClick={handleUpdateRoles}
                 className="flex-1 px-4 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl font-medium hover:from-purple-600 hover:to-pink-600 shadow-lg shadow-purple-500/30 transition-all duration-200 flex items-center justify-center gap-2"
               >
-                <Icon icon="solar:check-circle-bold-duotone" className="text-lg" />
+                <Icon
+                  icon="solar:check-circle-bold-duotone"
+                  className="text-lg"
+                />
                 Cập nhật
               </button>
             </div>

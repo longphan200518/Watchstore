@@ -11,6 +11,7 @@ import { formatCurrency } from "../utils/format";
 import Sidebar from "../components/Sidebar";
 import AdminHeader from "../components/AdminHeader";
 import ImageUpload from "../components/ImageUpload";
+import { useToast } from "../contexts/ToastContext";
 
 const statusMap = {
   1: {
@@ -31,6 +32,7 @@ const statusMap = {
 };
 
 export default function Products() {
+  const { showToast } = useToast();
   const navItems = [
     { label: "Dashboard", path: "/" },
     { label: "Quản lý sản phẩm", path: "/products" },
@@ -38,6 +40,7 @@ export default function Products() {
     { label: "Quản lý thương hiệu", path: "/brands" },
     { label: "Quản lý người dùng", path: "/users" },
     { label: "Quản lý đánh giá", path: "/reviews" },
+    { label: "Cài đặt Website", path: "/website-settings" },
   ];
 
   const [products, setProducts] = useState([]);
@@ -45,9 +48,10 @@ export default function Products() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [pagination, setPagination] = useState({ pageNumber: 1, pageSize: 20 });
+  const [totalPages, setTotalPages] = useState(1);
   const [showModal, setShowModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
-  
+
   // Search & Filter states
   const [searchTerm, setSearchTerm] = useState("");
   const [filterBrand, setFilterBrand] = useState("");
@@ -91,6 +95,7 @@ export default function Products() {
       });
       if (response.success) {
         setProducts(response.data.items || []);
+        setTotalPages(response.data.totalPages || 1);
       } else {
         setError("Không tải được sản phẩm");
       }
@@ -176,12 +181,13 @@ export default function Products() {
     try {
       const response = await deleteWatch(id);
       if (response.success) {
+        showToast("Xóa sản phẩm thành công!", "success");
         fetchProducts();
       } else {
-        alert("Không thể xóa sản phẩm");
+        showToast("Không thể xóa sản phẩm", "error");
       }
     } catch (err) {
-      alert("Lỗi khi xóa sản phẩm");
+      showToast("Lỗi khi xóa sản phẩm", "error");
     }
   };
 
@@ -207,13 +213,19 @@ export default function Products() {
         : await createWatch(payload);
 
       if (response.success) {
+        showToast(
+          editingProduct
+            ? "Cập nhật sản phẩm thành công!"
+            : "Thêm sản phẩm thành công!",
+          "success"
+        );
         setShowModal(false);
         fetchProducts();
       } else {
-        alert(response.message || "Có lỗi xảy ra");
+        showToast(response.message || "Có lỗi xảy ra", "error");
       }
     } catch (err) {
-      alert("Lỗi khi lưu sản phẩm");
+      showToast("Lỗi khi lưu sản phẩm", "error");
     }
   };
 
@@ -258,8 +270,8 @@ export default function Products() {
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-6">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div className="relative">
-                <Icon 
-                  icon="solar:magnifer-bold-duotone" 
+                <Icon
+                  icon="solar:magnifer-bold-duotone"
                   className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg"
                 />
                 <input
@@ -277,7 +289,9 @@ export default function Products() {
               >
                 <option value="">Tất cả thương hiệu</option>
                 {brands.map((brand) => (
-                  <option key={brand.id} value={brand.id}>{brand.name}</option>
+                  <option key={brand.id} value={brand.id}>
+                    {brand.name}
+                  </option>
                 ))}
               </select>
               <select
@@ -287,7 +301,9 @@ export default function Products() {
               >
                 <option value="">Tất cả trạng thái</option>
                 {Object.entries(statusMap).map(([key, value]) => (
-                  <option key={key} value={key}>{value.label}</option>
+                  <option key={key} value={key}>
+                    {value.label}
+                  </option>
                 ))}
               </select>
               <select
@@ -353,7 +369,10 @@ export default function Products() {
                   {products
                     .filter((p) => {
                       // Search filter
-                      if (searchTerm && !p.name.toLowerCase().includes(searchTerm.toLowerCase())) {
+                      if (
+                        searchTerm &&
+                        !p.name.toLowerCase().includes(searchTerm.toLowerCase())
+                      ) {
                         return false;
                       }
                       // Brand filter
@@ -361,112 +380,185 @@ export default function Products() {
                         return false;
                       }
                       // Status filter
-                      if (filterStatus && p.status.toString() !== filterStatus) {
+                      if (
+                        filterStatus &&
+                        p.status.toString() !== filterStatus
+                      ) {
                         return false;
                       }
                       return true;
                     })
                     .sort((a, b) => {
                       // Sorting
-                      if (sortBy === "name") return a.name.localeCompare(b.name);
+                      if (sortBy === "name")
+                        return a.name.localeCompare(b.name);
                       if (sortBy === "price-asc") return a.price - b.price;
                       if (sortBy === "price-desc") return b.price - a.price;
-                      if (sortBy === "stock") return b.stockQuantity - a.stockQuantity;
+                      if (sortBy === "stock")
+                        return b.stockQuantity - a.stockQuantity;
                       return 0;
                     })
                     .map((p) => {
-                    const statusInfo = statusMap[p.status] || statusMap[1];
-                    return (
-                      <tr
-                        key={p.id}
-                        className="hover:bg-gray-50/50 transition-colors group"
-                      >
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-3">
-                            <div className="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden">
-                              {p.images?.[0]?.imageUrl ? (
-                                <img
-                                  src={p.images[0].imageUrl}
-                                  alt={p.name}
-                                  className="w-full h-full object-cover"
-                                />
-                              ) : (
-                                <div className="w-full h-full flex items-center justify-center">
-                                  <Icon
-                                    icon="solar:watch-bold-duotone"
-                                    className="text-2xl text-gray-400"
+                      const statusInfo = statusMap[p.status] || statusMap[1];
+                      return (
+                        <tr
+                          key={p.id}
+                          className="hover:bg-gray-50/50 transition-colors group"
+                        >
+                          <td className="px-6 py-4">
+                            <div className="flex items-center gap-3">
+                              <div className="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden">
+                                {p.images?.[0]?.imageUrl ? (
+                                  <img
+                                    src={p.images[0].imageUrl}
+                                    alt={p.name}
+                                    className="w-full h-full object-cover"
                                   />
-                                </div>
-                              )}
+                                ) : (
+                                  <div className="w-full h-full flex items-center justify-center">
+                                    <Icon
+                                      icon="solar:watch-bold-duotone"
+                                      className="text-2xl text-gray-400"
+                                    />
+                                  </div>
+                                )}
+                              </div>
+                              <div>
+                                <p className="font-semibold text-gray-900">
+                                  {p.name}
+                                </p>
+                                <p className="text-xs text-gray-500">
+                                  ID: {p.id}
+                                </p>
+                              </div>
                             </div>
-                            <div>
-                              <p className="font-semibold text-gray-900">
-                                {p.name}
-                              </p>
-                              <p className="text-xs text-gray-500">
-                                ID: {p.id}
-                              </p>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium">
-                            {p.brandName}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4">
-                          <span className="text-gray-900 font-bold">
-                            {formatCurrency(p.price)}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-2">
-                            <Icon
-                              icon="solar:box-bold-duotone"
-                              className="text-gray-400"
-                            />
-                            <span className="text-gray-700 font-medium">
-                              {p.stockQuantity}
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium">
+                              {p.brandName}
                             </span>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <span
-                            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold ${statusInfo.color}`}
-                          >
-                            <Icon icon={statusInfo.icon} className="text-sm" />
-                            {statusInfo.label}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 text-right">
-                          <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button
-                              onClick={() => handleEdit(p)}
-                              className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                              title="Chỉnh sửa"
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className="text-gray-900 font-bold">
+                              {formatCurrency(p.price)}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="flex items-center gap-2">
+                              <Icon
+                                icon="solar:box-bold-duotone"
+                                className="text-gray-400"
+                              />
+                              <span className="text-gray-700 font-medium">
+                                {p.stockQuantity}
+                              </span>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span
+                              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold ${statusInfo.color}`}
                             >
                               <Icon
-                                icon="solar:pen-bold-duotone"
-                                className="text-lg"
+                                icon={statusInfo.icon}
+                                className="text-sm"
                               />
-                            </button>
-                            <button
-                              onClick={() => handleDelete(p.id)}
-                              className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                              title="Xóa"
-                            >
-                              <Icon
-                                icon="solar:trash-bin-trash-bold-duotone"
-                                className="text-lg"
-                              />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
+                              {statusInfo.label}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 text-right">
+                            <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <button
+                                onClick={() => handleEdit(p)}
+                                className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                title="Chỉnh sửa"
+                              >
+                                <Icon
+                                  icon="solar:pen-bold-duotone"
+                                  className="text-lg"
+                                />
+                              </button>
+                              <button
+                                onClick={() => handleDelete(p.id)}
+                                className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                title="Xóa"
+                              >
+                                <Icon
+                                  icon="solar:trash-bin-trash-bold-duotone"
+                                  className="text-lg"
+                                />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
                 </tbody>
               </table>
+
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200 bg-gray-50">
+                  <div className="text-sm text-gray-600">
+                    Trang {pagination.pageNumber} / {totalPages}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() =>
+                        setPagination({
+                          ...pagination,
+                          pageNumber: pagination.pageNumber - 1,
+                        })
+                      }
+                      disabled={pagination.pageNumber === 1}
+                      className="px-3 py-2 rounded-lg border border-gray-300 text-sm font-medium text-gray-700 hover:bg-white disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                    >
+                      <Icon icon="solar:alt-arrow-left-bold" />
+                    </button>
+                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                      let pageNum;
+                      if (totalPages <= 5) {
+                        pageNum = i + 1;
+                      } else if (pagination.pageNumber <= 3) {
+                        pageNum = i + 1;
+                      } else if (pagination.pageNumber >= totalPages - 2) {
+                        pageNum = totalPages - 4 + i;
+                      } else {
+                        pageNum = pagination.pageNumber - 2 + i;
+                      }
+                      return (
+                        <button
+                          key={pageNum}
+                          onClick={() =>
+                            setPagination({
+                              ...pagination,
+                              pageNumber: pageNum,
+                            })
+                          }
+                          className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                            pagination.pageNumber === pageNum
+                              ? "bg-amber-500 text-white shadow-lg shadow-amber-500/30"
+                              : "border border-gray-300 text-gray-700 hover:bg-white"
+                          }`}
+                        >
+                          {pageNum}
+                        </button>
+                      );
+                    })}
+                    <button
+                      onClick={() =>
+                        setPagination({
+                          ...pagination,
+                          pageNumber: pagination.pageNumber + 1,
+                        })
+                      }
+                      disabled={pagination.pageNumber === totalPages}
+                      className="px-3 py-2 rounded-lg border border-gray-300 text-sm font-medium text-gray-700 hover:bg-white disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                    >
+                      <Icon icon="solar:alt-arrow-right-bold" />
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>

@@ -1,0 +1,38 @@
+using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
+
+namespace WatchStore.Application.Interfaces
+{
+    public interface IImageUploadService
+    {
+        /// <summary>
+        /// Upload single image to cloud storage
+        /// </summary>
+        /// <param name="file">Image file</param>
+        /// <param name="folder">Folder name (e.g., "products", "brands")</param>
+        /// <returns>Image URL</returns>
+        Task<string> UploadImageAsync(IFormFile file, string folder = "general");
+
+        /// <summary>
+        /// Upload multiple images to cloud storage
+        /// </summary>
+        /// <param name="files">Image files</param>
+        /// <param name="folder">Folder name</param>
+        /// <returns>List of image URLs</returns>
+        Task<List<string>> UploadMultipleImagesAsync(List<IFormFile> files, string folder = "general");
+
+        /// <summary>
+        /// Delete image from cloud storage
+        /// </summary>
+        /// <param name="imageUrl">Image URL to delete</param>
+        /// <returns>Success status</returns>
+        Task<bool> DeleteImageAsync(string imageUrl);
+
+        /// <summary>
+        /// Delete multiple images from cloud storage
+        /// </summary>
+        /// <param name="imageUrls">List of image URLs to delete</param>
+        /// <returns>Success status</returns>
+        Task<bool> DeleteMultipleImagesAsync(List<string> imageUrls);
+    }
+}

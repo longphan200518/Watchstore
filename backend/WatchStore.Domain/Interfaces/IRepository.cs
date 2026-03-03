@@ -12,7 +12,7 @@ namespace WatchStore.Domain.Interfaces
         Task UpdateAsync(T entity, CancellationToken cancellationToken = default);
         Task DeleteAsync(T entity, CancellationToken cancellationToken = default);
         IQueryable<T> GetQueryable();
-        
+
         // Specification pattern support
         Task<T?> GetBySpecAsync(ISpecification<T> spec, CancellationToken cancellationToken = default);
         Task<IEnumerable<T>> ListAsync(ISpecification<T> spec, CancellationToken cancellationToken = default);

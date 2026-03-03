@@ -3,23 +3,24 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using System.Text;
+using WatchStore.API.Data;
+using WatchStore.Application.Common;
 using WatchStore.Application.Features.Auth;
-using WatchStore.Application.Features.Users;
-using WatchStore.Application.Features.Watches;
 using WatchStore.Application.Features.Brands;
+using WatchStore.Application.Features.Dashboard;
 using WatchStore.Application.Features.Orders;
 using WatchStore.Application.Features.Reviews;
-using WatchStore.Application.Features.Dashboard;
+using WatchStore.Application.Features.Users;
+using WatchStore.Application.Features.Watches;
 using WatchStore.Application.Features.WebsiteSettings;
-using Microsoft.OpenApi.Models;
 using WatchStore.Application.Interfaces;
 using WatchStore.Application.Services;
 using WatchStore.Domain.Entities;
 using WatchStore.Domain.Interfaces;
 using WatchStore.Infrastructure.Data;
 using WatchStore.Infrastructure.Repositories;
-using WatchStore.API.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -108,6 +109,16 @@ builder.Services.AddCors(options =>
 });
 
 // Services
+// Singleton Logging Service
+builder.Services.AddSingleton<ILoggingService>(serviceProvider =>
+{
+    var logger = serviceProvider.GetRequiredService<ILogger<WatchStore.Application.Services.LoggingService>>();
+    return WatchStore.Application.Services.LoggingService.GetInstance(logger);
+});
+
+// Facade Pattern - Gom tất cả common dependencies
+builder.Services.AddScoped<IServiceFacade, ServiceFacade>();
+
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IJwtService, JwtService>();
@@ -164,6 +175,10 @@ if (!app.Environment.IsDevelopment())
     app.UseHttpsRedirection();
 }
 app.UseCors("AllowFrontend");
+
+// Global Exception Handler Middleware
+app.UseMiddleware<WatchStore.API.Middlewares.GlobalExceptionHandlerMiddleware>();
+
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

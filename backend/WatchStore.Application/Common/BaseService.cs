@@ -1,6 +1,5 @@
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
-using WatchStore.Domain.Interfaces;
 
 namespace WatchStore.Application.Common
 {
@@ -9,17 +8,14 @@ namespace WatchStore.Application.Common
     /// </summary>
     public abstract class BaseService
     {
-        protected readonly IUnitOfWork UnitOfWork;
+        protected readonly IServiceFacade Facade;
         protected readonly IMemoryCache Cache;
         protected readonly ILogger Logger;
 
-        protected BaseService(
-            IUnitOfWork unitOfWork,
-            IMemoryCache cache,
-            ILogger logger)
+        protected BaseService(IServiceFacade facade, ILogger logger)
         {
-            UnitOfWork = unitOfWork;
-            Cache = cache;
+            Facade = facade;
+            Cache = facade.Cache;
             Logger = logger;
         }
 
@@ -79,19 +75,19 @@ namespace WatchStore.Application.Common
         {
             try
             {
-                await UnitOfWork.BeginTransactionAsync();
+                await Facade.UnitOfWork.BeginTransactionAsync();
                 Logger.LogInformation("Starting transaction for: {Operation}", operationName);
 
                 var result = await operation();
 
                 if (result.Success)
                 {
-                    await UnitOfWork.CommitAsync();
+                    await Facade.UnitOfWork.CommitAsync();
                     Logger.LogInformation("Transaction committed for: {Operation}", operationName);
                 }
                 else
                 {
-                    await UnitOfWork.RollbackAsync();
+                    await Facade.UnitOfWork.RollbackAsync();
                     Logger.LogWarning("Transaction rolled back for: {Operation}", operationName);
                 }
 
@@ -99,7 +95,7 @@ namespace WatchStore.Application.Common
             }
             catch (Exception ex)
             {
-                await UnitOfWork.RollbackAsync();
+                await Facade.UnitOfWork.RollbackAsync();
                 Logger.LogError(ex, "Transaction failed for: {Operation}", operationName);
                 return ApiResponse<T>.ErrorResponse($"Operation failed: {ex.Message}");
             }

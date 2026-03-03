@@ -9,8 +9,8 @@ namespace WatchStore.API.Controllers
         [HttpGet]
         public IActionResult Get()
         {
-            return Ok(new 
-            { 
+            return Ok(new
+            {
                 status = "Healthy",
                 message = "WatchStore API is running!",
                 timestamp = DateTime.UtcNow

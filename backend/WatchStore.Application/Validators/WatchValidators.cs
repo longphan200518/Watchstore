@@ -1,6 +1,5 @@
 using FluentValidation;
 using WatchStore.Application.DTOs;
-using WatchStore.Domain.Enums;
 
 namespace WatchStore.Application.Validators
 {

@@ -1,5 +1,5 @@
-using WatchStore.Application.DTOs;
 using WatchStore.Application.Common;
+using WatchStore.Application.DTOs;
 
 namespace WatchStore.Application.Interfaces
 {

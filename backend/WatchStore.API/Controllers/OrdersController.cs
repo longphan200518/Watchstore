@@ -4,7 +4,6 @@ using System.Security.Claims;
 using WatchStore.Application.Common;
 using WatchStore.Application.DTOs;
 using WatchStore.Application.Interfaces;
-using WatchStore.Domain.Enums;
 
 namespace WatchStore.API.Controllers
 {

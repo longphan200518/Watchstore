@@ -3,8 +3,8 @@ using WatchStore.Application.DTOs;
 
 namespace WatchStore.Application.Interfaces
 {
-  public interface IDashboardService
-  {
-    Task<ApiResponse<DashboardSummaryDto>> GetSummaryAsync(DashboardFilterDto filter);
-  }
+    public interface IDashboardService
+    {
+        Task<ApiResponse<DashboardSummaryDto>> GetSummaryAsync(DashboardFilterDto filter);
+    }
 }

@@ -105,4 +105,126 @@ namespace WatchStore.Application.DTOs
         public string? SortBy { get; set; } = "createdAt"; // name, price, createdAt
         public bool IsDescending { get; set; } = true;
     }
+
+    /// <summary>
+    /// Fluent Builder Pattern for CreateWatchDto
+    /// </summary>
+    public class CreateWatchDtoBuilder
+    {
+        private readonly CreateWatchDto _dto = new();
+
+        public CreateWatchDtoBuilder WithName(string name)
+        {
+            _dto.Name = name;
+            return this;
+        }
+
+        public CreateWatchDtoBuilder WithDescription(string? description)
+        {
+            _dto.Description = description;
+            return this;
+        }
+
+        public CreateWatchDtoBuilder WithPrice(decimal price)
+        {
+            _dto.Price = price;
+            return this;
+        }
+
+        public CreateWatchDtoBuilder WithStockQuantity(int quantity)
+        {
+            _dto.StockQuantity = quantity;
+            return this;
+        }
+
+        public CreateWatchDtoBuilder WithBrand(int brandId)
+        {
+            _dto.BrandId = brandId;
+            return this;
+        }
+
+        public CreateWatchDtoBuilder WithCaseSize(string caseSize)
+        {
+            _dto.CaseSize = caseSize;
+            return this;
+        }
+
+        public CreateWatchDtoBuilder WithMovement(string movement)
+        {
+            _dto.Movement = movement;
+            return this;
+        }
+
+        public CreateWatchDtoBuilder WithFunctions(string functions)
+        {
+            _dto.Functions = functions;
+            return this;
+        }
+
+        public CreateWatchDtoBuilder WithThickness(string thickness)
+        {
+            _dto.Thickness = thickness;
+            return this;
+        }
+
+        public CreateWatchDtoBuilder WithBandWidth(string bandWidth)
+        {
+            _dto.BandWidth = bandWidth;
+            return this;
+        }
+
+        public CreateWatchDtoBuilder WithCrystal(string crystal)
+        {
+            _dto.Crystal = crystal;
+            return this;
+        }
+
+        public CreateWatchDtoBuilder WithCaseMaterial(string caseMaterial)
+        {
+            _dto.CaseMaterial = caseMaterial;
+            return this;
+        }
+
+        public CreateWatchDtoBuilder WithBandMaterial(string bandMaterial)
+        {
+            _dto.BandMaterial = bandMaterial;
+            return this;
+        }
+
+        public CreateWatchDtoBuilder WithWaterResistance(string waterResistance)
+        {
+            _dto.WaterResistance = waterResistance;
+            return this;
+        }
+
+        public CreateWatchDtoBuilder WithWarranty(string warranty)
+        {
+            _dto.Warranty = warranty;
+            return this;
+        }
+
+        public CreateWatchDtoBuilder WithStatus(WatchStatus status)
+        {
+            _dto.Status = status;
+            return this;
+        }
+
+        public CreateWatchDtoBuilder WithImageUrls(params string[] imageUrls)
+        {
+            _dto.ImageUrls = imageUrls.ToList();
+            return this;
+        }
+
+        public CreateWatchDtoBuilder AddImageUrl(string imageUrl)
+        {
+            _dto.ImageUrls ??= new List<string>();
+            _dto.ImageUrls.Add(imageUrl);
+            return this;
+        }
+
+        public CreateWatchDto Build()
+        {
+            return _dto;
+        }
+    }
 }

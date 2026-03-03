@@ -1,22 +1,23 @@
 using System.Net;
 using System.Text.Json;
 using WatchStore.Application.Common;
+using WatchStore.Application.Interfaces;
 
 namespace WatchStore.API.Middlewares
 {
     public class GlobalExceptionHandlerMiddleware
     {
         private readonly RequestDelegate _next;
-        private readonly ILogger<GlobalExceptionHandlerMiddleware> _logger;
+        private readonly ILoggingService _loggingService;
         private readonly IHostEnvironment _env;
 
         public GlobalExceptionHandlerMiddleware(
             RequestDelegate next,
-            ILogger<GlobalExceptionHandlerMiddleware> logger,
+            ILoggingService loggingService,
             IHostEnvironment env)
         {
             _next = next;
-            _logger = logger;
+            _loggingService = loggingService;
             _env = env;
         }
 
@@ -28,7 +29,7 @@ namespace WatchStore.API.Middlewares
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unhandled exception occurred");
+                _loggingService.LogError("An unhandled exception occurred", ex);
                 await HandleExceptionAsync(context, ex);
             }
         }

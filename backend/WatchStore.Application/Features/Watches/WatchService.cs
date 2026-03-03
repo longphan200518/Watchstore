@@ -1,14 +1,11 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using WatchStore.Application.Common;
 using WatchStore.Application.DTOs;
 using WatchStore.Application.Interfaces;
-using WatchStore.Application.Specifications;
 using WatchStore.Common.Constants;
 using WatchStore.Common.Extensions;
 using WatchStore.Domain.Entities;
-using WatchStore.Domain.Enums;
 using WatchStore.Domain.Interfaces;
 
 namespace WatchStore.Application.Features.Watches
@@ -18,13 +15,11 @@ namespace WatchStore.Application.Features.Watches
         private readonly IRepository<Watch> _watchRepository;
         private readonly IRepository<Brand> _brandRepository;
 
-        public WatchService(
-            IUnitOfWork unitOfWork,
-            IMemoryCache cache,
-            ILogger<WatchService> logger) : base(unitOfWork, cache, logger)
+        public WatchService(IServiceFacade facade)
+            : base(facade, facade.GetLogger<WatchService>())
         {
-            _watchRepository = unitOfWork.GetRepository<Watch>();
-            _brandRepository = unitOfWork.GetRepository<Brand>();
+            _watchRepository = facade.UnitOfWork.GetRepository<Watch>();
+            _brandRepository = facade.UnitOfWork.GetRepository<Brand>();
         }
 
         public async Task<ApiResponse<PagedResponse<WatchDto>>> GetAllAsync(WatchFilterDto filter, PaginationParams pagination)
@@ -167,7 +162,7 @@ namespace WatchStore.Application.Features.Watches
                     }
 
                     await _watchRepository.AddAsync(watch);
-                    await UnitOfWork.SaveChangesAsync();
+                    await Facade.UnitOfWork.SaveChangesAsync();
 
                     Logger.LogInformation("Watch created with ID: {WatchId}", watch.Id);
 
@@ -243,7 +238,7 @@ namespace WatchStore.Application.Features.Watches
                     }
 
                     await _watchRepository.UpdateAsync(watch);
-                    await UnitOfWork.SaveChangesAsync();
+                    await Facade.UnitOfWork.SaveChangesAsync();
 
                     // Invalidate cache for this watch
                     InvalidateCache(AppConstants.CacheKeys.GetWatchKey(dto.Id));
@@ -273,7 +268,7 @@ namespace WatchStore.Application.Features.Watches
                         return ApiResponse<bool>.ErrorResponse("Watch not found");
 
                     await _watchRepository.DeleteAsync(watch);
-                    await UnitOfWork.SaveChangesAsync();
+                    await Facade.UnitOfWork.SaveChangesAsync();
 
                     // Invalidate cache
                     InvalidateCache(AppConstants.CacheKeys.GetWatchKey(id));

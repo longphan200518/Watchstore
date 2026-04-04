@@ -35,9 +35,7 @@ namespace WatchStore.API.Controllers
                 : BadRequest(result);
         }
 
-        /// <summary>
-        /// Get my orders (Authenticated user)
-        /// </summary>
+ 
         [HttpGet("my-orders")]
         [ProducesResponseType(typeof(ApiResponse<PagedResponse<OrderDto>>), 200)]
         public async Task<IActionResult> GetMyOrders([FromQuery] PaginationParams pagination)
@@ -47,9 +45,7 @@ namespace WatchStore.API.Controllers
             return Ok(result);
         }
 
-        /// <summary>
-        /// Get order by ID
-        /// </summary>
+     
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(ApiResponse<OrderDto>), 200)]
         public async Task<IActionResult> GetById(int id)
@@ -64,9 +60,7 @@ namespace WatchStore.API.Controllers
             return result.Success ? Ok(result) : NotFound(result);
         }
 
-        /// <summary>
-        /// Cancel order (Order owner only, pending orders only)
-        /// </summary>
+        
         [HttpPost("{id}/cancel")]
         [ProducesResponseType(typeof(ApiResponse<bool>), 200)]
         public async Task<IActionResult> Cancel(int id)

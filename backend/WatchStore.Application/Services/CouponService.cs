@@ -12,9 +12,8 @@ namespace WatchStore.Application.Services
     public class CouponService : BaseService, ICouponService
     {
         public CouponService(
-            IUnitOfWork unitOfWork,
-            IMemoryCache cache,
-            ILogger<CouponService> logger) : base(unitOfWork, cache, logger)
+            IServiceFacade facade,
+            ILogger<CouponService> logger) : base(facade, logger)
         {
         }
 
@@ -22,7 +21,7 @@ namespace WatchStore.Application.Services
         {
             try
             {
-                var query = UnitOfWork.GetRepository<Coupon>()
+                var query = Facade.UnitOfWork.GetRepository<Coupon>()
                     .GetQueryable()
                     .OrderByDescending(c => c.CreatedAt);
 
@@ -56,7 +55,7 @@ namespace WatchStore.Application.Services
         {
             try
             {
-                var coupon = await UnitOfWork.GetRepository<Coupon>()
+                var coupon = await Facade.UnitOfWork.GetRepository<Coupon>()
                     .GetByIdAsync(id);
 
                 if (coupon == null)
@@ -75,7 +74,7 @@ namespace WatchStore.Application.Services
         {
             try
             {
-                var coupon = await UnitOfWork.GetRepository<Coupon>()
+                var coupon = await Facade.UnitOfWork.GetRepository<Coupon>()
                     .GetQueryable()
                     .FirstOrDefaultAsync(c => c.Code.ToLower() == code.ToLower());
 
@@ -96,7 +95,7 @@ namespace WatchStore.Application.Services
             try
             {
                 // Check if code already exists
-                var existing = await UnitOfWork.GetRepository<Coupon>()
+                var existing = await Facade.UnitOfWork.GetRepository<Coupon>()
                     .GetQueryable()
                     .FirstOrDefaultAsync(c => c.Code.ToLower() == dto.Code.ToLower());
 
@@ -118,8 +117,8 @@ namespace WatchStore.Application.Services
                     IsActive = dto.IsActive
                 };
 
-                await UnitOfWork.GetRepository<Coupon>().AddAsync(coupon);
-                await UnitOfWork.SaveChangesAsync();
+                await Facade.UnitOfWork.GetRepository<Coupon>().AddAsync(coupon);
+                await Facade.UnitOfWork.SaveChangesAsync();
 
                 return ApiResponse<CouponDto>.SuccessResponse(MapToDto(coupon), "Coupon created successfully");
             }
@@ -134,7 +133,7 @@ namespace WatchStore.Application.Services
         {
             try
             {
-                var coupon = await UnitOfWork.GetRepository<Coupon>().GetByIdAsync(dto.Id);
+                var coupon = await Facade.UnitOfWork.GetRepository<Coupon>().GetByIdAsync(dto.Id);
 
                 if (coupon == null)
                     return ApiResponse<CouponDto>.ErrorResponse("Coupon not found");
@@ -149,8 +148,8 @@ namespace WatchStore.Application.Services
                 coupon.EndDate = dto.EndDate;
                 coupon.IsActive = dto.IsActive;
 
-                await UnitOfWork.GetRepository<Coupon>().UpdateAsync(coupon);
-                await UnitOfWork.SaveChangesAsync();
+                await Facade.UnitOfWork.GetRepository<Coupon>().UpdateAsync(coupon);
+                await Facade.UnitOfWork.SaveChangesAsync();
 
                 return ApiResponse<CouponDto>.SuccessResponse(MapToDto(coupon), "Coupon updated successfully");
             }
@@ -165,13 +164,13 @@ namespace WatchStore.Application.Services
         {
             try
             {
-                var coupon = await UnitOfWork.GetRepository<Coupon>().GetByIdAsync(id);
+                var coupon = await Facade.UnitOfWork.GetRepository<Coupon>().GetByIdAsync(id);
 
                 if (coupon == null)
                     return ApiResponse<bool>.ErrorResponse("Coupon not found");
 
-                await UnitOfWork.GetRepository<Coupon>().DeleteAsync(coupon);
-                await UnitOfWork.SaveChangesAsync();
+                await Facade.UnitOfWork.GetRepository<Coupon>().DeleteAsync(coupon);
+                await Facade.UnitOfWork.SaveChangesAsync();
 
                 return ApiResponse<bool>.SuccessResponse(true, "Coupon deleted successfully");
             }
@@ -186,7 +185,7 @@ namespace WatchStore.Application.Services
         {
             try
             {
-                var coupon = await UnitOfWork.GetRepository<Coupon>()
+                var coupon = await Facade.UnitOfWork.GetRepository<Coupon>()
                     .GetQueryable()
                     .FirstOrDefaultAsync(c => c.Code.ToLower() == dto.Code.ToLower());
 
@@ -252,7 +251,7 @@ namespace WatchStore.Application.Services
                 // Check per-user limit (if userId provided)
                 if (dto.UserId.HasValue && coupon.MaxUsagePerUser.HasValue)
                 {
-                    var userUsageCount = await UnitOfWork.GetRepository<CouponUsage>()
+                    var userUsageCount = await Facade.UnitOfWork.GetRepository<CouponUsage>()
                         .GetQueryable()
                         .CountAsync(cu => cu.CouponId == coupon.Id && cu.UserId == dto.UserId.Value);
 
@@ -307,7 +306,7 @@ namespace WatchStore.Application.Services
             try
             {
                 var now = DateTime.UtcNow;
-                var coupons = await UnitOfWork.GetRepository<Coupon>()
+                var coupons = await Facade.UnitOfWork.GetRepository<Coupon>()
                     .GetQueryable()
                     .Where(c => c.IsActive && c.StartDate <= now && c.EndDate >= now)
                     .OrderByDescending(c => c.CreatedAt)

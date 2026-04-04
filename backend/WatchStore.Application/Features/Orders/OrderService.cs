@@ -10,17 +10,19 @@ namespace WatchStore.Application.Features.Orders
 {
     public class OrderService : IOrderService
     {
-        private readonly IServiceFacade _facade;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IRepository<Order> _orderRepository;
         private readonly IRepository<OrderItem> _orderItemRepository;
         private readonly IRepository<Watch> _watchRepository;
+        private readonly IEmailService _emailService;
 
-        public OrderService(IServiceFacade facade)
+        public OrderService(IUnitOfWork unitOfWork, IEmailService emailService)
         {
-            _facade = facade;
-            _orderRepository = facade.UnitOfWork.GetRepository<Order>();
-            _orderItemRepository = facade.UnitOfWork.GetRepository<OrderItem>();
-            _watchRepository = facade.UnitOfWork.GetRepository<Watch>();
+            _unitOfWork = unitOfWork;
+            _orderRepository = _unitOfWork.GetRepository<Order>();
+            _orderItemRepository = _unitOfWork.GetRepository<OrderItem>();
+            _watchRepository = _unitOfWork.GetRepository<Watch>();
+            _emailService = emailService;
         }
 
         public async Task<ApiResponse<OrderDto>> CreateAsync(CreateOrderDto dto, int userId)
@@ -70,7 +72,7 @@ namespace WatchStore.Application.Features.Orders
             };
 
             await _orderRepository.AddAsync(order);
-            await _facade.UnitOfWork.SaveChangesAsync();
+            await _unitOfWork.SaveChangesAsync();
 
             // Load order with full details including items, watches, images, and user
             var orderWithDetails = await _orderRepository.GetQueryable()
@@ -93,7 +95,7 @@ namespace WatchStore.Application.Features.Orders
                     ImageUrl: item.Watch.Images.FirstOrDefault()?.ImageUrl ?? "https://via.placeholder.com/60"
                 )).ToList();
 
-                await _facade.EmailService.SendOrderConfirmationEmailAsync(
+                await _emailService.SendOrderConfirmationEmailAsync(
                     orderWithDetails.User.Email,
                     orderWithDetails.User.FullName,
                     orderWithDetails.Id,
@@ -102,7 +104,7 @@ namespace WatchStore.Application.Features.Orders
                     orderWithDetails.ShippingAddress,
                     orderWithDetails.PhoneNumber ?? "Không có"
                 );
-
+                
                 Console.WriteLine($"[ORDER] Email confirmation sent to {orderWithDetails.User.Email} for order #{orderWithDetails.Id}");
             }
             catch (Exception ex)
@@ -137,7 +139,7 @@ namespace WatchStore.Application.Features.Orders
         }
 
         private async Task<ApiResponse<PagedResponse<OrderDto>>> GetOrdersPagedAsync(
-            IQueryable<Order> query,
+            IQueryable<Order> query, 
             PaginationParams pagination)
         {
             var totalRecords = await query.CountAsync();
@@ -228,7 +230,7 @@ namespace WatchStore.Application.Features.Orders
 
             order.Status = status;
             await _orderRepository.UpdateAsync(order);
-            await _facade.UnitOfWork.SaveChangesAsync();
+            await _unitOfWork.SaveChangesAsync();
 
             return ApiResponse<bool>.SuccessResponse(true, $"Order status updated to {status}");
         }
@@ -255,7 +257,7 @@ namespace WatchStore.Application.Features.Orders
             }
 
             order.Status = OrderStatus.Cancelled;
-            await _facade.UnitOfWork.SaveChangesAsync();
+            await _unitOfWork.SaveChangesAsync();
 
             return ApiResponse<bool>.SuccessResponse(true, "Order cancelled successfully");
         }

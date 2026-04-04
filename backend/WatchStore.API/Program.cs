@@ -125,7 +125,20 @@ builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
+
+// Bridge Pattern - Payment Services
+// Register payment providers (Implementors)
+builder.Services.AddScoped<WatchStore.Application.Services.Payment.VNPayProvider>();
+builder.Services.AddScoped<WatchStore.Application.Services.Payment.CODProvider>();
+// Có thể thêm: builder.Services.AddScoped<MomoProvider>();
+// Có thể thêm: builder.Services.AddScoped<ZaloPayProvider>();
+
+// Register payment service (Bridge)
+builder.Services.AddScoped<WatchStore.Application.Services.Payment.PaymentService>();
+
+// Legacy support - if needed
 builder.Services.AddScoped<VNPayService>();
+
 builder.Services.AddScoped<IWatchService, WatchService>();
 builder.Services.AddScoped<IBrandService, BrandService>();
 builder.Services.AddScoped<IOrderService, OrderService>();

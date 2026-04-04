@@ -1,0 +1,118 @@
+using Microsoft.Extensions.Configuration;
+
+namespace WatchStore.Application.Services.Payment
+{
+    /// <summary>
+    /// Bridge Pattern - Example: Momo Provider (Future Implementation)
+    /// Đây là ví dụ template để implement provider mới
+    /// </summary>
+    public class MomoProvider : IPaymentProvider
+    {
+        private readonly IConfiguration _configuration;
+
+        public string ProviderName => "Momo";
+
+        public MomoProvider(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
+
+        public async Task<PaymentUrlResult> CreatePaymentUrlAsync(PaymentRequest request)
+        {
+            try
+            {
+                // TODO: Implement Momo payment URL creation
+                var momoUrl = _configuration["Momo:Url"];
+                var momoPartnerCode = _configuration["Momo:PartnerCode"];
+                var momoAccessKey = _configuration["Momo:AccessKey"];
+                var momoSecretKey = _configuration["Momo:SecretKey"];
+
+                // Example Momo implementation structure
+                var rawData = $"partnerCode={momoPartnerCode}" +
+                              $"&accessKey={momoAccessKey}" +
+                              $"&requestId={request.OrderId}" +
+                              $"&amount={request.Amount}" +
+                              $"&orderId={request.OrderId}" +
+                              $"&orderInfo={request.OrderInfo}";
+
+                // Sign request with secretKey
+                // var signature = ComputeHmacSHA256(rawData, momoSecretKey);
+
+                // Build payment URL
+                // var paymentUrl = $"{momoUrl}?...";
+
+                return await Task.FromResult(new PaymentUrlResult
+                {
+                    Success = true,
+                    PaymentUrl = "https://test-payment.momo.vn/...", // Example
+                    TransactionId = $"MOMO_{request.OrderId}"
+                });
+            }
+            catch (Exception ex)
+            {
+                return await Task.FromResult(new PaymentUrlResult
+                {
+                    Success = false,
+                    ErrorMessage = $"Momo error: {ex.Message}"
+                });
+            }
+        }
+
+        public async Task<PaymentValidationResult> ValidatePaymentResponseAsync(Dictionary<string, string> responseData)
+        {
+            try
+            {
+                // TODO: Implement Momo signature validation
+                var signature = responseData.GetValueOrDefault("signature", "");
+                var resultCode = responseData.GetValueOrDefault("resultCode", "");
+                var orderId = int.Parse(responseData.GetValueOrDefault("orderId", "0"));
+                var amount = decimal.Parse(responseData.GetValueOrDefault("amount", "0"));
+
+                // Validate signature
+                // var isValid = ValidateMomoSignature(responseData, signature);
+
+                return await Task.FromResult(new PaymentValidationResult
+                {
+                    IsValid = true, // TODO: Implement actual validation
+                    IsSuccess = resultCode == "0", // Momo success code
+                    OrderId = orderId,
+                    Amount = amount,
+                    TransactionId = responseData.GetValueOrDefault("transId", ""),
+                    ResponseCode = resultCode,
+                    RawData = responseData
+                });
+            }
+            catch (Exception ex)
+            {
+                return await Task.FromResult(new PaymentValidationResult
+                {
+                    IsValid = false,
+                    ErrorMessage = $"Validation error: {ex.Message}"
+                });
+            }
+        }
+
+        public async Task<bool> IsAvailableAsync()
+        {
+            var momoUrl = _configuration["Momo:Url"];
+            var momoPartnerCode = _configuration["Momo:PartnerCode"];
+            var momoSecretKey = _configuration["Momo:SecretKey"];
+
+            return await Task.FromResult(
+                !string.IsNullOrEmpty(momoUrl) &&
+                !string.IsNullOrEmpty(momoPartnerCode) &&
+                !string.IsNullOrEmpty(momoSecretKey)
+            );
+        }
+
+        // Helper method for HMAC SHA256 signing (Momo uses this)
+        // private string ComputeHmacSHA256(string message, string secret)
+        // {
+        //     using (var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(secret)))
+        //     {
+        //         var hash = hmac.ComputeHash(Encoding.UTF8.GetBytes(message));
+        //         return BitConverter.ToString(hash).Replace("-", "").ToLower();
+        //     }
+        // }
+    }
+}

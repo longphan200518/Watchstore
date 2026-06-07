@@ -26,6 +26,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddSession();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("user", new OpenApiInfo
@@ -125,6 +127,7 @@ builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<ICartService, WatchStore.Application.Features.Cart.CartService>();
 
 // Bridge Pattern - Payment Services
 // Register payment providers (Implementors)
@@ -135,6 +138,7 @@ builder.Services.AddScoped<WatchStore.Application.Services.Payment.CODProvider>(
 
 // Register payment service (Bridge)
 builder.Services.AddScoped<WatchStore.Application.Services.Payment.PaymentService>();
+builder.Services.AddScoped<WatchStore.Application.Services.Payment.IPaymentProvider, WatchStore.Application.Services.Payment.VNPayProvider>();
 
 // Legacy support - if needed
 builder.Services.AddScoped<VNPayService>();
@@ -188,6 +192,7 @@ if (!app.Environment.IsDevelopment())
     app.UseHttpsRedirection();
 }
 app.UseCors("AllowFrontend");
+app.UseSession();
 
 // Global Exception Handler Middleware
 app.UseMiddleware<WatchStore.API.Middlewares.GlobalExceptionHandlerMiddleware>();

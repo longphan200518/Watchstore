@@ -3,10 +3,11 @@ using WatchStore.Application.Interfaces;
 
 namespace WatchStore.Application.Services
 {
-    public class LoggingService : ILoggingService
+    public sealed class LoggingService : ILoggingService
     {
         private readonly ILogger<LoggingService> _logger;
         private static LoggingService? _instance;
+        private static readonly object _lock = new();
 
         private LoggingService(ILogger<LoggingService> logger)
         {
@@ -15,7 +16,18 @@ namespace WatchStore.Application.Services
 
         public static LoggingService GetInstance(ILogger<LoggingService> logger)
         {
-            _instance ??= new LoggingService(logger);
+            ArgumentNullException.ThrowIfNull(logger);
+
+            if (_instance != null)
+            {
+                return _instance;
+            }
+
+            lock (_lock)
+            {
+                _instance ??= new LoggingService(logger);
+            }
+
             return _instance;
         }
 

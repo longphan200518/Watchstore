@@ -3,8 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WatchStore.Application.Services;
 using WatchStore.Application.Interfaces;
+using WatchStore.Application.Services.Payment;
 using WatchStore.Domain.Interfaces;
 using WatchStore.Domain.Enums;
+using WatchStore.Domain.Entities;
 
 namespace WatchStore.API.Controllers
 {
@@ -14,17 +16,20 @@ namespace WatchStore.API.Controllers
   public class PaymentController : ControllerBase
   {
     private readonly VNPayService _vnPayService;
+    private readonly PaymentService _paymentService;
     private readonly IRepository<WatchStore.Domain.Entities.Order> _orderRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IEmailService _emailService;
 
     public PaymentController(
         VNPayService vnPayService,
+        PaymentService paymentService,
         IRepository<WatchStore.Domain.Entities.Order> orderRepository,
         IUnitOfWork unitOfWork,
         IEmailService emailService)
     {
       _vnPayService = vnPayService;
+      _paymentService = paymentService;
       _orderRepository = orderRepository;
       _unitOfWork = unitOfWork;
       _emailService = emailService;
@@ -45,6 +50,20 @@ namespace WatchStore.API.Controllers
         var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "127.0.0.1";
         var orderInfo = $"Thanh toán đơn hàng #{order.Id}";
         var paymentUrl = _vnPayService.CreatePaymentUrl(order.Id, order.TotalAmount, orderInfo, ipAddress);
+
+        var paymentRepo = _unitOfWork.GetRepository<Payment>();
+        var paymentRecord = new Payment
+        {
+          OrderId = order.Id,
+          Provider = "VNPay",
+          Amount = order.TotalAmount,
+          Currency = "VND",
+          TransactionId = order.Id.ToString(),
+          Status = "Pending"
+        };
+
+        await paymentRepo.AddAsync(paymentRecord);
+        await _unitOfWork.SaveChangesAsync();
 
         return Ok(new { success = true, data = new { paymentUrl } });
       }
@@ -88,6 +107,17 @@ namespace WatchStore.API.Controllers
           // Payment success
           order.Status = OrderStatus.Processing;
           await _orderRepository.UpdateAsync(order);
+
+          var paymentRepo = _unitOfWork.GetRepository<Payment>();
+          var payment = (await paymentRepo.FindAsync(p => p.OrderId == order.Id && p.Provider == "VNPay")).FirstOrDefault();
+          if (payment != null)
+          {
+            payment.Status = "Paid";
+            payment.TransactionId = Request.Query["vnp_TransactionNo"].ToString();
+            payment.PaidAt = DateTime.UtcNow;
+            await paymentRepo.UpdateAsync(payment);
+          }
+
           await _unitOfWork.SaveChangesAsync();
 
           // Load order with items and watch details for email
@@ -134,6 +164,16 @@ namespace WatchStore.API.Controllers
         else
         {
           // Payment failed
+          var paymentRepo = _unitOfWork.GetRepository<Payment>();
+          var payment = (await paymentRepo.FindAsync(p => p.OrderId == order.Id && p.Provider == "VNPay")).FirstOrDefault();
+          if (payment != null)
+          {
+            payment.Status = "Failed";
+            payment.TransactionId = Request.Query["vnp_TransactionNo"].ToString();
+            await paymentRepo.UpdateAsync(payment);
+            await _unitOfWork.SaveChangesAsync();
+          }
+
           return Redirect($"http://localhost:6868/payment-failed?orderId={orderId}");
         }
       }

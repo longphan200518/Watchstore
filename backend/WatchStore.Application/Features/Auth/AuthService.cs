@@ -16,6 +16,7 @@ namespace WatchStore.Application.Features.Auth
         private readonly IEmailService _emailService;
         private readonly IConfiguration _configuration;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly ICartService _cartService;
 
         public AuthService(
             UserManager<User> userManager,
@@ -23,7 +24,8 @@ namespace WatchStore.Application.Features.Auth
             IJwtService jwtService,
             IEmailService emailService,
             IConfiguration configuration,
-            IUnitOfWork unitOfWork)
+            IUnitOfWork unitOfWork,
+            ICartService cartService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -31,6 +33,7 @@ namespace WatchStore.Application.Features.Auth
             _emailService = emailService;
             _configuration = configuration;
             _unitOfWork = unitOfWork;
+            _cartService = cartService;
         }
 
         public async Task<ApiResponse<AuthResponseDto>> LoginAsync(LoginRequestDto request)
@@ -79,6 +82,8 @@ namespace WatchStore.Application.Features.Auth
                     Roles = roles.ToList()
                 }
             };
+
+            await _cartService.MergeSessionCartToUserAsync(user.Id);
 
             return ApiResponse<AuthResponseDto>.SuccessResponse(response, "Đăng nhập thành công");
         }
@@ -174,7 +179,13 @@ namespace WatchStore.Application.Features.Auth
             await _unitOfWork.SaveChangesAsync();
 
             // Gửi email OTP
-            await _emailService.SendVerificationEmailAsync(request.Email, otp);
+            var emailSent = await _emailService.SendVerificationEmailAsync(request.Email, otp);
+            if (!emailSent)
+            {
+                await otpRepository.DeleteAsync(otpRecord);
+                await _unitOfWork.SaveChangesAsync();
+                return ApiResponse<string>.ErrorResponse("Không gửi được mã OTP qua email. Vui lòng thử lại sau.");
+            }
 
             return ApiResponse<string>.SuccessResponse(otp, "Đăng ký thành công. Vui lòng kiểm tra email để lấy mã xác thực.");
         }
@@ -236,14 +247,6 @@ namespace WatchStore.Application.Features.Auth
                 return ApiResponse<bool>.ErrorResponse("Email đã được xác thực");
 
             var otpRepository = _unitOfWork.OtpVerifications;
-            // Xóa OTP cũ
-            var oldOtps = (await otpRepository.FindAsync(
-                o => o.Email == email && o.Type == "email_verification" && !o.IsVerified))
-                .ToList();
-
-            foreach (var oldOtp in oldOtps)
-                await otpRepository.DeleteAsync(oldOtp);
-
             // Tạo OTP mới
             var otp = GenerateOtp();
             var otpRecord = new OtpVerification
@@ -258,7 +261,24 @@ namespace WatchStore.Application.Features.Auth
             await _unitOfWork.SaveChangesAsync();
 
             // Gửi email
-            await _emailService.SendVerificationEmailAsync(email, otp);
+            var emailSent = await _emailService.SendVerificationEmailAsync(email, otp);
+            if (!emailSent)
+            {
+                await otpRepository.DeleteAsync(otpRecord);
+                await _unitOfWork.SaveChangesAsync();
+                return ApiResponse<bool>.ErrorResponse("Không gửi được mã OTP mới qua email. Vui lòng thử lại sau.");
+            }
+
+            // Xóa OTP cũ sau khi gửi thành công
+            var oldOtps = (await otpRepository.FindAsync(
+                o => o.Email == email && o.Type == "email_verification" && !o.IsVerified))
+                .Where(o => o.Otp != otp)
+                .ToList();
+
+            foreach (var oldOtp in oldOtps)
+                await otpRepository.DeleteAsync(oldOtp);
+
+            await _unitOfWork.SaveChangesAsync();
 
             return ApiResponse<bool>.SuccessResponse(true, "Mã OTP mới đã được gửi");
         }
@@ -270,14 +290,6 @@ namespace WatchStore.Application.Features.Auth
                 return ApiResponse<bool>.ErrorResponse("Email không được tìm thấy");
 
             var otpRepository = _unitOfWork.OtpVerifications;
-            // Xóa OTP cũ
-            var oldOtps = (await otpRepository.FindAsync(
-                o => o.Email == email && o.Type == "password_reset" && !o.IsVerified))
-                .ToList();
-
-            foreach (var oldOtp in oldOtps)
-                await otpRepository.DeleteAsync(oldOtp);
-
             // Tạo OTP mới
             var otp = GenerateOtp();
             var otpRecord = new OtpVerification
@@ -292,7 +304,24 @@ namespace WatchStore.Application.Features.Auth
             await _unitOfWork.SaveChangesAsync();
 
             // Gửi email
-            await _emailService.SendPasswordResetEmailAsync(email, otp);
+            var emailSent = await _emailService.SendPasswordResetEmailAsync(email, otp);
+            if (!emailSent)
+            {
+                await otpRepository.DeleteAsync(otpRecord);
+                await _unitOfWork.SaveChangesAsync();
+                return ApiResponse<bool>.ErrorResponse("Không gửi được mã xác thực qua email. Vui lòng thử lại sau.");
+            }
+
+            // Xóa OTP cũ sau khi gửi thành công
+            var oldOtps = (await otpRepository.FindAsync(
+                o => o.Email == email && o.Type == "password_reset" && !o.IsVerified))
+                .Where(o => o.Otp != otp)
+                .ToList();
+
+            foreach (var oldOtp in oldOtps)
+                await otpRepository.DeleteAsync(oldOtp);
+
+            await _unitOfWork.SaveChangesAsync();
 
             return ApiResponse<bool>.SuccessResponse(true, "Mã xác thực đã được gửi đến email của bạn");
         }

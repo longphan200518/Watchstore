@@ -50,7 +50,7 @@ namespace WatchStore.Application.Features.Dashboard
                     })
                     .ToListAsync();
 
-                var deliveredQuery = query.Where(o => o.Status == OrderStatus.Delivered);
+                var deliveredQuery = query.Where(o => o.Status == OrderStatus.Delivered || o.Status == OrderStatus.Shipped);
 
                 var totalRevenue = await deliveredQuery
                     .SelectMany(o => o.OrderItems)

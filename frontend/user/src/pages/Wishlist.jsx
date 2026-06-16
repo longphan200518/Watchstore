@@ -28,15 +28,19 @@ export default function Wishlist() {
     localStorage.setItem("theme", newMode ? "dark" : "light");
   };
 
-  const handleAddToCart = (item) => {
-    addToCart(item, 1);
-    addToast(
-      language === "vi"
-        ? `${item.name} đã được thêm vào giỏ hàng`
-        : `${item.name} added to cart`,
-      "success",
-      2000
-    );
+  const handleAddToCart = async (item) => {
+    const result = await addToCart(item.id, 1);
+    if (result.success) {
+      addToast(
+        language === "vi"
+          ? `${item.name} đã được thêm vào giỏ hàng`
+          : `${item.name} added to cart`,
+        "success",
+        2000
+      );
+    } else {
+      addToast(result.message, "error");
+    }
   };
 
   return (

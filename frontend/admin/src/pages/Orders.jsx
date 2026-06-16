@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Icon } from "@iconify/react";
-import { getOrders } from "../services/orderService";
+import { getOrders, updateOrderStatus } from "../services/orderService";
 import { formatCurrency, formatDate } from "../utils/format";
 import Sidebar from "../components/Sidebar";
 import AdminHeader from "../components/AdminHeader";
@@ -94,22 +94,14 @@ export default function Orders() {
     if (!selectedOrder) return;
 
     try {
-      // TODO: Implement updateOrderStatus API call
-      // const response = await updateOrderStatus(selectedOrder.id, newStatus);
-      // if (response.success) {
-      //   fetchOrders();
-      //   setShowStatusModal(false);
-      //   alert("Cập nhật trạng thái thành công");
-      // }
-
-      // Temporary: Update locally
-      setOrders(
-        orders.map((o) =>
-          o.id === selectedOrder.id ? { ...o, status: newStatus } : o
-        )
-      );
-      setShowStatusModal(false);
-      showToast("Cập nhật trạng thái thành công!", "success");
+      const response = await updateOrderStatus(selectedOrder.id, newStatus);
+      if (response.success) {
+        fetchOrders();
+        setShowStatusModal(false);
+        showToast("Cập nhật trạng thái thành công!", "success");
+      } else {
+        showToast("Lỗi khi cập nhật trạng thái", "error");
+      }
     } catch (err) {
       showToast("Lỗi khi cập nhật trạng thái", "error");
     }

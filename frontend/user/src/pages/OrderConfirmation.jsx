@@ -139,7 +139,7 @@ export default function OrderConfirmation() {
   };
 
   const totalPrice = order.orderItems.reduce(
-    (sum, item) => sum + item.unitPrice * item.quantity,
+    (sum, item) => sum + item.price * item.quantity,
     0
   );
 
@@ -246,7 +246,7 @@ export default function OrderConfirmation() {
                     {new Intl.NumberFormat("vi-VN", {
                       style: "currency",
                       currency: "VND",
-                    }).format(item.unitPrice * item.quantity)}
+                    }).format(item.price * item.quantity)}
                   </p>
                 </div>
               ))}

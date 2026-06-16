@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using WatchStore.Domain.Entities;
 using WatchStore.Domain.Enums;
@@ -25,6 +25,12 @@ namespace WatchStore.API.Data
             if (!context.Brands.Any())
             {
                 await SeedBrands(context);
+            }
+
+            // Seed Categories
+            if (!context.Categories.Any())
+            {
+                await SeedCategories(context);
             }
 
             // Seed Watches
@@ -88,725 +94,400 @@ namespace WatchStore.API.Data
                 new Brand { Name = "Seiko", Description = "Japanese watchmaker renowned for innovation and quality", LogoUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Seiko_logo.svg/200px-Seiko_logo.svg.png", Country = "Japan" },
                 new Brand { Name = "Casio", Description = "Japanese electronics company famous for G-Shock watches", LogoUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/Casio_logo.svg/200px-Casio_logo.svg.png", Country = "Japan" },
                 new Brand { Name = "Citizen", Description = "Japanese watchmaker known for Eco-Drive technology", LogoUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Citizen_Watch_Company_of_America%2C_Inc._logo.svg/200px-Citizen_Watch_Company_of_America%2C_Inc._logo.svg.png", Country = "Japan" },
-                new Brand { Name = "Orient", Description = "Japanese watch brand offering mechanical watches at accessible prices", LogoUrl = "https://www.orientwatch.com/images/orient-logo.png", Country = "Japan" }
+                new Brand { Name = "Orient", Description = "Japanese watch brand offering mechanical watches at accessible prices", LogoUrl = "https://www.orientwatch.com/images/orient-logo.png", Country = "Japan" },
+                new Brand { Name = "Tag Heuer", Description = "Swiss luxury watchmaker known for sports and racing watches", LogoUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/TAG_Heuer_logo.svg/200px-TAG_Heuer_logo.svg.png", Country = "Switzerland" },
+                new Brand { Name = "Longines", Description = "Swiss watch brand with a rich history of elegance and precision", LogoUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Longines_Logo.svg/200px-Longines_Logo.svg.png", Country = "Switzerland" }
             };
 
             await context.Brands.AddRangeAsync(brands);
             await context.SaveChangesAsync();
         }
 
+        private static async Task SeedCategories(WatchStoreDbContext context)
+        {
+            var categories = new List<Category>
+            {
+                new Category { Name = "Đồng hồ Nam", Description = "Bộ sưu tập đồng hồ dành riêng cho nam giới, phong cách mạnh mẽ và lịch lãm" },
+                new Category { Name = "Đồng hồ Nữ", Description = "Bộ sưu tập đồng hồ dành riêng cho nữ giới, thanh lịch và tinh tế" },
+                new Category { Name = "Đồng hồ Thể thao", Description = "Đồng hồ chịu nước, chịu va đập cao, dành cho hoạt động thể thao" },
+                new Category { Name = "Đồng hồ Lặn", Description = "Đồng hồ chuyên dụng cho lặn biển, chịu áp suất nước sâu" },
+                new Category { Name = "Đồng hồ Dự tiệc", Description = "Đồng hồ thanh lịch sang trọng dành cho các buổi dự tiệc và sự kiện" },
+                new Category { Name = "Đồng hồ Cổ điển", Description = "Thiết kế truyền thống, mang phong cách vintage và cổ điển" }
+            };
+
+            await context.Categories.AddRangeAsync(categories);
+            await context.SaveChangesAsync();
+        }
+
         private static async Task SeedWatches(WatchStoreDbContext context)
         {
             var brands = await context.Brands.ToListAsync();
-            var rolex = brands.First(b => b.Name == "Rolex");
-            var omega = brands.First(b => b.Name == "Omega");
-            var seiko = brands.First(b => b.Name == "Seiko");
-            var casio = brands.First(b => b.Name == "Casio");
-            var citizen = brands.First(b => b.Name == "Citizen");
-            var orient = brands.First(b => b.Name == "Orient");
+            var categories = await context.Categories.ToListAsync();
+
+            var rolex    = brands.First(b => b.Name == "Rolex");
+            var omega    = brands.First(b => b.Name == "Omega");
+            var seiko    = brands.First(b => b.Name == "Seiko");
+            var casio    = brands.First(b => b.Name == "Casio");
+            var citizen  = brands.First(b => b.Name == "Citizen");
+            var orient   = brands.First(b => b.Name == "Orient");
+
+            var catNam      = categories.First(c => c.Name == "Đồng hồ Nam");
+            var catNu       = categories.First(c => c.Name == "Đồng hồ Nữ");
+            var catTheThao  = categories.First(c => c.Name == "Đồng hồ Thể thao");
+            var catLan      = categories.First(c => c.Name == "Đồng hồ Lặn");
+            var catDuTiec   = categories.First(c => c.Name == "Đồng hồ Dự tiệc");
+            var catCoDien   = categories.First(c => c.Name == "Đồng hồ Cổ điển");
 
             var watches = new List<Watch>
             {
-                // Rolex Watches (5 models)
+                // ── ROLEX ──────────────────────────────────────────
                 new Watch
                 {
-                    Name = "Rolex Submariner Date",
-                    Description = "Iconic diving watch with date function, water-resistant to 300m",
-                    Price = 285000000,
-                    StockQuantity = 5,
+                    Name = "Rolex Submariner Date 126610LN",
+                    Description = "Huyền thoại đồng hồ lặn của Rolex, mặt số đen với bezel ceramic đen. Đồng hồ dành cho những quý ông yêu biển.",
+                    Price = 285000000, StockQuantity = 5,
                     Status = WatchStatus.Available,
-                    BrandId = rolex.Id,
-                    CaseSize = "41mm",
-                    Movement = "Automatic Caliber 3235",
-                    Functions = "Date, Unidirectional Rotatable Bezel",
-                    Thickness = "12.5mm",
-                    BandWidth = "20mm",
-                    Crystal = "Sapphire Crystal",
-                    CaseMaterial = "Oystersteel",
-                    BandMaterial = "Oystersteel Bracelet",
-                    WaterResistance = "300m",
-                    Warranty = "5 Years International Warranty",
-                    Images = new List<WatchImage>
-                    {
-                        new WatchImage { ImageUrl = "https://images.unsplash.com/photo-1523170335258-f5ed11844a49?w=500", IsPrimary = true }
-                    }
+                    BrandId = rolex.Id, CategoryId = catLan.Id,
+                    CaseSize = "41mm", Movement = "Tự động Caliber 3235",
+                    Functions = "Ngày, Bezel xoay một chiều", Thickness = "12.5mm", BandWidth = "20mm",
+                    Crystal = "Kính Sapphire", CaseMaterial = "Oystersteel", BandMaterial = "Dây Oystersteel",
+                    WaterResistance = "300m", Warranty = "5 năm bảo hành quốc tế",
+                    Images = new List<WatchImage> { new WatchImage { ImageUrl = "https://images.unsplash.com/photo-1548171915-e04d93cb1c59?w=600&q=80", IsPrimary = true } }
                 },
                 new Watch
                 {
-                    Name = "Rolex Datejust 36",
-                    Description = "Classic dress watch with date display and cyclops lens",
-                    Price = 245000000,
-                    StockQuantity = 8,
+                    Name = "Rolex Datejust 126234",
+                    Description = "Đồng hồ nam cổ điển với mặt số xanh lá Rolesor vàng trắng. Biểu tượng của sự thanh lịch và đẳng cấp.",
+                    Price = 245000000, StockQuantity = 8,
                     Status = WatchStatus.Available,
-                    BrandId = rolex.Id,
-                    CaseSize = "36mm",
-                    Movement = "Automatic Caliber 3235",
-                    Functions = "Date, Hour, Minute, Second",
-                    Thickness = "11.5mm",
-                    BandWidth = "20mm",
-                    Crystal = "Sapphire Crystal",
-                    CaseMaterial = "Oystersteel",
-                    BandMaterial = "Jubilee Bracelet",
-                    WaterResistance = "100m",
-                    Warranty = "5 Years International Warranty",
-                    Images = new List<WatchImage>
-                    {
-                        new WatchImage { ImageUrl = "https://content.rolex.com/dam/2024/upright-bba-with-shadow/m126234-0051.png", IsPrimary = true }
-                    }
+                    BrandId = rolex.Id, CategoryId = catCoDien.Id,
+                    CaseSize = "36mm", Movement = "Tự động Caliber 3235",
+                    Functions = "Ngày, kính lúp Cyclops", Thickness = "11.5mm", BandWidth = "20mm",
+                    Crystal = "Kính Sapphire", CaseMaterial = "Oystersteel", BandMaterial = "Dây Jubilee",
+                    WaterResistance = "100m", Warranty = "5 năm bảo hành quốc tế",
+                    Images = new List<WatchImage> { new WatchImage { ImageUrl = "https://images.unsplash.com/photo-1612817288484-6f916006741a?w=600&q=80", IsPrimary = true } }
                 },
                 new Watch
                 {
-                    Name = "Rolex GMT-Master II",
-                    Description = "Dual time zone watch for travelers with 24-hour hand",
-                    Price = 295000000,
-                    StockQuantity = 3,
+                    Name = "Rolex GMT-Master II Pepsi 126710BLRO",
+                    Description = "Đồng hồ du lịch 2 múi giờ với bezel ceramic xanh đỏ huyền thoại 'Pepsi'. Dành cho những nhà du hành.",
+                    Price = 315000000, StockQuantity = 3,
                     Status = WatchStatus.Available,
-                    BrandId = rolex.Id,
-                    CaseSize = "40mm",
-                    Movement = "Automatic Caliber 3285",
-                    Functions = "GMT, Date, Hour, Minute, Second",
-                    Thickness = "12mm",
-                    BandWidth = "20mm",
-                    Crystal = "Sapphire Crystal",
-                    CaseMaterial = "Oystersteel",
-                    BandMaterial = "Oyster Bracelet",
-                    WaterResistance = "100m",
-                    Warranty = "5 Years International Warranty",
-                    Images = new List<WatchImage>
-                    {
-                        new WatchImage { ImageUrl = "https://content.rolex.com/dam/2024/upright-bba-with-shadow/m126710blro-0003.png", IsPrimary = true }
-                    }
+                    BrandId = rolex.Id, CategoryId = catNam.Id,
+                    CaseSize = "40mm", Movement = "Tự động Caliber 3285",
+                    Functions = "GMT, Ngày", Thickness = "12mm", BandWidth = "20mm",
+                    Crystal = "Kính Sapphire", CaseMaterial = "Oystersteel", BandMaterial = "Dây Jubilee",
+                    WaterResistance = "100m", Warranty = "5 năm bảo hành quốc tế",
+                    Images = new List<WatchImage> { new WatchImage { ImageUrl = "https://images.unsplash.com/photo-1587836374828-4dbafa94cf0e?w=600&q=80", IsPrimary = true } }
                 },
                 new Watch
                 {
-                    Name = "Rolex Day-Date 40",
-                    Description = "Prestigious watch displaying day and date, President bracelet",
-                    Price = 850000000,
-                    StockQuantity = 2,
+                    Name = "Rolex Day-Date 40 Vàng 18k",
+                    Description = "Chiếc đồng hồ của các tổng thống và nguyên thủ quốc gia. Vỏ vàng 18k với dây President sang trọng.",
+                    Price = 980000000, StockQuantity = 2,
                     Status = WatchStatus.Available,
-                    BrandId = rolex.Id,
-                    CaseSize = "40mm",
-                    Movement = "Automatic Caliber 3255",
-                    Functions = "Day, Date, Hour, Minute, Second",
-                    Thickness = "12mm",
-                    BandWidth = "20mm",
-                    Crystal = "Sapphire Crystal",
-                    CaseMaterial = "18k Yellow Gold",
-                    BandMaterial = "President Bracelet",
-                    WaterResistance = "100m",
-                    Warranty = "5 Years International Warranty",
-                    Images = new List<WatchImage>
-                    {
-                        new WatchImage { ImageUrl = "https://content.rolex.com/dam/2024/upright-bba-with-shadow/m228238-0042.png", IsPrimary = true }
-                    }
+                    BrandId = rolex.Id, CategoryId = catDuTiec.Id,
+                    CaseSize = "40mm", Movement = "Tự động Caliber 3255",
+                    Functions = "Ngày, Thứ", Thickness = "12mm", BandWidth = "20mm",
+                    Crystal = "Kính Sapphire", CaseMaterial = "Vàng 18k", BandMaterial = "Dây President Vàng 18k",
+                    WaterResistance = "100m", Warranty = "5 năm bảo hành quốc tế",
+                    Images = new List<WatchImage> { new WatchImage { ImageUrl = "https://images.unsplash.com/photo-1526045431048-f857369baa09?w=600&q=80", IsPrimary = true } }
                 },
                 new Watch
                 {
-                    Name = "Rolex Oyster Perpetual 41",
-                    Description = "Entry-level Rolex with vibrant dial colors, time-only",
-                    Price = 195000000,
-                    StockQuantity = 10,
+                    Name = "Rolex Lady-Datejust 28 Hồng",
+                    Description = "Đồng hồ nữ quý phái với mặt số hồng và dây Rolesor vàng hồng. Tinh tế, sang trọng cho phái đẹp.",
+                    Price = 235000000, StockQuantity = 6,
                     Status = WatchStatus.Available,
-                    BrandId = rolex.Id,
-                    CaseSize = "41mm",
-                    Movement = "Automatic Caliber 3230",
-                    Functions = "Hour, Minute, Second",
-                    Thickness = "11.5mm",
-                    BandWidth = "20mm",
-                    Crystal = "Sapphire Crystal",
-                    CaseMaterial = "Oystersteel",
-                    BandMaterial = "Oyster Bracelet",
-                    WaterResistance = "100m",
-                    Warranty = "5 Years International Warranty",
-                    Images = new List<WatchImage>
-                    {
-                        new WatchImage { ImageUrl = "https://content.rolex.com/dam/2024/upright-bba-with-shadow/m124300-0005.png", IsPrimary = true }
-                    }
+                    BrandId = rolex.Id, CategoryId = catNu.Id,
+                    CaseSize = "28mm", Movement = "Tự động Caliber 2236",
+                    Functions = "Ngày, kính lúp Cyclops", Thickness = "10.5mm", BandWidth = "13mm",
+                    Crystal = "Kính Sapphire", CaseMaterial = "Rolesor Vàng Hồng", BandMaterial = "Dây Jubilee",
+                    WaterResistance = "100m", Warranty = "5 năm bảo hành quốc tế",
+                    Images = new List<WatchImage> { new WatchImage { ImageUrl = "https://images.unsplash.com/photo-1619946794135-5bc917a27793?w=600&q=80", IsPrimary = true } }
                 },
 
-                // Omega Watches (5 models)
+                // ── OMEGA ──────────────────────────────────────────
                 new Watch
                 {
-                    Name = "Omega Speedmaster Professional Moonwatch",
-                    Description = "Legendary chronograph worn on the moon, manual-wind",
-                    Price = 155000000,
-                    StockQuantity = 12,
+                    Name = "Omega Speedmaster Moonwatch 310.30.42.50.01.001",
+                    Description = "Chiếc đồng hồ lên mặt trăng huyền thoại của NASA. Chronograph cơ thủ công mang theo lịch sử chinh phục không gian.",
+                    Price = 168000000, StockQuantity = 10,
                     Status = WatchStatus.Available,
-                    BrandId = omega.Id,
-                    CaseSize = "42mm",
-                    Movement = "Manual Caliber 1861",
-                    Functions = "Chronograph, Tachymeter, Hour, Minute, Second",
-                    Thickness = "13.2mm",
-                    BandWidth = "20mm",
-                    Crystal = "Hesalite Crystal",
-                    CaseMaterial = "Stainless Steel",
-                    BandMaterial = "Stainless Steel Bracelet",
-                    WaterResistance = "50m",
-                    Warranty = "5 Years International Warranty",
-                    Images = new List<WatchImage>
-                    {
-                        new WatchImage { ImageUrl = "https://www.omegawatches.com/media/catalog/product/cache/a5c37fddc1a529a1a44fea55d527b9a116f3738da3a2cc38006fcc613c37c391/o/m/omega-speedmaster-moonwatch-professional-co-axial-master-chronometer-chronograph-42-mm-31030425001002-l.png", IsPrimary = true }
-                    }
+                    BrandId = omega.Id, CategoryId = catTheThao.Id,
+                    CaseSize = "42mm", Movement = "Cơ thủ công Caliber 3861 Master Chronometer",
+                    Functions = "Chronograph, Tachymeter", Thickness = "13.2mm", BandWidth = "20mm",
+                    Crystal = "Kính Hesalite", CaseMaterial = "Thép không gỉ", BandMaterial = "Dây thép không gỉ",
+                    WaterResistance = "50m", Warranty = "5 năm bảo hành quốc tế",
+                    Images = new List<WatchImage> { new WatchImage { ImageUrl = "https://images.unsplash.com/photo-1547996160-81dfa63595aa?w=600&q=80", IsPrimary = true } }
                 },
                 new Watch
                 {
-                    Name = "Omega Seamaster Diver 300M",
-                    Description = "Professional diving watch with Co-Axial movement",
-                    Price = 135000000,
-                    StockQuantity = 15,
+                    Name = "Omega Seamaster Diver 300M Blue 210.30.42.20.03.001",
+                    Description = "Đồng hồ lặn chuyên nghiệp với mặt số xanh cobalt tuyệt đẹp. Người bạn đồng hành của điệp viên 007.",
+                    Price = 148000000, StockQuantity = 12,
                     Status = WatchStatus.Available,
-                    BrandId = omega.Id,
-                    CaseSize = "42mm",
-                    Movement = "Automatic Co-Axial 8800",
-                    Functions = "Date, Hour, Minute, Second, Helium Escape Valve",
-                    Thickness = "13.5mm",
-                    BandWidth = "20mm",
-                    Crystal = "Sapphire Crystal",
-                    CaseMaterial = "Stainless Steel",
-                    BandMaterial = "Stainless Steel Bracelet",
-                    WaterResistance = "300m",
-                    Warranty = "5 Years International Warranty",
-                    Images = new List<WatchImage>
-                    {
-                        new WatchImage { ImageUrl = "https://www.omegawatches.com/media/catalog/product/cache/a5c37fddc1a529a1a44fea55d527b9a116f3738da3a2cc38006fcc613c37c391/o/m/omega-seamaster-diver-300m-co-axial-master-chronometer-42-mm-21030422003001-l.png", IsPrimary = true }
-                    }
+                    BrandId = omega.Id, CategoryId = catLan.Id,
+                    CaseSize = "42mm", Movement = "Tự động Co-Axial Master Chronometer 8800",
+                    Functions = "Ngày, Bezel xoay, Van thoát helium", Thickness = "13.5mm", BandWidth = "20mm",
+                    Crystal = "Kính Sapphire", CaseMaterial = "Thép không gỉ", BandMaterial = "Dây rubber xanh",
+                    WaterResistance = "300m", Warranty = "5 năm bảo hành quốc tế",
+                    Images = new List<WatchImage> { new WatchImage { ImageUrl = "https://images.unsplash.com/photo-1594576722512-582bcd3e4e49?w=600&q=80", IsPrimary = true } }
                 },
                 new Watch
                 {
-                    Name = "Omega Constellation Co-Axial",
-                    Description = "Elegant dress watch with iconic 'claws' design",
-                    Price = 125000000,
-                    StockQuantity = 8,
+                    Name = "Omega De Ville Prestige Co-Axial",
+                    Description = "Đồng hồ dự tiệc siêu mỏng với thiết kế đồng hồ bỏ túi cổ điển. Tinh tế và đẳng cấp cho mọi dịp.",
+                    Price = 105000000, StockQuantity = 8,
                     Status = WatchStatus.Available,
-                    BrandId = omega.Id,
-                    CaseSize = "39mm",
-                    Movement = "Automatic Co-Axial 8900",
-                    Functions = "Date, Hour, Minute, Second",
-                    Thickness = "12.1mm",
-                    BandWidth = "19mm",
-                    Crystal = "Sapphire Crystal",
-                    CaseMaterial = "Stainless Steel",
-                    BandMaterial = "Stainless Steel Bracelet",
-                    WaterResistance = "100m",
-                    Warranty = "5 Years International Warranty",
-                    Images = new List<WatchImage>
-                    {
-                        new WatchImage { ImageUrl = "https://www.omegawatches.com/media/catalog/product/cache/a5c37fddc1a529a1a44fea55d527b9a116f3738da3a2cc38006fcc613c37c391/o/m/omega-constellation-co-axial-master-chronometer-39-mm-13110392103001-l.png", IsPrimary = true }
-                    }
+                    BrandId = omega.Id, CategoryId = catDuTiec.Id,
+                    CaseSize = "39.5mm", Movement = "Tự động Co-Axial 2500",
+                    Functions = "Ngày", Thickness = "9.5mm", BandWidth = "19mm",
+                    Crystal = "Kính Sapphire", CaseMaterial = "Thép không gỉ", BandMaterial = "Dây da cá sấu",
+                    WaterResistance = "30m", Warranty = "5 năm bảo hành quốc tế",
+                    Images = new List<WatchImage> { new WatchImage { ImageUrl = "https://images.unsplash.com/photo-1539874754764-5a96559165b0?w=600&q=80", IsPrimary = true } }
                 },
                 new Watch
                 {
-                    Name = "Omega De Ville Prestige",
-                    Description = "Classic dress watch with slim profile and elegant design",
-                    Price = 95000000,
-                    StockQuantity = 10,
+                    Name = "Omega Constellation Ladies 28mm",
+                    Description = "Đồng hồ nữ Omega Constellation với 8 sao đính trên bezel vàng, mặt số xà cừ trắng tinh khiết.",
+                    Price = 118000000, StockQuantity = 7,
                     Status = WatchStatus.Available,
-                    BrandId = omega.Id,
-                    CaseSize = "39.5mm",
-                    Movement = "Automatic Co-Axial 2500",
-                    Functions = "Date, Hour, Minute, Second",
-                    Thickness = "9.5mm",
-                    BandWidth = "19mm",
-                    Crystal = "Sapphire Crystal",
-                    CaseMaterial = "Stainless Steel",
-                    BandMaterial = "Leather Strap",
-                    WaterResistance = "30m",
-                    Warranty = "3 Years International Warranty",
-                    Images = new List<WatchImage>
-                    {
-                        new WatchImage { ImageUrl = "https://www.omegawatches.com/media/catalog/product/cache/a5c37fddc1a529a1a44fea55d527b9a116f3738da3a2cc38006fcc613c37c391/o/m/omega-de-ville-prestige-co-axial-39-5-mm-42413402001001-l.png", IsPrimary = true }
-                    }
+                    BrandId = omega.Id, CategoryId = catNu.Id,
+                    CaseSize = "28mm", Movement = "Tự động Co-Axial 8800",
+                    Functions = "Ngày", Thickness = "10.9mm", BandWidth = "14mm",
+                    Crystal = "Kính Sapphire", CaseMaterial = "Rolesor vàng hồng", BandMaterial = "Dây rolesor vàng hồng",
+                    WaterResistance = "100m", Warranty = "5 năm bảo hành quốc tế",
+                    Images = new List<WatchImage> { new WatchImage { ImageUrl = "https://images.unsplash.com/photo-1563720223185-11003d516935?w=600&q=80", IsPrimary = true } }
                 },
                 new Watch
                 {
-                    Name = "Omega Aqua Terra 150M",
-                    Description = "Versatile sports-elegant watch with teak dial pattern",
-                    Price = 145000000,
-                    StockQuantity = 7,
+                    Name = "Omega Aqua Terra 150M 41mm",
+                    Description = "Đồng hồ đa năng thể thao - lịch lãm với mặt số sọc teak đặc trưng. Phù hợp mọi dịp, từ văn phòng đến biển.",
+                    Price = 152000000, StockQuantity = 9,
                     Status = WatchStatus.Available,
-                    BrandId = omega.Id,
-                    CaseSize = "41mm",
-                    Movement = "Automatic Co-Axial 8900",
-                    Functions = "Date, Hour, Minute, Second",
-                    Thickness = "12.5mm",
-                    BandWidth = "20mm",
-                    Crystal = "Sapphire Crystal",
-                    CaseMaterial = "Stainless Steel",
-                    BandMaterial = "Stainless Steel Bracelet",
-                    WaterResistance = "150m",
-                    Warranty = "5 Years International Warranty",
-                    Images = new List<WatchImage>
-                    {
-                        new WatchImage { ImageUrl = "https://www.omegawatches.com/media/catalog/product/cache/a5c37fddc1a529a1a44fea55d527b9a116f3738da3a2cc38006fcc613c37c391/o/m/omega-seamaster-aqua-terra-150m-co-axial-master-chronometer-41-mm-22010412103001-l.png", IsPrimary = true }
-                    }
+                    BrandId = omega.Id, CategoryId = catNam.Id,
+                    CaseSize = "41mm", Movement = "Tự động Co-Axial Master Chronometer 8900",
+                    Functions = "Ngày", Thickness = "12.5mm", BandWidth = "20mm",
+                    Crystal = "Kính Sapphire", CaseMaterial = "Thép không gỉ", BandMaterial = "Dây thép không gỉ",
+                    WaterResistance = "150m", Warranty = "5 năm bảo hành quốc tế",
+                    Images = new List<WatchImage> { new WatchImage { ImageUrl = "https://images.unsplash.com/photo-1620625515032-6ed0c1790c75?w=600&q=80", IsPrimary = true } }
                 },
 
-                // Seiko Watches (5 models)
+                // ── SEIKO ──────────────────────────────────────────
                 new Watch
                 {
-                    Name = "Seiko Prospex Diver's 200m Automatic",
-                    Description = "Professional diving watch inspired by 1965 classic",
-                    Price = 12500000,
-                    StockQuantity = 20,
+                    Name = "Seiko Prospex Turtle SPB153J1",
+                    Description = "Đồng hồ lặn cơ tự động kiểu dáng Rùa huyền thoại. Bền bỉ, chống nước 200m, lý tưởng cho thợ lặn nghiệp dư.",
+                    Price = 18500000, StockQuantity = 18,
                     Status = WatchStatus.Available,
-                    BrandId = seiko.Id,
-                    CaseSize = "42.6mm",
-                    Movement = "Automatic Caliber 6R35",
-                    Functions = "Date, Unidirectional Bezel, Hour, Minute, Second",
-                    Thickness = "13.2mm",
-                    BandWidth = "22mm",
-                    Crystal = "Hardlex Crystal",
-                    CaseMaterial = "Stainless Steel",
-                    BandMaterial = "Stainless Steel Bracelet",
-                    WaterResistance = "200m",
-                    Warranty = "2 Years International Warranty",
-                    Images = new List<WatchImage>
-                    {
-                        new WatchImage { ImageUrl = "https://seikousa.com/cdn/shop/files/SPB143_3.jpg", IsPrimary = true }
-                    }
+                    BrandId = seiko.Id, CategoryId = catLan.Id,
+                    CaseSize = "45mm", Movement = "Tự động Caliber 6R35",
+                    Functions = "Ngày, Bezel xoay một chiều", Thickness = "13mm", BandWidth = "22mm",
+                    Crystal = "Kính Sapphire", CaseMaterial = "Thép không gỉ", BandMaterial = "Dây silicone",
+                    WaterResistance = "200m", Warranty = "2 năm bảo hành quốc tế",
+                    Images = new List<WatchImage> { new WatchImage { ImageUrl = "https://images.unsplash.com/photo-1638131855001-8b476c5741e4?w=600&q=80", IsPrimary = true } }
                 },
                 new Watch
                 {
-                    Name = "Seiko Presage Cocktail Time",
-                    Description = "Dress watch with stunning sunburst dial and cocktail-inspired design",
-                    Price = 8900000,
-                    StockQuantity = 25,
+                    Name = "Seiko Presage Cocktail White Birch SRPG27J1",
+                    Description = "Đồng hồ cơ Presage mặt số Bạch Dương trắng, lấy cảm hứng từ cây bạch dương mùa đông. Sang trọng và độc đáo.",
+                    Price = 12800000, StockQuantity = 22,
                     Status = WatchStatus.Available,
-                    BrandId = seiko.Id,
-                    CaseSize = "40.5mm",
-                    Movement = "Automatic Caliber 4R35",
-                    Functions = "Date, Hour, Minute, Second",
-                    Thickness = "11.8mm",
-                    BandWidth = "20mm",
-                    Crystal = "Sapphire Crystal",
-                    CaseMaterial = "Stainless Steel",
-                    BandMaterial = "Leather Strap",
-                    WaterResistance = "50m",
-                    Warranty = "2 Years International Warranty",
-                    Images = new List<WatchImage>
-                    {
-                        new WatchImage { ImageUrl = "https://seikousa.com/cdn/shop/files/SRPB43_3.jpg", IsPrimary = true }
-                    }
+                    BrandId = seiko.Id, CategoryId = catCoDien.Id,
+                    CaseSize = "40.5mm", Movement = "Tự động Caliber 4R35",
+                    Functions = "Ngày", Thickness = "11.8mm", BandWidth = "20mm",
+                    Crystal = "Kính Sapphire", CaseMaterial = "Thép không gỉ", BandMaterial = "Dây da màu nâu",
+                    WaterResistance = "50m", Warranty = "2 năm bảo hành quốc tế",
+                    Images = new List<WatchImage> { new WatchImage { ImageUrl = "https://images.unsplash.com/photo-1627386538380-5a9a23a12d22?w=600&q=80", IsPrimary = true } }
                 },
                 new Watch
                 {
-                    Name = "Seiko 5 Sports Automatic",
-                    Description = "Affordable automatic watch with great build quality",
-                    Price = 5500000,
-                    StockQuantity = 35,
+                    Name = "Seiko 5 Sports Street Fighter SRPF19K1 Ryu",
+                    Description = "Phiên bản giới hạn hợp tác Street Fighter. Mặt số xanh nước biển thiết kế đặc sắc. Chỉ có số lượng hữu hạn!",
+                    Price = 9200000, StockQuantity = 15,
                     Status = WatchStatus.Available,
-                    BrandId = seiko.Id,
-                    CaseSize = "42.5mm",
-                    Movement = "Automatic Caliber 4R36",
-                    Functions = "Date, Day, Hour, Minute, Second",
-                    Thickness = "13.4mm",
-                    BandWidth = "22mm",
-                    Crystal = "Hardlex Crystal",
-                    CaseMaterial = "Stainless Steel",
-                    BandMaterial = "Stainless Steel Bracelet",
-                    WaterResistance = "100m",
-                    Warranty = "2 Years International Warranty",
-                    Images = new List<WatchImage>
-                    {
-                        new WatchImage { ImageUrl = "https://seikousa.com/cdn/shop/files/SRPD51_3.jpg", IsPrimary = true }
-                    }
+                    BrandId = seiko.Id, CategoryId = catTheThao.Id,
+                    CaseSize = "42.5mm", Movement = "Tự động Caliber 4R36",
+                    Functions = "Ngày, Thứ", Thickness = "13.4mm", BandWidth = "22mm",
+                    Crystal = "Kính Hardlex", CaseMaterial = "Thép không gỉ", BandMaterial = "Dây thép không gỉ",
+                    WaterResistance = "100m", Warranty = "2 năm bảo hành quốc tế",
+                    Images = new List<WatchImage> { new WatchImage { ImageUrl = "https://images.unsplash.com/photo-1641133618699-8d44bf48e7b7?w=600&q=80", IsPrimary = true } }
                 },
                 new Watch
                 {
-                    Name = "Seiko Astron GPS Solar",
-                    Description = "Solar-powered GPS watch with dual-time display",
-                    Price = 28000000,
-                    StockQuantity = 8,
+                    Name = "Seiko Astron GPS Solar SSH023J1",
+                    Description = "Đồng hồ GPS Solar tự đồng bộ giờ chính xác nhất thế giới. Vỏ titan siêu nhẹ, bền bỉ, không cần thay pin.",
+                    Price = 35000000, StockQuantity = 8,
                     Status = WatchStatus.Available,
-                    BrandId = seiko.Id,
-                    CaseSize = "42.7mm",
-                    Movement = "GPS Solar Caliber 5X53",
-                    Functions = "GPS Time Sync, Dual Time, Perpetual Calendar",
-                    Thickness = "12.2mm",
-                    BandWidth = "22mm",
-                    Crystal = "Sapphire Crystal",
-                    CaseMaterial = "Titanium",
-                    BandMaterial = "Titanium Bracelet",
-                    WaterResistance = "100m",
-                    Warranty = "3 Years International Warranty",
-                    Images = new List<WatchImage>
-                    {
-                        new WatchImage { ImageUrl = "https://seikousa.com/cdn/shop/files/SSH001_3.jpg", IsPrimary = true }
-                    }
+                    BrandId = seiko.Id, CategoryId = catNam.Id,
+                    CaseSize = "42.8mm", Movement = "GPS Solar Caliber 5X53",
+                    Functions = "GPS Đồng bộ, Dual Time, Lịch vạn niên", Thickness = "12.2mm", BandWidth = "22mm",
+                    Crystal = "Kính Sapphire", CaseMaterial = "Titan", BandMaterial = "Dây titan",
+                    WaterResistance = "100m", Warranty = "3 năm bảo hành quốc tế",
+                    Images = new List<WatchImage> { new WatchImage { ImageUrl = "https://images.unsplash.com/photo-1624913503273-5f9c4e980dba?w=600&q=80", IsPrimary = true } }
                 },
                 new Watch
                 {
-                    Name = "Seiko King Turtle Automatic Diver",
-                    Description = "Robust diving watch with cushion-shaped case",
-                    Price = 15000000,
-                    StockQuantity = 15,
+                    Name = "Seiko Lukia Women's SSH105J1",
+                    Description = "Đồng hồ nữ Seiko Lukia với mặt số xà cừ hồng cực kỳ nữ tính. Năng lượng mặt trời, không cần thay pin.",
+                    Price = 8900000, StockQuantity = 20,
                     Status = WatchStatus.Available,
-                    BrandId = seiko.Id,
-                    CaseSize = "45mm",
-                    Movement = "Automatic Caliber 4R36",
-                    Functions = "Date, Day, Unidirectional Bezel",
-                    Thickness = "13mm",
-                    BandWidth = "22mm",
-                    Crystal = "Sapphire Crystal",
-                    CaseMaterial = "Stainless Steel",
-                    BandMaterial = "Silicone Strap",
-                    WaterResistance = "200m",
-                    Warranty = "2 Years International Warranty",
-                    Images = new List<WatchImage>
-                    {
-                        new WatchImage { ImageUrl = "https://seikousa.com/cdn/shop/files/SRPE05_3.jpg", IsPrimary = true }
-                    }
+                    BrandId = seiko.Id, CategoryId = catNu.Id,
+                    CaseSize = "29.8mm", Movement = "Solar Caliber V157",
+                    Functions = "Ngày", Thickness = "9.2mm", BandWidth = "12mm",
+                    Crystal = "Kính Sapphire", CaseMaterial = "Thép không gỉ xi vàng hồng", BandMaterial = "Dây thép xi vàng hồng",
+                    WaterResistance = "30m", Warranty = "2 năm bảo hành quốc tế",
+                    Images = new List<WatchImage> { new WatchImage { ImageUrl = "https://images.unsplash.com/photo-1585386959984-a4155224a1ad?w=600&q=80", IsPrimary = true } }
                 },
 
-                // Casio Watches (5 models)
+                // ── CASIO ──────────────────────────────────────────
                 new Watch
                 {
-                    Name = "Casio G-Shock GA-2100 CasiOak",
-                    Description = "Slim octagonal G-Shock with Carbon Core Guard structure",
-                    Price = 3200000,
-                    StockQuantity = 40,
+                    Name = "Casio G-Shock Mudmaster GWG-2000-1A3",
+                    Description = "G-Shock đỉnh cao dành cho địa hình khắc nghiệt. Chống bùn đất, năng lượng mặt trời, radio đồng bộ giờ toàn cầu.",
+                    Price = 18500000, StockQuantity = 15,
                     Status = WatchStatus.Available,
-                    BrandId = casio.Id,
-                    CaseSize = "45.4mm",
-                    Movement = "Quartz Digital-Analog",
-                    Functions = "World Time, Stopwatch, LED Light, Shock Resistant",
-                    Thickness = "11.8mm",
-                    BandWidth = "25mm",
-                    Crystal = "Mineral Crystal",
-                    CaseMaterial = "Carbon & Resin",
-                    BandMaterial = "Resin Band",
-                    WaterResistance = "200m",
-                    Warranty = "2 Years International Warranty",
-                    Images = new List<WatchImage>
-                    {
-                        new WatchImage { ImageUrl = "https://www.casio.com/content/dam/casio/product-info/locales/intl/en/timepiece/product/watch/G/GA/GA2/GA-2100-1A1/assets/GA-2100-1A1.png", IsPrimary = true }
-                    }
+                    BrandId = casio.Id, CategoryId = catTheThao.Id,
+                    CaseSize = "56.2mm", Movement = "Tough Solar Quartz",
+                    Functions = "La bàn, Nhiệt kế, Đo cao, Bước chân, Radio sync", Thickness = "18.6mm", BandWidth = "26mm",
+                    Crystal = "Kính khoáng chống trầy", CaseMaterial = "Resin carbon sợi + Thép", BandMaterial = "Dây resin",
+                    WaterResistance = "200m", Warranty = "2 năm bảo hành quốc tế",
+                    Images = new List<WatchImage> { new WatchImage { ImageUrl = "https://images.unsplash.com/photo-1585386959984-a4155224a1ad?w=600&q=80", IsPrimary = true } }
                 },
                 new Watch
                 {
-                    Name = "Casio G-Shock DW-5600E Classic Square",
-                    Description = "Iconic square G-Shock, the original shock-resistant watch",
-                    Price = 2500000,
-                    StockQuantity = 50,
+                    Name = "Casio G-Shock CasiOak GA-2110SU-3A",
+                    Description = "CasiOak phong cách đường phố với màu xanh lá army cực cool. Nhỏ gọn, bền bỉ, thích hợp thời trang hàng ngày.",
+                    Price = 4200000, StockQuantity = 40,
                     Status = WatchStatus.Available,
-                    BrandId = casio.Id,
-                    CaseSize = "42.8mm",
-                    Movement = "Quartz Digital",
-                    Functions = "Stopwatch, Timer, Alarm, EL Backlight",
-                    Thickness = "13.4mm",
-                    BandWidth = "18mm",
-                    Crystal = "Mineral Crystal",
-                    CaseMaterial = "Resin",
-                    BandMaterial = "Resin Band",
-                    WaterResistance = "200m",
-                    Warranty = "2 Years International Warranty",
-                    Images = new List<WatchImage>
-                    {
-                        new WatchImage { ImageUrl = "https://www.casio.com/content/dam/casio/product-info/locales/intl/en/timepiece/product/watch/G/DW/DW5/DW-5600E-1V/assets/DW-5600E-1V.png", IsPrimary = true }
-                    }
+                    BrandId = casio.Id, CategoryId = catTheThao.Id,
+                    CaseSize = "45.4mm", Movement = "Quartz số-kim",
+                    Functions = "World time, Đồng hồ bấm giây, Đèn LED", Thickness = "11.8mm", BandWidth = "25mm",
+                    Crystal = "Kính khoáng", CaseMaterial = "Carbon + Resin", BandMaterial = "Dây resin",
+                    WaterResistance = "200m", Warranty = "2 năm bảo hành quốc tế",
+                    Images = new List<WatchImage> { new WatchImage { ImageUrl = "https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?w=600&q=80", IsPrimary = true } }
                 },
                 new Watch
                 {
-                    Name = "Casio Edifice EQB-1000",
-                    Description = "Solar-powered chronograph with Bluetooth connectivity",
-                    Price = 8500000,
-                    StockQuantity = 18,
+                    Name = "Casio Edifice Bluetooth EQB-1100XD-1A",
+                    Description = "Đồng hồ thể thao kết nối Bluetooth, solar, thiết kế Racing. Đồng bộ giờ với điện thoại, hiển thị thông tin smartphone.",
+                    Price = 9800000, StockQuantity = 20,
                     Status = WatchStatus.Available,
-                    BrandId = casio.Id,
-                    CaseSize = "47mm",
-                    Movement = "Tough Solar Quartz",
-                    Functions = "Bluetooth, Chronograph, World Time, Solar Power",
-                    Thickness = "12.8mm",
-                    BandWidth = "22mm",
-                    Crystal = "Sapphire Crystal",
-                    CaseMaterial = "Stainless Steel",
-                    BandMaterial = "Stainless Steel Bracelet",
-                    WaterResistance = "100m",
-                    Warranty = "2 Years International Warranty",
-                    Images = new List<WatchImage>
-                    {
-                        new WatchImage { ImageUrl = "https://www.casio.com/content/dam/casio/product-info/locales/intl/en/timepiece/product/watch/E/EQ/EQB/EQB-1000D-1A/assets/EQB-1000D-1A.png", IsPrimary = true }
-                    }
+                    BrandId = casio.Id, CategoryId = catNam.Id,
+                    CaseSize = "47mm", Movement = "Tough Solar Quartz + Bluetooth",
+                    Functions = "Bluetooth, Chronograph, World Time, Solar", Thickness = "12.1mm", BandWidth = "22mm",
+                    Crystal = "Kính Sapphire", CaseMaterial = "Thép không gỉ + Carbon", BandMaterial = "Dây thép không gỉ",
+                    WaterResistance = "100m", Warranty = "2 năm bảo hành quốc tế",
+                    Images = new List<WatchImage> { new WatchImage { ImageUrl = "https://images.unsplash.com/photo-1622434641406-a158123450f9?w=600&q=80", IsPrimary = true } }
                 },
                 new Watch
                 {
-                    Name = "Casio Pro Trek PRW-6900",
-                    Description = "Multi-sensor outdoor watch with compass, altimeter, barometer",
-                    Price = 7200000,
-                    StockQuantity = 12,
+                    Name = "Casio Vintage A168WA-1 Gold",
+                    Description = "Đồng hồ retro 8x huyền thoại với viền vàng lấp lánh. Biểu tượng văn hóa đường phố, trở lại mạnh mẽ trong thời trang unisex.",
+                    Price = 1500000, StockQuantity = 60,
                     Status = WatchStatus.Available,
-                    BrandId = casio.Id,
-                    CaseSize = "56.3mm",
-                    Movement = "Tough Solar Quartz",
-                    Functions = "Compass, Altimeter, Barometer, Thermometer, Solar",
-                    Thickness = "14.3mm",
-                    BandWidth = "25mm",
-                    Crystal = "Sapphire Crystal",
-                    CaseMaterial = "Resin & Stainless Steel",
-                    BandMaterial = "Resin Band",
-                    WaterResistance = "200m",
-                    Warranty = "2 Years International Warranty",
-                    Images = new List<WatchImage>
-                    {
-                        new WatchImage { ImageUrl = "https://www.casio.com/content/dam/casio/product-info/locales/intl/en/timepiece/product/watch/P/PR/PRW/PRW-6900Y-1/assets/PRW-6900Y-1.png", IsPrimary = true }
-                    }
-                },
-                new Watch
-                {
-                    Name = "Casio Vintage A168WA Digital",
-                    Description = "Retro digital watch with iconic 80s design",
-                    Price = 1200000,
-                    StockQuantity = 60,
-                    Status = WatchStatus.Available,
-                    BrandId = casio.Id,
-                    CaseSize = "36.8mm",
-                    Movement = "Quartz Digital",
-                    Functions = "Alarm, Stopwatch, LED Light, Calendar",
-                    Thickness = "9.6mm",
-                    BandWidth = "18mm",
-                    Crystal = "Acrylic Crystal",
-                    CaseMaterial = "Stainless Steel",
-                    BandMaterial = "Stainless Steel Bracelet",
-                    WaterResistance = "30m",
-                    Warranty = "1 Year International Warranty",
-                    Images = new List<WatchImage>
-                    {
-                        new WatchImage { ImageUrl = "https://www.casio.com/content/dam/casio/product-info/locales/intl/en/timepiece/product/watch/A/A1/A16/A168WA-1/assets/A168WA-1.png", IsPrimary = true }
-                    }
+                    BrandId = casio.Id, CategoryId = catCoDien.Id,
+                    CaseSize = "36.8mm", Movement = "Quartz số",
+                    Functions = "Báo thức, Bấm giây, Đèn LED, Lịch", Thickness = "9.6mm", BandWidth = "18mm",
+                    Crystal = "Kính Acrylic", CaseMaterial = "Thép không gỉ xi vàng", BandMaterial = "Dây thép xi vàng",
+                    WaterResistance = "30m", Warranty = "1 năm bảo hành quốc tế",
+                    Images = new List<WatchImage> { new WatchImage { ImageUrl = "https://images.unsplash.com/photo-1646832000000-e8c2571ccd24?w=600&q=80", IsPrimary = true } }
                 },
 
-                // Citizen Watches (5 models)
+                // ── CITIZEN ──────────────────────────────────────────
                 new Watch
                 {
-                    Name = "Citizen Promaster Diver Eco-Drive",
-                    Description = "Solar-powered diving watch with 200m water resistance",
-                    Price = 9800000,
-                    StockQuantity = 22,
+                    Name = "Citizen Promaster Marine BN0196-01L",
+                    Description = "Đồng hồ lặn Eco-Drive chuyên nghiệp, ISO 6425 certified. Hành trang không thể thiếu của thợ lặn chuyên nghiệp.",
+                    Price = 12800000, StockQuantity = 18,
                     Status = WatchStatus.Available,
-                    BrandId = citizen.Id,
-                    CaseSize = "44mm",
-                    Movement = "Eco-Drive Solar Quartz",
-                    Functions = "Date, Solar Power, Unidirectional Bezel",
-                    Thickness = "12mm",
-                    BandWidth = "22mm",
-                    Crystal = "Mineral Crystal",
-                    CaseMaterial = "Stainless Steel",
-                    BandMaterial = "Polyurethane Strap",
-                    WaterResistance = "200m",
-                    Warranty = "5 Years Eco-Drive Warranty",
-                    Images = new List<WatchImage>
-                    {
-                        new WatchImage { ImageUrl = "https://www.citizenwatch.com/dw/image/v2/BFNH_PRD/on/demandware.static/-/Sites-ctznUS-Library/default/dw26a09f21/images/products/BN0150-28E_angle.jpg", IsPrimary = true }
-                    }
+                    BrandId = citizen.Id, CategoryId = catLan.Id,
+                    CaseSize = "44mm", Movement = "Eco-Drive Solar",
+                    Functions = "Ngày, Bezel xoay, Chứng nhận ISO 6425", Thickness = "12.7mm", BandWidth = "22mm",
+                    Crystal = "Kính khoáng", CaseMaterial = "Thép không gỉ", BandMaterial = "Dây polyurethane",
+                    WaterResistance = "200m", Warranty = "5 năm Eco-Drive",
+                    Images = new List<WatchImage> { new WatchImage { ImageUrl = "https://images.unsplash.com/photo-1550246140-5119ae4790b8?w=600&q=80", IsPrimary = true } }
                 },
                 new Watch
                 {
-                    Name = "Citizen Eco-Drive Perpetual Calendar",
-                    Description = "Solar watch with perpetual calendar, never needs battery",
-                    Price = 12000000,
-                    StockQuantity = 15,
+                    Name = "Citizen Exceed Perpetual Calendar CB3030-76L",
+                    Description = "Đồng hồ Radio-Controlled Solar, đồng bộ sóng radio nguyên tử. Lịch vạn niên, không bao giờ sai dù qua Tết Nguyên Đán.",
+                    Price = 22000000, StockQuantity = 12,
                     Status = WatchStatus.Available,
-                    BrandId = citizen.Id,
-                    CaseSize = "42mm",
-                    Movement = "Eco-Drive Caliber H500",
-                    Functions = "Perpetual Calendar, Date, Day, Month",
-                    Thickness = "11.5mm",
-                    BandWidth = "22mm",
-                    Crystal = "Sapphire Crystal",
-                    CaseMaterial = "Stainless Steel",
-                    BandMaterial = "Stainless Steel Bracelet",
-                    WaterResistance = "100m",
-                    Warranty = "5 Years Eco-Drive Warranty",
-                    Images = new List<WatchImage>
-                    {
-                        new WatchImage { ImageUrl = "https://www.citizenwatch.com/dw/image/v2/BFNH_PRD/on/demandware.static/-/Sites-ctznUS-Library/default/dw8e4f2c91/images/products/BL8144-54H_angle.jpg", IsPrimary = true }
-                    }
+                    BrandId = citizen.Id, CategoryId = catNam.Id,
+                    CaseSize = "41mm", Movement = "Radio-Controlled Eco-Drive",
+                    Functions = "Radio sync, Lịch vạn niên, Dual time", Thickness = "10.7mm", BandWidth = "20mm",
+                    Crystal = "Kính Sapphire", CaseMaterial = "Titan", BandMaterial = "Dây titan",
+                    WaterResistance = "100m", Warranty = "5 năm Eco-Drive",
+                    Images = new List<WatchImage> { new WatchImage { ImageUrl = "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=600&q=80", IsPrimary = true } }
                 },
                 new Watch
                 {
-                    Name = "Citizen Satellite Wave GPS",
-                    Description = "GPS timekeeping watch syncing with atomic clocks worldwide",
-                    Price = 18500000,
-                    StockQuantity = 10,
+                    Name = "Citizen L Eco-Drive EM0920-13A Nữ",
+                    Description = "Đồng hồ nữ Citizen L với mặt số xà cừ trắng, đính đá zirconia tinh tế. Solar không cần thay pin, thân thiện môi trường.",
+                    Price = 7800000, StockQuantity = 22,
                     Status = WatchStatus.Available,
-                    BrandId = citizen.Id,
-                    CaseSize = "44mm",
-                    Movement = "Eco-Drive Satellite Wave GPS",
-                    Functions = "GPS Time Sync, Dual Time, Perpetual Calendar",
-                    Thickness = "13.1mm",
-                    BandWidth = "23mm",
-                    Crystal = "Sapphire Crystal",
-                    CaseMaterial = "Titanium",
-                    BandMaterial = "Titanium Bracelet",
-                    WaterResistance = "100m",
-                    Warranty = "5 Years Eco-Drive Warranty",
-                    Images = new List<WatchImage>
-                    {
-                        new WatchImage { ImageUrl = "https://www.citizenwatch.com/dw/image/v2/BFNH_PRD/on/demandware.static/-/Sites-ctznUS-Library/default/dw1c8f7e5e/images/products/CC3035-50E_angle.jpg", IsPrimary = true }
-                    }
-                },
-                new Watch
-                {
-                    Name = "Citizen Chandler Field Watch",
-                    Description = "Military-inspired field watch with Eco-Drive technology",
-                    Price = 4500000,
-                    StockQuantity = 30,
-                    Status = WatchStatus.Available,
-                    BrandId = citizen.Id,
-                    CaseSize = "42mm",
-                    Movement = "Eco-Drive Solar Quartz",
-                    Functions = "Date, Hour, Minute, Second",
-                    Thickness = "11mm",
-                    BandWidth = "22mm",
-                    Crystal = "Mineral Crystal",
-                    CaseMaterial = "Stainless Steel",
-                    BandMaterial = "Canvas Strap",
-                    WaterResistance = "100m",
-                    Warranty = "5 Years Eco-Drive Warranty",
-                    Images = new List<WatchImage>
-                    {
-                        new WatchImage { ImageUrl = "https://www.citizenwatch.com/dw/image/v2/BFNH_PRD/on/demandware.static/-/Sites-ctznUS-Library/default/dw9f7c8b5d/images/products/BM8180-03E_angle.jpg", IsPrimary = true }
-                    }
-                },
-                new Watch
-                {
-                    Name = "Citizen Corso Dress Watch",
-                    Description = "Slim elegant dress watch perfect for formal occasions",
-                    Price = 6800000,
-                    StockQuantity = 18,
-                    Status = WatchStatus.Available,
-                    BrandId = citizen.Id,
-                    CaseSize = "40mm",
-                    Movement = "Eco-Drive Solar Quartz",
-                    Functions = "Date, Hour, Minute, Second",
-                    Thickness = "8.5mm",
-                    BandWidth = "20mm",
-                    Crystal = "Sapphire Crystal",
-                    CaseMaterial = "Stainless Steel",
-                    BandMaterial = "Leather Strap",
-                    WaterResistance = "50m",
-                    Warranty = "5 Years Eco-Drive Warranty",
-                    Images = new List<WatchImage>
-                    {
-                        new WatchImage { ImageUrl = "https://www.citizenwatch.com/dw/image/v2/BFNH_PRD/on/demandware.static/-/Sites-ctznUS-Library/default/dw4e5f6a7b/images/products/BM7100-59E_angle.jpg", IsPrimary = true }
-                    }
+                    BrandId = citizen.Id, CategoryId = catNu.Id,
+                    CaseSize = "32mm", Movement = "Eco-Drive Solar",
+                    Functions = "Ngày", Thickness = "9mm", BandWidth = "12mm",
+                    Crystal = "Kính Sapphire", CaseMaterial = "Thép không gỉ xi vàng hồng", BandMaterial = "Dây thép xi vàng hồng",
+                    WaterResistance = "50m", Warranty = "5 năm Eco-Drive",
+                    Images = new List<WatchImage> { new WatchImage { ImageUrl = "https://images.unsplash.com/photo-1596944924591-2a9eba0bfb73?w=600&q=80", IsPrimary = true } }
                 },
 
-                // Orient Watches (5 models)
+                // ── ORIENT ──────────────────────────────────────────
                 new Watch
                 {
-                    Name = "Orient Bambino Gen 2 Version 2",
-                    Description = "Classic dress watch with domed crystal and elegant design",
-                    Price = 4200000,
-                    StockQuantity = 25,
+                    Name = "Orient Bambino Gen 5 Classic FAC0000EB0",
+                    Description = "Đồng hồ cổ điển phong cách đồng hồ bỏ túi với mặt kính dome dạng vòm. Cơ tự động, giá trị vượt trội phân khúc.",
+                    Price = 5800000, StockQuantity = 25,
                     Status = WatchStatus.Available,
-                    BrandId = orient.Id,
-                    CaseSize = "40.5mm",
-                    Movement = "Automatic Caliber F6724",
-                    Functions = "Hour, Minute, Second",
-                    Thickness = "11.8mm",
-                    BandWidth = "21mm",
-                    Crystal = "Mineral Crystal",
-                    CaseMaterial = "Stainless Steel",
-                    BandMaterial = "Leather Strap",
-                    WaterResistance = "30m",
-                    Warranty = "2 Years International Warranty",
-                    Images = new List<WatchImage>
-                    {
-                        new WatchImage { ImageUrl = "https://orientwatch.com/cdn/shop/products/FAC00009N0_1.jpg", IsPrimary = true }
-                    }
+                    BrandId = orient.Id, CategoryId = catCoDien.Id,
+                    CaseSize = "40.5mm", Movement = "Tự động Caliber F6724",
+                    Functions = "Giờ, Phút, Giây", Thickness = "11.8mm", BandWidth = "21mm",
+                    Crystal = "Kính khoáng dome", CaseMaterial = "Thép không gỉ", BandMaterial = "Dây da nâu",
+                    WaterResistance = "30m", Warranty = "2 năm bảo hành quốc tế",
+                    Images = new List<WatchImage> { new WatchImage { ImageUrl = "https://images.unsplash.com/photo-1524592094714-0f0654e20314?w=600&q=80", IsPrimary = true } }
                 },
                 new Watch
                 {
-                    Name = "Orient Kamasu Automatic Diver",
-                    Description = "Affordable automatic diver with sapphire crystal",
-                    Price = 6500000,
-                    StockQuantity = 20,
+                    Name = "Orient Kamasu Diver RA-AA0004E19B",
+                    Description = "Đồng hồ lặn cơ tự động giá tốt nhất phân khúc. Kính Sapphire, bezel ceramic, chống nước 200m. Best value diver!",
+                    Price = 7200000, StockQuantity = 22,
                     Status = WatchStatus.Available,
-                    BrandId = orient.Id,
-                    CaseSize = "41.8mm",
-                    Movement = "Automatic Caliber F6922",
-                    Functions = "Date, Day, Unidirectional Bezel",
-                    Thickness = "12.8mm",
-                    BandWidth = "22mm",
-                    Crystal = "Sapphire Crystal",
-                    CaseMaterial = "Stainless Steel",
-                    BandMaterial = "Stainless Steel Bracelet",
-                    WaterResistance = "200m",
-                    Warranty = "2 Years International Warranty",
-                    Images = new List<WatchImage>
-                    {
-                        new WatchImage { ImageUrl = "https://orientwatch.com/cdn/shop/products/RA-AA0004E19B_1.jpg", IsPrimary = true }
-                    }
+                    BrandId = orient.Id, CategoryId = catLan.Id,
+                    CaseSize = "41.8mm", Movement = "Tự động Caliber F6922",
+                    Functions = "Ngày, Thứ, Bezel xoay", Thickness = "12.8mm", BandWidth = "22mm",
+                    Crystal = "Kính Sapphire", CaseMaterial = "Thép không gỉ", BandMaterial = "Dây thép không gỉ",
+                    WaterResistance = "200m", Warranty = "2 năm bảo hành quốc tế",
+                    Images = new List<WatchImage> { new WatchImage { ImageUrl = "https://images.unsplash.com/photo-1614164185128-e4ec99c436d7?w=600&q=80", IsPrimary = true } }
                 },
                 new Watch
                 {
-                    Name = "Orient Ray II Automatic Diver",
-                    Description = "Popular automatic diver inspired by vintage diving watches",
-                    Price = 5800000,
-                    StockQuantity = 28,
+                    Name = "Orient Sun and Moon Open Heart RA-AS0103R10B",
+                    Description = "Đồng hồ cơ tự động với chỉ thị Mặt Trời / Mặt Trăng và lỗ hổng trái tim nhìn thấy bộ máy chuyển động.",
+                    Price = 9800000, StockQuantity = 15,
                     Status = WatchStatus.Available,
-                    BrandId = orient.Id,
-                    CaseSize = "41.5mm",
-                    Movement = "Automatic Caliber F6922",
-                    Functions = "Date, Day, Unidirectional Bezel",
-                    Thickness = "13mm",
-                    BandWidth = "22mm",
-                    Crystal = "Mineral Crystal",
-                    CaseMaterial = "Stainless Steel",
-                    BandMaterial = "Stainless Steel Bracelet",
-                    WaterResistance = "200m",
-                    Warranty = "2 Years International Warranty",
-                    Images = new List<WatchImage>
-                    {
-                        new WatchImage { ImageUrl = "https://orientwatch.com/cdn/shop/products/FAA02004D9_1.jpg", IsPrimary = true }
-                    }
+                    BrandId = orient.Id, CategoryId = catDuTiec.Id,
+                    CaseSize = "42mm", Movement = "Tự động Caliber F6B24",
+                    Functions = "Ngày, Chỉ thị Mặt Trăng, Open Heart", Thickness = "13.2mm", BandWidth = "22mm",
+                    Crystal = "Kính Sapphire", CaseMaterial = "Thép không gỉ", BandMaterial = "Dây da nâu",
+                    WaterResistance = "50m", Warranty = "2 năm bảo hành quốc tế",
+                    Images = new List<WatchImage> { new WatchImage { ImageUrl = "https://images.unsplash.com/photo-1434056886845-dac89ffe9b56?w=600&q=80", IsPrimary = true } }
                 },
                 new Watch
                 {
-                    Name = "Orient Sun and Moon Open Heart",
-                    Description = "Elegant automatic with sun/moon indicator and open heart",
-                    Price = 9500000,
-                    StockQuantity = 12,
+                    Name = "Orient Nữ RA-NB0101S10B Crystal Hoa",
+                    Description = "Đồng hồ nữ Orient với mặt kính nổi bật đính pha lê Swarovski. Cơ tự động lộ máy, tinh tế và đặc biệt.",
+                    Price = 6500000, StockQuantity = 18,
                     Status = WatchStatus.Available,
-                    BrandId = orient.Id,
-                    CaseSize = "42mm",
-                    Movement = "Automatic Caliber F6B24",
-                    Functions = "Date, Sun/Moon Indicator, Open Heart",
-                    Thickness = "13.2mm",
-                    BandWidth = "22mm",
-                    Crystal = "Sapphire Crystal",
-                    CaseMaterial = "Stainless Steel",
-                    BandMaterial = "Leather Strap",
-                    WaterResistance = "50m",
-                    Warranty = "2 Years International Warranty",
-                    Images = new List<WatchImage>
-                    {
-                        new WatchImage { ImageUrl = "https://orientwatch.com/cdn/shop/products/RA-AS0003S10B_1.jpg", IsPrimary = true }
-                    }
-                },
-                new Watch
-                {
-                    Name = "Orient Tristar Automatic",
-                    Description = "Classic three-star automatic with day-date display",
-                    Price = 3500000,
-                    StockQuantity = 35,
-                    Status = WatchStatus.Available,
-                    BrandId = orient.Id,
-                    CaseSize = "39mm",
-                    Movement = "Automatic Caliber 46943",
-                    Functions = "Date, Day, Hour, Minute, Second",
-                    Thickness = "11.5mm",
-                    BandWidth = "19mm",
-                    Crystal = "Mineral Crystal",
-                    CaseMaterial = "Stainless Steel",
-                    BandMaterial = "Stainless Steel Bracelet",
-                    WaterResistance = "50m",
-                    Warranty = "2 Years International Warranty",
-                    Images = new List<WatchImage>
-                    {
-                        new WatchImage { ImageUrl = "https://orientwatch.com/cdn/shop/products/FAB00005D9_1.jpg", IsPrimary = true }
-                    }
+                    BrandId = orient.Id, CategoryId = catNu.Id,
+                    CaseSize = "30mm", Movement = "Tự động Caliber F5S22",
+                    Functions = "Lộ máy cơ", Thickness = "10.5mm", BandWidth = "16mm",
+                    Crystal = "Kính khoáng + Pha lê Swarovski", CaseMaterial = "Thép không gỉ", BandMaterial = "Dây da trắng",
+                    WaterResistance = "50m", Warranty = "2 năm bảo hành quốc tế",
+                    Images = new List<WatchImage> { new WatchImage { ImageUrl = "https://images.unsplash.com/photo-1602173574767-37ac01994b2a?w=600&q=80", IsPrimary = true } }
                 }
             };
 

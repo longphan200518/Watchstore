@@ -50,7 +50,7 @@ export default function AdminHeader({ title, subtitle }) {
             <input
               type="text"
               placeholder="Tìm kiếm..."
-              className="pl-10 pr-4 py-2.5 w-64 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent text-sm"
+              className="pl-10 pr-4 py-2.5 w-64 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent text-sm"
             />
           </div>
 
@@ -62,7 +62,7 @@ export default function AdminHeader({ title, subtitle }) {
             >
               <Icon icon="solar:bell-bold-duotone" className="text-2xl" />
               {unreadCount > 0 && (
-                <span className="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center animate-pulse">
+                <span className="absolute top-1 right-1 w-5 h-5 bg-black text-white text-xs font-bold rounded-full flex items-center justify-center">
                   {unreadCount}
                 </span>
               )}
@@ -70,8 +70,8 @@ export default function AdminHeader({ title, subtitle }) {
 
             {/* Notifications Dropdown */}
             {showNotifications && (
-              <div className="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden z-50">
-                <div className="px-4 py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white">
+              <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden z-50">
+                <div className="px-4 py-3 bg-black text-white">
                   <h3 className="font-semibold flex items-center gap-2">
                     <Icon icon="solar:bell-bold" />
                     Thông báo
@@ -82,12 +82,12 @@ export default function AdminHeader({ title, subtitle }) {
                     <div
                       key={notif.id}
                       className={`px-4 py-3 border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors ${
-                        notif.unread ? "bg-amber-50" : ""
+                        notif.unread ? "bg-gray-100" : ""
                       }`}
                     >
                       <div className="flex items-start gap-3">
                         {notif.unread && (
-                          <div className="w-2 h-2 bg-amber-500 rounded-full mt-2" />
+                          <div className="w-2 h-2 bg-black rounded-full mt-2" />
                         )}
                         <div className="flex-1">
                           <p className="text-sm text-gray-800">{notif.text}</p>
@@ -100,7 +100,7 @@ export default function AdminHeader({ title, subtitle }) {
                   ))}
                 </div>
                 <div className="px-4 py-3 bg-gray-50 text-center">
-                  <button className="text-sm text-amber-600 font-medium hover:text-amber-700">
+                  <button className="text-sm text-black font-medium hover:text-gray-700">
                     Xem tất cả thông báo
                   </button>
                 </div>

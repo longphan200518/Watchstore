@@ -28,6 +28,7 @@ namespace WatchStore.Application.Services
             vnpay.AddRequestData("vnp_Amount", ((long)(amount * 100)).ToString());
             vnpay.AddRequestData("vnp_CreateDate", DateTime.Now.ToString("yyyyMMddHHmmss"));
             vnpay.AddRequestData("vnp_CurrCode", "VND");
+            vnpay.AddRequestData("vnp_ExpireDate", DateTime.Now.AddMinutes(15).ToString("yyyyMMddHHmmss"));
             vnpay.AddRequestData("vnp_IpAddr", ipAddress);
             vnpay.AddRequestData("vnp_Locale", "vn");
             vnpay.AddRequestData("vnp_OrderInfo", orderInfo);
@@ -59,8 +60,8 @@ namespace WatchStore.Application.Services
 
     public class VNPayLibrary
     {
-        private readonly SortedList<string, string> _requestData = new();
-        private readonly SortedList<string, string> _responseData = new();
+        private readonly SortedList<string, string> _requestData = new(new VnPayCompare());
+        private readonly SortedList<string, string> _responseData = new(new VnPayCompare());
 
         public void AddRequestData(string key, string value)
         {
@@ -138,6 +139,17 @@ namespace WatchStore.Application.Services
             }
 
             return hash.ToString();
+        }
+    }
+
+    public class VnPayCompare : IComparer<string>
+    {
+        public int Compare(string x, string y)
+        {
+            if (x == y) return 0;
+            if (x == null) return -1;
+            if (y == null) return 1;
+            return string.Compare(x, y, StringComparison.Ordinal);
         }
     }
 }

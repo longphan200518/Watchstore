@@ -13,6 +13,8 @@ namespace WatchStore.Application.DTOs
         public WatchStatus Status { get; set; }
         public int BrandId { get; set; }
         public string BrandName { get; set; } = string.Empty;
+        public int CategoryId { get; set; }
+        public string CategoryName { get; set; } = string.Empty;
         public int? SellerId { get; set; }
         public string? SellerName { get; set; }
 
@@ -65,6 +67,9 @@ namespace WatchStore.Application.DTOs
         [Required(ErrorMessage = "Brand is required")]
         public int BrandId { get; set; }
 
+        [Required(ErrorMessage = "Category is required")]
+        public int CategoryId { get; set; }
+
         // Thông số máy
         public string CaseSize { get; set; } = string.Empty;
         public string Movement { get; set; } = string.Empty;
@@ -99,6 +104,7 @@ namespace WatchStore.Application.DTOs
     {
         public string? SearchTerm { get; set; }
         public int? BrandId { get; set; }
+        public int? CategoryId { get; set; }
         public decimal? MinPrice { get; set; }
         public decimal? MaxPrice { get; set; }
         public WatchStatus? Status { get; set; }
@@ -140,6 +146,12 @@ namespace WatchStore.Application.DTOs
         public CreateWatchDtoBuilder WithBrand(int brandId)
         {
             _dto.BrandId = brandId;
+            return this;
+        }
+
+        public CreateWatchDtoBuilder WithCategory(int categoryId)
+        {
+            _dto.CategoryId = categoryId;
             return this;
         }
 

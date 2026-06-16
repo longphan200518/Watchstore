@@ -43,7 +43,7 @@ namespace WatchStore.API.Controllers
         }
 
         var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "127.0.0.1";
-        var orderInfo = $"Thanh toán đơn hàng #{order.Id}";
+        var orderInfo = $"Thanh_toan_don_hang_{order.Id}";
         var paymentUrl = _vnPayService.CreatePaymentUrl(order.Id, order.TotalAmount, orderInfo, ipAddress);
 
         return Ok(new { success = true, data = new { paymentUrl } });
@@ -77,7 +77,13 @@ namespace WatchStore.API.Controllers
         var orderId = int.Parse(Request.Query["vnp_TxnRef"].ToString());
         var responseCode = Request.Query["vnp_ResponseCode"].ToString();
 
-        var order = await _orderRepository.GetByIdAsync(orderId);
+        var query = _orderRepository.GetQueryable()
+            .Include(o => o.User)
+            .Include(o => o.OrderItems)
+                .ThenInclude(oi => oi.Watch)
+                    .ThenInclude(w => w.Images);
+        var order = await query.FirstOrDefaultAsync(o => o.Id == orderId);
+        
         if (order == null)
         {
           return NotFound(new { success = false, message = "Đơn hàng không tồn tại" });
@@ -90,18 +96,7 @@ namespace WatchStore.API.Controllers
           await _orderRepository.UpdateAsync(order);
           await _unitOfWork.SaveChangesAsync();
 
-          // Load order with items and watch details for email
-          var dbContext = _unitOfWork as WatchStore.Infrastructure.Data.WatchStoreDbContext;
-          if (dbContext != null)
-          {
-            await dbContext.Entry(order)
-              .Collection(o => o.OrderItems)
-              .Query()
-              .Include(oi => oi.Watch)
-              .ThenInclude(w => w.Images)
-              .LoadAsync();
-            await dbContext.Entry(order).Reference(o => o.User).LoadAsync();
-          }
+          // Items and User are already loaded via Include
 
           // Send email notification
           try
@@ -129,12 +124,12 @@ namespace WatchStore.API.Controllers
             Console.WriteLine($"Failed to send email: {emailEx.Message}");
           }
 
-          return Redirect($"http://localhost:6868/payment-success?orderId={orderId}");
+          return Redirect($"http://localhost:3000/payment-success?orderId={orderId}");
         }
         else
         {
           // Payment failed
-          return Redirect($"http://localhost:6868/payment-failed?orderId={orderId}");
+          return Redirect($"http://localhost:3000/payment-failed?orderId={orderId}");
         }
       }
       catch (Exception ex)

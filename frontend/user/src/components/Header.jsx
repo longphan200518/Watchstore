@@ -18,7 +18,7 @@ export default function Header({ isDark = false, onThemeToggle = () => {} }) {
   const navigate = useNavigate();
   const location = useLocation();
   const { getTotalItems } = useCart();
-  const { getTotalWishlist } = useWishlist();
+  const { getTotalWishlist, clearWishlist } = useWishlist();
   const cartCount = getTotalItems();
   const wishlistCount = getTotalWishlist();
 
@@ -77,6 +77,7 @@ export default function Header({ isDark = false, onThemeToggle = () => {} }) {
     sessionStorage.removeItem("user");
     sessionStorage.removeItem("cart");
     sessionStorage.removeItem("wishlist");
+    clearWishlist();
     setIsLoggedIn(false);
     setUser(null);
     setDropdownOpen(false);

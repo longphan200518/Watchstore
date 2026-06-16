@@ -86,8 +86,7 @@ export default function Dashboard() {
               label="Tổng doanh thu"
               value={formatCurrency(data?.totalRevenue ?? 0)}
               icon="solar:dollar-bold-duotone"
-              iconColor="text-emerald-500"
-              bgGradient="from-emerald-500 to-teal-500"
+              iconColor="text-black"
               trend="+12.5%"
               trendUp={true}
             />
@@ -95,8 +94,7 @@ export default function Dashboard() {
               label="Tổng đơn hàng"
               value={data?.totalOrders ?? 0}
               icon="solar:cart-large-4-bold-duotone"
-              iconColor="text-blue-500"
-              bgGradient="from-blue-500 to-indigo-500"
+              iconColor="text-black"
               trend="+8.2%"
               trendUp={true}
             />
@@ -104,8 +102,7 @@ export default function Dashboard() {
               label="Trạng thái cao nhất"
               value={ordersByStatus[0]?.status ?? "--"}
               icon="solar:widget-5-bold-duotone"
-              iconColor="text-purple-500"
-              bgGradient="from-purple-500 to-pink-500"
+              iconColor="text-black"
               trend="+5.1%"
               trendUp={false}
             />
@@ -113,8 +110,7 @@ export default function Dashboard() {
               label="Top sản phẩm"
               value={topProducts[0]?.watchName ?? "--"}
               icon="solar:cup-star-bold-duotone"
-              iconColor="text-amber-500"
-              bgGradient="from-amber-500 to-orange-500"
+              iconColor="text-black"
               trend="+23.5%"
               trendUp={true}
             />
@@ -192,38 +188,36 @@ function StatCard({
   trendUp,
 }) {
   return (
-    <div className="relative bg-white rounded-2xl shadow-sm border border-gray-100 p-6 overflow-hidden group hover:shadow-xl transition-all duration-300">
-      {/* Background Gradient */}
-      <div
-        className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${bgGradient} opacity-5 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500`}
-      />
-
-      <div className="relative">
-        <div className="flex items-start justify-between mb-4">
-          <div
-            className={`w-14 h-14 bg-gradient-to-br ${bgGradient} rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300`}
-          >
-            <Icon icon={icon} className="text-2xl text-white" />
-          </div>
-          {trend && (
-            <div
-              className={`flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-semibold ${
-                trendUp
-                  ? "bg-green-50 text-green-600"
-                  : "bg-red-50 text-red-600"
-              }`}
-            >
-              <Icon
-                icon={trendUp ? "solar:arrow-up-bold" : "solar:arrow-down-bold"}
-              />
-              <span>{trend}</span>
-            </div>
-          )}
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-5 flex flex-col justify-between">
+      <div className="flex items-start justify-between mb-4">
+        <div>
+          <p className="text-sm font-medium text-gray-500 mb-1">{label}</p>
+          <h4 className="text-2xl font-bold text-gray-900">{value}</h4>
         </div>
-
-        <p className="text-sm text-gray-500 mb-2">{label}</p>
-        <p className="text-3xl font-bold text-gray-900 mb-1">{value}</p>
+        <div
+          className={`w-12 h-12 rounded-md flex items-center justify-center bg-gray-50 border border-gray-100`}
+        >
+          <Icon icon={icon} className={`text-2xl ${iconColor}`} />
+        </div>
       </div>
+      
+      {trend && (
+        <div className="flex items-center gap-2 mt-auto">
+          <div
+            className={`flex items-center gap-1 text-xs font-medium ${
+              trendUp
+                ? "text-green-600"
+                : "text-red-600"
+            }`}
+          >
+            <Icon
+              icon={trendUp ? "carbon:arrow-up" : "carbon:arrow-down"}
+            />
+            <span>{trend}</span>
+          </div>
+          <span className="text-xs text-gray-400">so với tháng trước</span>
+        </div>
+      )}
     </div>
   );
 }
@@ -257,13 +251,7 @@ function LineChart({ data }) {
         data={chartData}
         margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
       >
-        <defs>
-          <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
-            <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
-          </linearGradient>
-        </defs>
-        <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+        <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" vertical={false} />
         <XAxis dataKey="date" stroke="#6b7280" fontSize={12} tickLine={false} />
         <YAxis
           stroke="#6b7280"
@@ -279,7 +267,7 @@ function LineChart({ data }) {
                   <p className="text-xs text-gray-500 mb-1">
                     {payload[0].payload.date}
                   </p>
-                  <p className="text-sm font-semibold text-blue-600">
+                  <p className="text-sm font-semibold text-black">
                     {formatCurrency(payload[0].value)}
                   </p>
                 </div>
@@ -291,9 +279,9 @@ function LineChart({ data }) {
         <Area
           type="monotone"
           dataKey="revenue"
-          stroke="#3b82f6"
+          stroke="#000000"
           strokeWidth={2}
-          fill="url(#colorRevenue)"
+          fill="#f3f4f6"
           animationDuration={1000}
         />
       </AreaChart>
@@ -317,11 +305,11 @@ function PieChart({ data }) {
   }
 
   const COLORS = {
-    Pending: "#f59e0b",
-    Processing: "#3b82f6",
-    Shipped: "#8b5cf6",
-    Delivered: "#10b981",
-    Cancelled: "#ef4444",
+    Pending: "#9ca3af",
+    Processing: "#6b7280",
+    Shipped: "#4b5563",
+    Delivered: "#111827",
+    Cancelled: "#e5e7eb",
   };
 
   const chartData = data.map((d) => ({
@@ -404,13 +392,7 @@ function BarChart({ data }) {
         data={chartData}
         margin={{ top: 10, right: 10, left: 0, bottom: 5 }}
       >
-        <defs>
-          <linearGradient id="colorBar" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.9} />
-            <stop offset="95%" stopColor="#f97316" stopOpacity={0.7} />
-          </linearGradient>
-        </defs>
-        <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+        <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" vertical={false} />
         <XAxis
           dataKey="name"
           stroke="#6b7280"
@@ -434,7 +416,7 @@ function BarChart({ data }) {
                   <p className="text-xs font-semibold text-gray-900 mb-1">
                     {payload[0].payload.fullName}
                   </p>
-                  <p className="text-sm font-bold text-amber-600">
+                  <p className="text-sm font-bold text-black">
                     {formatCurrency(payload[0].value)}
                   </p>
                 </div>
@@ -445,8 +427,8 @@ function BarChart({ data }) {
         />
         <Bar
           dataKey="revenue"
-          fill="url(#colorBar)"
-          radius={[8, 8, 0, 0]}
+          fill="#111827"
+          radius={[4, 4, 0, 0]}
           animationDuration={1000}
         />
       </RechartsBar>

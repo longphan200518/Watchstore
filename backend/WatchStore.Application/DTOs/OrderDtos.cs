@@ -42,6 +42,8 @@ namespace WatchStore.Application.DTOs
         [Required(ErrorMessage = "Order items are required")]
         [MinLength(1, ErrorMessage = "Order must have at least one item")]
         public List<CreateOrderItemDto> OrderItems { get; set; } = new();
+
+        public string PaymentMethod { get; set; } = "COD";
     }
 
     public class CreateOrderItemDto

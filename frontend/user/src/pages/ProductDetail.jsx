@@ -106,24 +106,32 @@ export default function ProductDetail() {
     localStorage.setItem("theme", newMode ? "dark" : "light");
   };
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
     if (quantity > 0 && product.status === 1) {
-      addToCart(product, quantity);
-      addToast(
-        language === "vi"
-          ? `${product.name} x${quantity} đã được thêm vào giỏ hàng`
-          : `${product.name} x${quantity} added to cart`,
-        "success",
-        2000
-      );
+      const result = await addToCart(product.id, quantity);
+      if (result.success) {
+        addToast(
+          language === "vi"
+            ? `${product.name} x${quantity} đã được thêm vào giỏ hàng`
+            : `${product.name} x${quantity} added to cart`,
+          "success",
+          2000
+        );
+      } else {
+        addToast(result.message, "error");
+      }
       setQuantity(1);
     }
   };
 
-  const handleBuyNow = () => {
+  const handleBuyNow = async () => {
     if (quantity > 0 && product.status === 1) {
-      addToCart(product, quantity);
-      navigate("/cart");
+      const result = await addToCart(product.id, quantity);
+      if (result.success) {
+        navigate("/cart");
+      } else {
+        addToast(result.message, "error");
+      }
     }
   };
 
@@ -392,7 +400,7 @@ export default function ProductDetail() {
                       isDark ? "text-amber-500" : "text-amber-600"
                     }`}
                   >
-                    {product.brand?.name || "LUXURY WATCH"}
+                    {product.brand?.name || "LUXURY WATCH"} <span className="text-gray-400 mx-2">|</span> <span className="text-gray-500">{product.categoryName}</span>
                   </span>
                   <p
                     className={`text-xs mt-2 ${

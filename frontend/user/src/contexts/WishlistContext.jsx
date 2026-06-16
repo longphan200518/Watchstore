@@ -3,20 +3,28 @@ import { createContext, useContext, useState, useEffect } from "react";
 const WishlistContext = createContext();
 
 export const WishlistProvider = ({ children }) => {
-  const [wishlist, setWishlist] = useState([]);
-
-  // Load wishlist from localStorage
-  useEffect(() => {
+  const [wishlist, setWishlist] = useState(() => {
+    const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+    if (!token) return [];
+    
     const savedWishlist = localStorage.getItem("wishlist");
-    if (savedWishlist) {
-      setWishlist(JSON.parse(savedWishlist));
-    }
-  }, []);
+    return savedWishlist ? JSON.parse(savedWishlist) : [];
+  });
 
-  // Save wishlist to localStorage
+  // Save wishlist to localStorage whenever it changes
   useEffect(() => {
-    localStorage.setItem("wishlist", JSON.stringify(wishlist));
+    const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+    if (token) {
+      localStorage.setItem("wishlist", JSON.stringify(wishlist));
+    } else {
+      localStorage.removeItem("wishlist");
+    }
   }, [wishlist]);
+
+  const clearWishlist = () => {
+    setWishlist([]);
+    localStorage.removeItem("wishlist");
+  };
 
   const addToWishlist = (product) => {
     // Kiểm tra xem user có đăng nhập không
@@ -59,6 +67,7 @@ export const WishlistProvider = ({ children }) => {
         removeFromWishlist,
         isInWishlist,
         getTotalWishlist,
+        clearWishlist,
       }}
     >
       {children}

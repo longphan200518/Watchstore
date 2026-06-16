@@ -12,5 +12,6 @@ namespace WatchStore.Domain.Entities
         // Navigation properties
         public virtual User User { get; set; } = null!;
         public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
+        public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();
     }
 }

@@ -11,6 +11,7 @@ export default function Products() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [watches, setWatches] = useState([]);
   const [brands, setBrands] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [totalPages, setTotalPages] = useState(1);
@@ -46,6 +47,7 @@ export default function Products() {
   const page = parseInt(searchParams.get("page")) || 1;
   const search = searchParams.get("search") || "";
   const brandId = searchParams.get("brandId") || "";
+  const categoryId = searchParams.get("categoryId") || "";
   const minPrice = searchParams.get("minPrice") || "";
   const maxPrice = searchParams.get("maxPrice") || "";
   const sortBy = searchParams.get("sortBy") || "latest";
@@ -68,6 +70,22 @@ export default function Products() {
     fetchBrands();
   }, []);
 
+  // Fetch categories
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch("http://localhost:5221/api/categories");
+        const result = await response.json();
+        if (result.success) {
+          setCategories(result.data || []);
+        }
+      } catch (err) {
+        console.error("Failed to load categories:", err);
+      }
+    };
+    fetchCategories();
+  }, []);
+
   // Fetch watches
   useEffect(() => {
     const fetchWatches = async () => {
@@ -78,6 +96,7 @@ export default function Products() {
           pageSize: 12,
           ...(search && { searchTerm: search }),
           ...(brandId && { brandId }),
+          ...(categoryId && { categoryId }),
           ...(minPrice && { minPrice }),
           ...(maxPrice && { maxPrice }),
           sortBy: sortBy,
@@ -104,7 +123,7 @@ export default function Products() {
     };
 
     fetchWatches();
-  }, [page, search, brandId, minPrice, maxPrice, sortBy]);
+  }, [page, search, brandId, categoryId, minPrice, maxPrice, sortBy]);
 
   const updateFilter = (key, value) => {
     const newParams = new URLSearchParams(searchParams);
@@ -120,15 +139,19 @@ export default function Products() {
     setSearchParams(newParams);
   };
 
-  const handleAddToCart = (watch) => {
-    addToCart(watch, 1);
-    addToast(
-      language === "vi"
-        ? `${watch.name} đã được thêm vào giỏ hàng`
-        : `${watch.name} added to cart`,
-      "success",
-      2000
-    );
+  const handleAddToCart = async (watch) => {
+    const result = await addToCart(watch.id, 1);
+    if (result.success) {
+      addToast(
+        language === "vi"
+          ? `${watch.name} đã được thêm vào giỏ hàng`
+          : `${watch.name} added to cart`,
+        "success",
+        2000
+      );
+    } else {
+      addToast(result.message, "error");
+    }
   };
 
   const handleWishlist = (watch) => {
@@ -184,7 +207,7 @@ export default function Products() {
 
         <div className="mb-12">
           <div
-            className={`grid grid-cols-1 md:grid-cols-4 gap-6 p-8 border ${
+            className={`grid grid-cols-1 md:grid-cols-5 gap-6 p-8 border ${
               isDark
                 ? "bg-black border-gray-900"
                 : "bg-white border-gray-200 shadow-sm"
@@ -241,6 +264,35 @@ export default function Products() {
               </select>
             </div>
 
+            {/* Category Filter */}
+            <div>
+              <label
+                className={`block text-xs tracking-wider uppercase font-semibold mb-3 ${
+                  isDark ? "text-gray-400" : "text-gray-600"
+                }`}
+              >
+                {language === "vi" ? "Danh Mục" : "Category"}
+              </label>
+              <select
+                value={categoryId}
+                onChange={(e) => updateFilter("categoryId", e.target.value)}
+                className={`w-full px-4 py-3 border focus:border-amber-600 focus:outline-none transition-colors duration-300 ${
+                  isDark
+                    ? "bg-black border-gray-900 text-white"
+                    : "bg-white border-gray-300 text-gray-900"
+                }`}
+              >
+                <option value="">
+                  {language === "vi" ? "Tất cả danh mục" : "All categories"}
+                </option>
+                {categories.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
             <div>
               <label
                 className={`block text-xs tracking-wider uppercase font-semibold mb-3 ${
@@ -284,31 +336,35 @@ export default function Products() {
             </div>
           </div>
 
-          <div className="mt-6 flex justify-between items-center">
-            <select
-              value={sortBy}
-              onChange={(e) => updateFilter("sortBy", e.target.value)}
-              className={`px-6 py-3 border focus:border-amber-600 focus:outline-none transition-colors duration-300 text-sm font-medium ${
-                isDark
-                  ? "bg-black border-gray-900 text-white"
-                  : "bg-white border-gray-300 text-gray-900"
-              }`}
-            >
-              <option value="latest">
-                {language === "vi" ? "Mới nhất" : "Latest"}
-              </option>
-              <option value="price-low">
-                {language === "vi" ? "Giá: Thấp đến Cao" : "Price: Low to High"}
-              </option>
-              <option value="price-high">
-                {language === "vi" ? "Giá: Cao đến Thấp" : "Price: High to Low"}
-              </option>
-              <option value="popular">
-                {language === "vi" ? "Phổ biến nhất" : "Most Popular"}
-              </option>
-            </select>
+          <div className="mt-8 mb-6 border-b pb-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className={`text-sm font-semibold mr-2 ${isDark ? "text-gray-400" : "text-gray-600"}`}>
+                {language === "vi" ? "Sắp xếp theo:" : "Sort by:"}
+              </span>
+              {[
+                { id: "latest", labelVi: "Nổi bật", labelEn: "Featured" },
+                { id: "best-selling", labelVi: "Bán chạy", labelEn: "Best Selling" },
+                { id: "newest", labelVi: "Mới", labelEn: "Newest" },
+                { id: "price-asc", labelVi: "Giá thấp - cao", labelEn: "Price Low-High" },
+                { id: "price-desc", labelVi: "Giá cao - thấp", labelEn: "Price High-Low" },
+              ].map((opt) => (
+                <button
+                  key={opt.id}
+                  onClick={() => updateFilter("sortBy", opt.id)}
+                  className={`px-4 py-2 text-sm font-medium rounded transition-all duration-300 ${
+                    sortBy === opt.id || (!sortBy && opt.id === "latest")
+                      ? "bg-amber-600 text-white shadow-md shadow-amber-600/20"
+                      : isDark
+                      ? "bg-gray-900 text-gray-300 hover:bg-gray-800 border border-gray-800"
+                      : "bg-white text-gray-600 hover:bg-gray-100 border border-gray-200"
+                  }`}
+                >
+                  {language === "vi" ? opt.labelVi : opt.labelEn}
+                </button>
+              ))}
+            </div>
             <p
-              className={`text-sm font-medium ${
+              className={`text-sm font-medium whitespace-nowrap ${
                 isDark ? "text-gray-400" : "text-gray-600"
               }`}
             >
@@ -416,7 +472,7 @@ export default function Products() {
 
                   <div className="space-y-3">
                     <p className="text-amber-600 text-xs tracking-widest uppercase font-semibold">
-                      {watch.brandName}
+                      {watch.brandName} <span className="text-gray-400 mx-1">|</span> <span className="text-gray-500">{watch.categoryName}</span>
                     </p>
                     <h3
                       className={`font-serif text-xl leading-tight group-hover:text-amber-600 transition-colors duration-300 ${

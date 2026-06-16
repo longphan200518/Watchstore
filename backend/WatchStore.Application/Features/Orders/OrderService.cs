@@ -14,6 +14,8 @@ namespace WatchStore.Application.Features.Orders
         private readonly IRepository<Order> _orderRepository;
         private readonly IRepository<OrderItem> _orderItemRepository;
         private readonly IRepository<Watch> _watchRepository;
+        private readonly IRepository<WatchStore.Domain.Entities.Cart> _cartRepository;
+        private readonly IRepository<CartItem> _cartItemRepository;
         private readonly IEmailService _emailService;
 
         public OrderService(IUnitOfWork unitOfWork, IEmailService emailService)
@@ -22,97 +24,130 @@ namespace WatchStore.Application.Features.Orders
             _orderRepository = _unitOfWork.GetRepository<Order>();
             _orderItemRepository = _unitOfWork.GetRepository<OrderItem>();
             _watchRepository = _unitOfWork.GetRepository<Watch>();
+            _cartRepository = _unitOfWork.GetRepository<WatchStore.Domain.Entities.Cart>();
+            _cartItemRepository = _unitOfWork.GetRepository<CartItem>();
             _emailService = emailService;
         }
 
         public async Task<ApiResponse<OrderDto>> CreateAsync(CreateOrderDto dto, int userId)
         {
-            // Validate watches and calculate total
-            decimal totalAmount = 0;
-            var orderItems = new List<OrderItem>();
-
-            foreach (var item in dto.OrderItems)
+            await _unitOfWork.BeginTransactionAsync();
+            try
             {
-                var watch = await _watchRepository.GetByIdAsync(item.WatchId);
-                if (watch == null)
-                    return ApiResponse<OrderDto>.ErrorResponse($"Watch with ID {item.WatchId} not found");
+                // Validate watches and calculate total
+                decimal totalAmount = 0;
+                var orderItems = new List<OrderItem>();
 
-                if (watch.Status != WatchStatus.Available)
-                    return ApiResponse<OrderDto>.ErrorResponse($"Watch '{watch.Name}' is not available");
-
-                if (watch.StockQuantity < item.Quantity)
-                    return ApiResponse<OrderDto>.ErrorResponse($"Insufficient stock for '{watch.Name}'. Available: {watch.StockQuantity}");
-
-                var orderItem = new OrderItem
+                foreach (var item in dto.OrderItems)
                 {
-                    WatchId = item.WatchId,
-                    Quantity = item.Quantity,
-                    Price = watch.Price
+                    var watch = await _watchRepository.GetByIdAsync(item.WatchId);
+                    if (watch == null)
+                        throw new Exception($"Watch with ID {item.WatchId} not found");
+
+                    if (watch.Status != WatchStatus.Available)
+                        throw new Exception($"Watch '{watch.Name}' is not available");
+
+                    if (watch.StockQuantity < item.Quantity)
+                        throw new Exception($"Insufficient stock for '{watch.Name}'. Available: {watch.StockQuantity}");
+
+                    var orderItem = new OrderItem
+                    {
+                        WatchId = item.WatchId,
+                        Quantity = item.Quantity,
+                        Price = watch.Price
+                    };
+
+                    orderItems.Add(orderItem);
+                    totalAmount += watch.Price * item.Quantity;
+
+                    // Update stock
+                    watch.StockQuantity -= item.Quantity;
+                    if (watch.StockQuantity == 0)
+                        watch.Status = WatchStatus.OutOfStock;
+                    
+                    await _watchRepository.UpdateAsync(watch);
+                }
+
+                // Create order
+                var order = new Order
+                {
+                    UserId = userId,
+                    TotalAmount = totalAmount,
+                    Status = OrderStatus.Pending,
+                    ShippingAddress = dto.ShippingAddress,
+                    PhoneNumber = dto.PhoneNumber,
+                    Notes = dto.Notes,
+                    OrderItems = orderItems
                 };
 
-                orderItems.Add(orderItem);
-                totalAmount += watch.Price * item.Quantity;
+                await _orderRepository.AddAsync(order);
 
-                // Update stock
-                watch.StockQuantity -= item.Quantity;
-                if (watch.StockQuantity == 0)
-                    watch.Status = WatchStatus.OutOfStock;
-            }
+                // Clear cart for the user
+                var userCart = await _cartRepository.GetQueryable()
+                    .Include(c => c.CartItems)
+                    .FirstOrDefaultAsync(c => c.UserId == userId);
+                
+                if (userCart != null && userCart.CartItems.Any())
+                {
+                    foreach (var cartItem in userCart.CartItems)
+                    {
+                        await _cartItemRepository.DeleteAsync(cartItem);
+                    }
+                }
 
-            // Create order
-            var order = new Order
-            {
-                UserId = userId,
-                TotalAmount = totalAmount,
-                Status = OrderStatus.Pending,
-                ShippingAddress = dto.ShippingAddress,
-                PhoneNumber = dto.PhoneNumber,
-                Notes = dto.Notes,
-                OrderItems = orderItems
-            };
+                await _unitOfWork.SaveChangesAsync();
+                await _unitOfWork.CommitAsync();
 
-            await _orderRepository.AddAsync(order);
-            await _unitOfWork.SaveChangesAsync();
-
-            // Load order with full details including items, watches, images, and user
-            var orderWithDetails = await _orderRepository.GetQueryable()
-                .Include(o => o.User)
-                .Include(o => o.OrderItems)
-                    .ThenInclude(oi => oi.Watch)
-                    .ThenInclude(w => w.Images)
-                .FirstOrDefaultAsync(o => o.Id == order.Id);
+                // Load order with full details including items, watches, images, and user
+                var orderWithDetails = await _orderRepository.GetQueryable()
+                    .Include(o => o.User)
+                    .Include(o => o.OrderItems)
+                        .ThenInclude(oi => oi.Watch)
+                        .ThenInclude(w => w.Images)
+                    .FirstOrDefaultAsync(o => o.Id == order.Id);
 
             if (orderWithDetails == null)
                 return await GetByIdAsync(order.Id);
 
-            // Send confirmation email
-            try
+            // Send confirmation email only if not VNPAY
+            // VNPAY will send the email AFTER successful payment in PaymentController
+            if (dto.PaymentMethod != "VNPAY")
             {
-                var orderItemsList = orderWithDetails.OrderItems.Select(item => (
-                    ProductName: item.Watch.Name,
-                    Quantity: item.Quantity,
-                    Price: item.Price,
-                    ImageUrl: item.Watch.Images.FirstOrDefault()?.ImageUrl ?? "https://via.placeholder.com/60"
-                )).ToList();
+                try
+                {
+                    var orderItemsList = orderWithDetails.OrderItems.Select(item => (
+                        ProductName: item.Watch.Name,
+                        Quantity: item.Quantity,
+                        Price: item.Price,
+                        ImageUrl: item.Watch.Images.FirstOrDefault()?.ImageUrl ?? "https://via.placeholder.com/60"
+                    )).ToList();
 
-                await _emailService.SendOrderConfirmationEmailAsync(
-                    orderWithDetails.User.Email,
-                    orderWithDetails.User.FullName,
-                    orderWithDetails.Id,
-                    orderWithDetails.TotalAmount,
-                    orderItemsList,
-                    orderWithDetails.ShippingAddress,
-                    orderWithDetails.PhoneNumber ?? "Không có"
-                );
-                
-                Console.WriteLine($"[ORDER] Email confirmation sent to {orderWithDetails.User.Email} for order #{orderWithDetails.Id}");
-            }
+                    await _emailService.SendOrderConfirmationEmailAsync(
+                        orderWithDetails.User.Email,
+                        orderWithDetails.User.FullName,
+                        orderWithDetails.Id,
+                        orderWithDetails.TotalAmount,
+                        orderItemsList,
+                        orderWithDetails.ShippingAddress,
+                        orderWithDetails.PhoneNumber ?? "Không có"
+                    );
+                    
+                    Console.WriteLine($"[ORDER] Email confirmation sent to {orderWithDetails.User.Email} for order #{orderWithDetails.Id}");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[ORDER] Failed to send email: {ex.Message}");
+                }
+            } // end if not VNPAY
+            
+            return await GetByIdAsync(orderWithDetails?.Id ?? 0);
+            
+            } // end try
             catch (Exception ex)
             {
-                Console.WriteLine($"[ORDER] Failed to send email: {ex.Message}");
+                await _unitOfWork.RollbackAsync();
+                return ApiResponse<OrderDto>.ErrorResponse($"Lỗi khi tạo đơn hàng: {ex.Message}");
             }
-
-            return await GetByIdAsync(order.Id);
         }
 
         public async Task<ApiResponse<PagedResponse<OrderDto>>> GetUserOrdersAsync(int userId, PaginationParams pagination)
@@ -227,6 +262,16 @@ namespace WatchStore.Application.Features.Orders
             var order = await _orderRepository.GetByIdAsync(orderId);
             if (order == null)
                 return ApiResponse<bool>.ErrorResponse("Order not found");
+
+            // Validate status transitions
+            if (order.Status == OrderStatus.Cancelled)
+                return ApiResponse<bool>.ErrorResponse("Cannot change status of a cancelled order");
+
+            if (order.Status == OrderStatus.Delivered && status != OrderStatus.Delivered)
+                return ApiResponse<bool>.ErrorResponse("Cannot change status backward from Delivered");
+
+            if (status == OrderStatus.Cancelled)
+                return await CancelOrderAsync(orderId, order.UserId);
 
             order.Status = status;
             await _orderRepository.UpdateAsync(order);

@@ -14,7 +14,7 @@ export default function Checkout() {
   const [success, setSuccess] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("COD"); // COD, BANK, or VNPAY
   const navigate = useNavigate();
-  const { cart, getTotalPrice, getTotalItems, clearCart } = useCart();
+  const { cartItems, getTotalPrice, getTotalItems, clearCart } = useCart();
   const { addToast } = useToast();
 
   const [formData, setFormData] = useState({
@@ -59,7 +59,7 @@ export default function Checkout() {
     setLoading(true);
     setError("");
 
-    if (cart.length === 0) {
+    if (cartItems.length === 0) {
       setError("Giỏ hàng trống");
       addToast("Giỏ hàng trống", "warning", 2000);
       setLoading(false);
@@ -80,10 +80,11 @@ export default function Checkout() {
         shippingAddress: formData.shippingAddress,
         phoneNumber: formData.phoneNumber,
         notes: formData.notes,
-        orderItems: cart.map((item) => ({
-          watchId: item.id,
+        orderItems: cartItems.map((item) => ({
+          watchId: item.watchId,
           quantity: item.quantity,
         })),
+        paymentMethod: paymentMethod,
       };
 
       const response = await fetch("http://localhost:5221/api/orders", {
@@ -116,7 +117,7 @@ export default function Checkout() {
             );
 
             const paymentResult = await paymentResponse.json();
-            if (paymentResult.success) {
+            if (paymentResult.success && paymentMethod === "VNPAY" && paymentResult.data?.paymentUrl) {
               clearCart();
               window.location.href = paymentResult.data.paymentUrl;
               return;
@@ -149,7 +150,7 @@ export default function Checkout() {
     }
   };
 
-  if (cart.length === 0) {
+  if (cartItems.length === 0) {
     return (
       <div
         className={`min-h-screen ${
@@ -552,16 +553,16 @@ export default function Checkout() {
             </h2>
 
             <div className="space-y-3 pb-4 border-b mb-4 border-white/10">
-              {cart.map((item) => (
+              {cartItems.map((item) => (
                 <div key={item.id} className="flex justify-between text-sm">
                   <span className={isDark ? "text-gray-400" : "text-gray-600"}>
-                    {item.name} x{item.quantity}
+                    {item.watchName} x{item.quantity}
                   </span>
                   <span className={isDark ? "text-gray-300" : "text-gray-700"}>
                     {new Intl.NumberFormat("vi-VN", {
                       style: "currency",
                       currency: "VND",
-                    }).format(item.price * item.quantity)}
+                    }).format(item.unitPrice * item.quantity)}
                   </span>
                 </div>
               ))}

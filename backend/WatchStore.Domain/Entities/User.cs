@@ -14,5 +14,6 @@ namespace WatchStore.Domain.Entities
         // Navigation properties
         public virtual ICollection<Watch> Watches { get; set; } = new List<Watch>();
         public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
+        public virtual ICollection<Cart> Carts { get; set; } = new List<Cart>();
     }
 }

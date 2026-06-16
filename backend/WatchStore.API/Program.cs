@@ -15,6 +15,8 @@ using WatchStore.Application.Features.Reviews;
 using WatchStore.Application.Features.Users;
 using WatchStore.Application.Features.Watches;
 using WatchStore.Application.Features.WebsiteSettings;
+using WatchStore.Application.Features.Cart;
+using WatchStore.Application.Features.Categories;
 using WatchStore.Application.Interfaces;
 using WatchStore.Application.Services;
 using WatchStore.Domain.Entities;
@@ -146,6 +148,8 @@ builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IWebsiteSettingsService, WebsiteSettingsService>();
 builder.Services.AddScoped<ICouponService, CouponService>();
+builder.Services.AddScoped<ICartService, CartService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
 
 // Image Upload Service (use Cloudinary or Local based on configuration)
 // TODO: Uncomment after installing CloudinaryDotNet package

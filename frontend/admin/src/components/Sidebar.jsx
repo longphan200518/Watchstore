@@ -60,22 +60,21 @@ export default function Sidebar({ navItems }) {
         />
       )}
 
-      {/* Sidebar */}
       <aside
-        className={`fixed left-0 top-0 w-72 h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 text-white shadow-2xl flex flex-col z-50 transition-transform duration-300 lg:translate-x-0 ${
+        className={`fixed left-0 top-0 w-72 h-screen bg-black text-gray-300 flex flex-col z-50 transition-transform duration-300 lg:translate-x-0 ${
           isMobileMenuOpen
             ? "translate-x-0"
             : "-translate-x-full lg:translate-x-0"
         }`}
       >
         {/* Logo Section */}
-        <div className="p-6 border-b border-white/10">
+        <div className="p-6 border-b border-gray-800">
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl flex items-center justify-center shadow-lg">
-              <Icon icon="solar:watch-bold" className="text-2xl text-white" />
+            <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
+              <Icon icon="solar:watch-bold" className="text-2xl text-black" />
             </div>
             <div>
-              <h1 className="text-xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+              <h1 className="text-xl font-bold text-white">
                 Watchstore
               </h1>
               <p className="text-xs text-gray-400">Admin Dashboard</p>
@@ -94,22 +93,19 @@ export default function Sidebar({ navItems }) {
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`group flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
+                  className={`group flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
                     active
-                      ? "bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-lg shadow-amber-500/30"
-                      : "text-gray-300 hover:bg-white/5 hover:text-white"
+                      ? "bg-gray-800 text-white"
+                      : "text-gray-400 hover:bg-gray-900 hover:text-white"
                   }`}
                 >
                   <Icon
                     icon={icon}
-                    className={`text-xl transition-transform duration-200 ${
-                      active ? "scale-110" : "group-hover:scale-110"
+                    className={`text-xl ${
+                      active ? "text-white" : "text-gray-500 group-hover:text-white"
                     }`}
                   />
                   <span>{item.label}</span>
-                  {active && (
-                    <div className="ml-auto w-2 h-2 bg-white rounded-full animate-pulse" />
-                  )}
                 </Link>
               );
             })}
@@ -117,9 +113,9 @@ export default function Sidebar({ navItems }) {
         </nav>
 
         {/* Admin Info & Logout */}
-        <div className="p-4 border-t border-white/10 space-y-3">
-          <div className="flex items-center gap-3 px-3 py-2 bg-white/5 rounded-lg">
-            <div className="w-9 h-9 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-sm font-bold">
+        <div className="p-4 border-t border-gray-800 space-y-3">
+          <div className="flex items-center gap-3 px-3 py-2 bg-gray-900 rounded-lg">
+            <div className="w-9 h-9 bg-gray-800 border border-gray-700 rounded-full flex items-center justify-center text-sm font-bold text-white">
               A
             </div>
             <div className="flex-1 min-w-0">
@@ -129,11 +125,11 @@ export default function Sidebar({ navItems }) {
           </div>
           <button
             onClick={handleLogout}
-            className="w-full px-4 py-2.5 text-sm font-medium text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 group"
+            className="w-full px-4 py-2.5 text-sm font-medium text-gray-400 hover:text-red-500 hover:bg-gray-900 rounded-lg transition-colors flex items-center justify-center gap-2"
           >
             <Icon
-              icon="solar:logout-2-bold-duotone"
-              className="text-lg group-hover:rotate-12 transition-transform"
+              icon="solar:logout-2-outline"
+              className="text-lg"
             />
             <span>Đăng xuất</span>
           </button>

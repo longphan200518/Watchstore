@@ -9,7 +9,7 @@ import { useToast } from "../contexts/ToastContext";
 export default function Cart() {
   const [isDark, setIsDark] = useState(false);
   const navigate = useNavigate();
-  const { cart, updateQuantity, removeFromCart, getTotalPrice, getTotalItems } =
+  const { cartItems, updateQuantity, removeFromCart, getTotalPrice, getTotalItems } =
     useCart();
   const { addToast } = useToast();
 
@@ -52,7 +52,7 @@ export default function Cart() {
           Giỏ hàng
         </h1>
 
-        {cart.length === 0 ? (
+        {cartItems.length === 0 ? (
           <div
             className={`text-center py-16 rounded-lg border ${
               isDark
@@ -87,7 +87,7 @@ export default function Cart() {
           <div className="grid lg:grid-cols-3 gap-8">
             {/* Cart Items */}
             <div className="lg:col-span-2 space-y-4">
-              {cart.map((item) => (
+              {cartItems.map((item) => (
                 <div
                   key={item.id}
                   className={`flex gap-4 p-4 rounded-lg border ${
@@ -97,10 +97,10 @@ export default function Cart() {
                   }`}
                 >
                   {/* Image */}
-                  {item.images && item.images.length > 0 ? (
+                  {item.watchImageUrl ? (
                     <img
-                      src={item.images[0].imageUrl}
-                      alt={item.name}
+                      src={item.watchImageUrl}
+                      alt={item.watchName}
                       className="w-24 h-24 object-cover rounded-lg"
                     />
                   ) : (
@@ -120,7 +120,7 @@ export default function Cart() {
                         isDark ? "text-white" : "text-black"
                       }`}
                     >
-                      {item.name}
+                      {item.watchName}
                     </h3>
                     <p
                       className={`text-sm ${
@@ -133,7 +133,7 @@ export default function Cart() {
                       {new Intl.NumberFormat("vi-VN", {
                         style: "currency",
                         currency: "VND",
-                      }).format(item.price)}
+                      }).format(item.unitPrice)}
                     </p>
                   </div>
 
@@ -169,7 +169,7 @@ export default function Cart() {
                     onClick={() => {
                       removeFromCart(item.id);
                       addToast(
-                        `${item.name} đã được xóa khỏi giỏ hàng`,
+                        `${item.watchName} đã được xóa khỏi giỏ hàng`,
                         "info",
                         2000
                       );

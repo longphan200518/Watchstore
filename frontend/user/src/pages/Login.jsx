@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
+import cartService from "../services/cartService";
+import { getSessionId, clearSessionId } from "../utils/sessionId";
 
 export default function Login() {
   const [searchParams] = useSearchParams();
@@ -43,7 +45,18 @@ export default function Login() {
           result.data.refreshTokenExpiresAt
         );
         storage.setItem("user", JSON.stringify(result.data.user));
-        window.location.href = "/";
+
+        // Merge giỏ hàng session vào tài khoản user
+        try {
+          const sessionId = getSessionId();
+          await cartService.mergeCart(sessionId);
+          clearSessionId();
+        } catch (mergeErr) {
+          console.warn("[Cart] Lỗi merge giỏ hàng sau đăng nhập:", mergeErr);
+        }
+
+        const redirect = searchParams.get("redirect") || "/";
+        window.location.href = redirect;
       } else {
         setError(result.message || "Đăng nhập thất bại");
       }

@@ -14,12 +14,14 @@ namespace WatchStore.Application.Features.Watches
     {
         private readonly IRepository<Watch> _watchRepository;
         private readonly IRepository<Brand> _brandRepository;
+        private readonly IRepository<Category> _categoryRepository;
 
         public WatchService(IServiceFacade facade)
             : base(facade, facade.GetLogger<WatchService>())
         {
             _watchRepository = facade.UnitOfWork.GetRepository<Watch>();
             _brandRepository = facade.UnitOfWork.GetRepository<Brand>();
+            _categoryRepository = facade.UnitOfWork.GetRepository<Category>();
         }
 
         public async Task<ApiResponse<PagedResponse<WatchDto>>> GetAllAsync(WatchFilterDto filter, PaginationParams pagination)
@@ -30,11 +32,13 @@ namespace WatchStore.Application.Features.Watches
 
                 var query = _watchRepository.GetQueryable()
                     .Include(w => w.Brand)
+                    .Include(w => w.Category)
                     .Include(w => w.Images)
                     .WhereIf(!filter.SearchTerm.IsNullOrEmpty(), w =>
                         w.Name.ToLower().Contains(filter.SearchTerm!.ToLower()) ||
                         (w.Description != null && w.Description.ToLower().Contains(filter.SearchTerm!.ToLower())))
                     .WhereIf(filter.BrandId.HasValue, w => w.BrandId == filter.BrandId!.Value)
+                    .WhereIf(filter.CategoryId.HasValue, w => w.CategoryId == filter.CategoryId!.Value)
                     .WhereIf(filter.MinPrice.HasValue, w => w.Price >= filter.MinPrice!.Value)
                     .WhereIf(filter.MaxPrice.HasValue, w => w.Price <= filter.MaxPrice!.Value)
                     .WhereIf(filter.Status.HasValue, w => w.Status == filter.Status!.Value);
@@ -44,7 +48,11 @@ namespace WatchStore.Application.Features.Watches
                 {
                     "name" => filter.IsDescending ? query.OrderByDescending(w => w.Name) : query.OrderBy(w => w.Name),
                     "price" => filter.IsDescending ? query.OrderByDescending(w => w.Price) : query.OrderBy(w => w.Price),
-                    _ => filter.IsDescending ? query.OrderByDescending(w => w.CreatedAt) : query.OrderBy(w => w.CreatedAt)
+                    "price-asc" => query.OrderBy(w => w.Price),
+                    "price-desc" => query.OrderByDescending(w => w.Price),
+                    "newest" => query.OrderByDescending(w => w.CreatedAt),
+                    "best-selling" => query.OrderByDescending(w => w.OrderItems.Sum(oi => oi.Quantity)),
+                    _ => filter.IsDescending ? query.OrderByDescending(w => w.CreatedAt) : query.OrderByDescending(w => w.CreatedAt) // Default to newest
                 };
 
                 var totalRecords = await query.CountAsync();
@@ -85,6 +93,7 @@ namespace WatchStore.Application.Features.Watches
                 {
                     var watch = await _watchRepository.GetQueryable()
                         .Include(w => w.Brand)
+                        .Include(w => w.Category)
                         .Include(w => w.Seller)
                         .Include(w => w.Images)
                         .FirstOrDefaultAsync(w => w.Id == id);
@@ -115,6 +124,10 @@ namespace WatchStore.Application.Features.Watches
                     if (brand == null)
                         return ApiResponse<WatchDto>.ErrorResponse("Brand not found");
 
+                    var category = await _categoryRepository.GetByIdAsync(dto.CategoryId);
+                    if (category == null)
+                        return ApiResponse<WatchDto>.ErrorResponse("Category not found");
+
                     var status = dto.Status;
 
                     var watch = new Watch
@@ -125,6 +138,7 @@ namespace WatchStore.Application.Features.Watches
                         StockQuantity = dto.StockQuantity,
                         Status = status,
                         BrandId = dto.BrandId,
+                        CategoryId = dto.CategoryId,
                         // Thông số máy
                         CaseSize = dto.CaseSize,
                         Movement = dto.Movement,
@@ -200,6 +214,7 @@ namespace WatchStore.Application.Features.Watches
                     watch.StockQuantity = dto.StockQuantity;
                     watch.Status = dto.Status;
                     watch.BrandId = dto.BrandId;
+                    watch.CategoryId = dto.CategoryId;
                     // Thông số máy
                     watch.CaseSize = dto.CaseSize;
                     watch.Movement = dto.Movement;
@@ -298,6 +313,8 @@ namespace WatchStore.Application.Features.Watches
                 Status = watch.Status,
                 BrandId = watch.BrandId,
                 BrandName = watch.Brand?.Name ?? string.Empty,
+                CategoryId = watch.CategoryId,
+                CategoryName = watch.Category?.Name ?? string.Empty,
                 SellerId = watch.SellerId,
                 SellerName = watch.Seller?.FullName,
                 // Thông số máy

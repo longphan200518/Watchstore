@@ -11,6 +11,6 @@ export const getOrderById = async (id) => {
 };
 
 export const updateOrderStatus = async (id, status) => {
-  const response = await apiClient.put(`admin/orders/${id}/status`, { status });
+  const response = await apiClient.patch(`admin/orders/${id}/status`, { status });
   return response.data;
 };

@@ -22,6 +22,14 @@ namespace WatchStore.Infrastructure.Data
         public DbSet<Coupon> Coupons { get; set; }
         public DbSet<CouponUsage> CouponUsages { get; set; }
 
+        // Nhiệm vụ 1 – Entities mới theo CSDL mới
+        public DbSet<Category> Categories { get; set; }
+        public DbSet<Cart> Carts { get; set; }
+        public DbSet<CartItem> CartItems { get; set; }
+        public DbSet<Payment> Payments { get; set; }
+        public DbSet<InventoryTransaction> InventoryTransactions { get; set; }
+        public DbSet<PriceHistory> PriceHistories { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -44,10 +52,23 @@ namespace WatchStore.Infrastructure.Data
                       .WithMany(b => b.Watches)
                       .HasForeignKey(e => e.BrandId)
                       .OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(e => e.Category)
+                      .WithMany(c => c.Watches)
+                      .HasForeignKey(e => e.CategoryId)
+                      .OnDelete(DeleteBehavior.Restrict);
                 entity.HasOne(e => e.Seller)
                       .WithMany(u => u.Watches)
                       .HasForeignKey(e => e.SellerId)
                       .OnDelete(DeleteBehavior.SetNull);
+                entity.HasQueryFilter(e => !e.IsDeleted);
+            });
+
+            // Category configuration
+            builder.Entity<Category>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Name).IsRequired().HasMaxLength(200);
+                entity.Property(e => e.Description).HasMaxLength(1000);
                 entity.HasQueryFilter(e => !e.IsDeleted);
             });
 
@@ -175,6 +196,93 @@ namespace WatchStore.Infrastructure.Data
                       .OnDelete(DeleteBehavior.Restrict);
                 entity.HasIndex(e => new { e.CouponId, e.UserId });
                 entity.HasQueryFilter(e => !e.IsDeleted);
+            });
+
+            // Cart configuration
+            builder.Entity<Cart>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.SessionId).HasMaxLength(100);
+                entity.HasOne(e => e.User)
+                      .WithMany(u => u.Carts)
+                      .HasForeignKey(e => e.UserId)
+                      .OnDelete(DeleteBehavior.Cascade);
+                entity.HasQueryFilter(e => !e.IsDeleted);
+                entity.HasIndex(e => e.UserId);
+                entity.HasIndex(e => e.SessionId);
+            });
+
+            // CartItem configuration
+            builder.Entity<CartItem>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.UnitPrice).HasColumnType("decimal(18,2)");
+                entity.HasOne(e => e.Cart)
+                      .WithMany(c => c.CartItems)
+                      .HasForeignKey(e => e.CartId)
+                      .OnDelete(DeleteBehavior.Cascade);
+                entity.HasOne(e => e.Watch)
+                      .WithMany(w => w.CartItems)
+                      .HasForeignKey(e => e.WatchId)
+                      .OnDelete(DeleteBehavior.Restrict);
+                entity.HasQueryFilter(e => !e.IsDeleted);
+                entity.HasIndex(e => new { e.CartId, e.WatchId }).IsUnique();
+            });
+
+            // Payment configuration
+            builder.Entity<Payment>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Provider).IsRequired().HasMaxLength(50);
+                entity.Property(e => e.Amount).HasColumnType("decimal(18,2)");
+                entity.Property(e => e.Currency).IsRequired().HasMaxLength(10);
+                entity.Property(e => e.TransactionId).HasMaxLength(100);
+                entity.Property(e => e.Status).IsRequired().HasMaxLength(30);
+                entity.HasOne(e => e.Order)
+                      .WithMany(o => o.Payments)
+                      .HasForeignKey(e => e.OrderId)
+                      .OnDelete(DeleteBehavior.Restrict);
+                entity.HasQueryFilter(e => !e.IsDeleted);
+                entity.HasIndex(e => e.OrderId);
+                entity.HasIndex(e => e.TransactionId);
+            });
+
+            // InventoryTransaction configuration
+            builder.Entity<InventoryTransaction>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.TransactionType).IsRequired().HasMaxLength(50);
+                entity.Property(e => e.ReferenceType).HasMaxLength(50);
+                entity.Property(e => e.Note).HasMaxLength(500);
+                entity.HasOne(e => e.Watch)
+                      .WithMany(w => w.InventoryTransactions)
+                      .HasForeignKey(e => e.WatchId)
+                      .OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(e => e.CreatedByUser)
+                      .WithMany()
+                      .HasForeignKey(e => e.CreatedBy)
+                      .OnDelete(DeleteBehavior.SetNull);
+                entity.HasQueryFilter(e => !e.IsDeleted);
+                entity.HasIndex(e => e.WatchId);
+            });
+
+            // PriceHistory configuration
+            builder.Entity<PriceHistory>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.OldPrice).HasColumnType("decimal(18,2)");
+                entity.Property(e => e.NewPrice).HasColumnType("decimal(18,2)");
+                entity.Property(e => e.Reason).HasMaxLength(500);
+                entity.HasOne(e => e.Watch)
+                      .WithMany(w => w.PriceHistories)
+                      .HasForeignKey(e => e.WatchId)
+                      .OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(e => e.ChangedByUser)
+                      .WithMany()
+                      .HasForeignKey(e => e.ChangedBy)
+                      .OnDelete(DeleteBehavior.SetNull);
+                entity.HasQueryFilter(e => !e.IsDeleted);
+                entity.HasIndex(e => e.WatchId);
             });
 
         }

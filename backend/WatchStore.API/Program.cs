@@ -17,16 +17,20 @@ using WatchStore.Application.Features.Watches;
 using WatchStore.Application.Features.WebsiteSettings;
 using WatchStore.Application.Features.Cart;
 using WatchStore.Application.Features.Categories;
+using WatchStore.Application.Features.Wishlists;
+using WatchStore.Application.Features.Exports;
 using WatchStore.Application.Interfaces;
 using WatchStore.Application.Services;
 using WatchStore.Domain.Entities;
 using WatchStore.Domain.Interfaces;
 using WatchStore.Infrastructure.Data;
 using WatchStore.Infrastructure.Repositories;
+using WatchStore.API.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
+builder.Services.AddSignalR();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -123,10 +127,13 @@ builder.Services.AddScoped<IServiceFacade, ServiceFacade>();
 
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IExportService, ExportService>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<WatchStore.Application.Interfaces.INotificationService, WatchStore.Application.Features.Notifications.NotificationService>();
+builder.Services.AddScoped<IAdminNotificationService, WatchStore.API.Services.AdminNotificationService>();
 
 // Bridge Pattern - Payment Services
 // Register payment providers (Implementors)
@@ -145,11 +152,17 @@ builder.Services.AddScoped<IWatchService, WatchService>();
 builder.Services.AddScoped<IBrandService, BrandService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
+builder.Services.AddScoped<IUserAddressService, WatchStore.Application.Features.Users.UserAddressService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IWebsiteSettingsService, WebsiteSettingsService>();
 builder.Services.AddScoped<ICouponService, CouponService>();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<ISearchHistoryService, WatchStore.Application.Features.SearchHistory.SearchHistoryService>();
+builder.Services.AddScoped<WatchStore.Application.Interfaces.IShippingService, WatchStore.Application.Features.Shipping.ShippingService>();
+builder.Services.AddScoped<IWishlistService, WishlistService>();
+builder.Services.AddScoped<IInventoryService, WatchStore.Application.Features.Inventory.InventoryService>();
+builder.Services.AddHttpClient();
 
 // Image Upload Service (use Cloudinary or Local based on configuration)
 // TODO: Uncomment after installing CloudinaryDotNet package
@@ -199,5 +212,6 @@ app.UseMiddleware<WatchStore.API.Middlewares.GlobalExceptionHandlerMiddleware>()
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+app.MapHub<AdminHub>("/hubs/admin");
 
 app.Run();

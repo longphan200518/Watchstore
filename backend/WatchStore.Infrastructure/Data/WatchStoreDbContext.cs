@@ -29,6 +29,10 @@ namespace WatchStore.Infrastructure.Data
         public DbSet<Payment> Payments { get; set; }
         public DbSet<InventoryTransaction> InventoryTransactions { get; set; }
         public DbSet<PriceHistory> PriceHistories { get; set; }
+        public DbSet<UserAddress> UserAddresses { get; set; }
+        public DbSet<SearchHistory> SearchHistories { get; set; }
+        public DbSet<Wishlist> Wishlists { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -285,6 +289,37 @@ namespace WatchStore.Infrastructure.Data
                 entity.HasIndex(e => e.WatchId);
             });
 
+            // Wishlist configuration
+            builder.Entity<Wishlist>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.HasOne(e => e.User)
+                      .WithMany()
+                      .HasForeignKey(e => e.UserId)
+                      .OnDelete(DeleteBehavior.Cascade);
+                entity.HasOne(e => e.Watch)
+                      .WithMany()
+                      .HasForeignKey(e => e.WatchId)
+                      .OnDelete(DeleteBehavior.Cascade);
+                entity.HasIndex(e => new { e.UserId, e.WatchId }).IsUnique();
+                entity.HasIndex(e => e.UserId);
+                entity.HasQueryFilter(e => !e.IsDeleted);
+            });
+
+            // Notification configuration
+            builder.Entity<Notification>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Title).IsRequired().HasMaxLength(200);
+                entity.Property(e => e.Message).IsRequired().HasMaxLength(1000);
+                entity.Property(e => e.Type).HasMaxLength(50);
+                entity.Property(e => e.ReferenceUrl).HasMaxLength(500);
+                
+                entity.HasOne(e => e.User)
+                      .WithMany(u => u.Notifications)
+                      .HasForeignKey(e => e.UserId)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
         }
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

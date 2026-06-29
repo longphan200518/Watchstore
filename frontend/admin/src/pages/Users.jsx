@@ -8,15 +8,6 @@ import { useToast } from "../contexts/ToastContext";
 
 export default function Users() {
   const { showToast } = useToast();
-  const navItems = [
-    { label: "Dashboard", path: "/" },
-    { label: "Quản lý sản phẩm", path: "/products" },
-    { label: "Quản lý đơn hàng", path: "/orders" },
-    { label: "Quản lý thương hiệu", path: "/brands" },
-    { label: "Quản lý người dùng", path: "/users" },
-    { label: "Quản lý đánh giá", path: "/reviews" },
-    { label: "Cài đặt Website", path: "/website-settings" },
-  ];
 
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -98,8 +89,8 @@ export default function Users() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Sidebar navItems={navItems} />
+    <div className="min-h-screen bg-[#F8F8F8] font-sans">
+      <Sidebar />
 
       <main className="lg:ml-72 min-h-screen">
         <AdminHeader
@@ -109,57 +100,24 @@ export default function Users() {
 
         <div className="px-4 lg:px-8 pb-8 space-y-6">
           {/* Stats Overview */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="bg-white rounded-xl border border-gray-200 p-4 hover:shadow-lg transition-shadow">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center mb-3">
-                <Icon
-                  icon="solar:users-group-rounded-bold-duotone"
-                  className="text-xl text-white"
-                />
-              </div>
-              <p className="text-2xl font-bold text-gray-900">{users.length}</p>
-              <p className="text-xs text-gray-500 mt-1">Tổng người dùng</p>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="bg-white border border-[#EAEAEA] p-6 flex flex-col justify-between hover:border-[#111111] transition-colors">
+              <p className="text-sm text-gray-500 uppercase tracking-widest font-light mb-2">Tổng người dùng</p>
+              <h4 className="text-3xl font-serif text-[#111111]">{users.length}</h4>
             </div>
-            <div className="bg-white rounded-xl border border-gray-200 p-4 hover:shadow-lg transition-shadow">
-              <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center mb-3">
-                <Icon
-                  icon="solar:shield-user-bold-duotone"
-                  className="text-xl text-white"
-                />
-              </div>
-              <p className="text-2xl font-bold text-gray-900">
-                {users.filter((u) => u.roles?.includes("Admin")).length}
-              </p>
-              <p className="text-xs text-gray-500 mt-1">Admin</p>
+            <div className="bg-white border border-[#EAEAEA] p-6 flex flex-col justify-between hover:border-[#111111] transition-colors">
+              <p className="text-sm text-gray-500 uppercase tracking-widest font-light mb-2">Admin</p>
+              <h4 className="text-3xl font-serif text-[#111111]">{users.filter((u) => u.roles?.includes("Admin")).length}</h4>
             </div>
-            <div className="bg-white rounded-xl border border-gray-200 p-4 hover:shadow-lg transition-shadow">
-              <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-500 rounded-lg flex items-center justify-center mb-3">
-                <Icon
-                  icon="solar:check-circle-bold-duotone"
-                  className="text-xl text-white"
-                />
-              </div>
-              <p className="text-2xl font-bold text-gray-900">
-                {users.filter((u) => u.emailConfirmed).length}
-              </p>
-              <p className="text-xs text-gray-500 mt-1">Email xác thực</p>
+            <div className="bg-white border border-[#EAEAEA] p-6 flex flex-col justify-between hover:border-[#111111] transition-colors">
+              <p className="text-sm text-gray-500 uppercase tracking-widest font-light mb-2">Email xác thực</p>
+              <h4 className="text-3xl font-serif text-[#111111]">{users.filter((u) => u.emailConfirmed).length}</h4>
             </div>
-            <div className="bg-white rounded-xl border border-gray-200 p-4 hover:shadow-lg transition-shadow">
-              <div className="w-10 h-10 bg-gradient-to-br from-amber-500 to-orange-500 rounded-lg flex items-center justify-center mb-3">
-                <Icon
-                  icon="solar:user-bold-duotone"
-                  className="text-xl text-white"
-                />
-              </div>
-              <p className="text-2xl font-bold text-gray-900">
-                {
-                  users.filter(
-                    (u) =>
-                      u.roles?.includes("User") && !u.roles?.includes("Admin")
-                  ).length
-                }
-              </p>
-              <p className="text-xs text-gray-500 mt-1">Khách hàng</p>
+            <div className="bg-white border border-[#EAEAEA] p-6 flex flex-col justify-between hover:border-[#111111] transition-colors">
+              <p className="text-sm text-gray-500 uppercase tracking-widest font-light mb-2">Khách hàng</p>
+              <h4 className="text-3xl font-serif text-[#111111]">
+                {users.filter((u) => u.roles?.includes("User") && !u.roles?.includes("Admin")).length}
+              </h4>
             </div>
           </div>
 
@@ -180,96 +138,72 @@ export default function Users() {
           )}
 
           {!loading && !error && (
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+            <div className="bg-white border border-[#EAEAEA] overflow-hidden">
               <table className="min-w-full">
-                <thead className="bg-gradient-to-r from-gray-50 to-gray-100 text-gray-700">
+                <thead className="bg-[#F8F8F8] border-b border-[#EAEAEA]">
                   <tr>
-                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">
-                      <div className="flex items-center gap-2">
-                        <Icon icon="solar:user-bold-duotone" />
-                        Người dùng
-                      </div>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-widest">
+                      Người dùng
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-widest">
                       Email
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-widest">
                       Số điện thoại
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-widest">
                       Quyền
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-widest">
                       Trạng thái
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-widest">
                       Ngày tạo
                     </th>
-                    <th className="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider">
+                    <th className="px-6 py-4 text-right text-xs font-medium text-gray-500 uppercase tracking-widest">
                       Hành động
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100">
+                <tbody className="divide-y divide-[#EAEAEA]">
                   {users.map((user) => (
                     <tr
                       key={user.id}
-                      className="hover:bg-gray-50/50 transition-colors group"
+                      className="hover:bg-[#F8F8F8] transition-colors group"
                     >
                       <td className="px-6 py-4">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                        <div className="flex items-center gap-4">
+                          <div className="w-10 h-10 bg-[#111111] flex items-center justify-center text-white font-serif text-lg">
                             {user.fullName?.charAt(0).toUpperCase() || "U"}
                           </div>
                           <div>
-                            <p className="font-semibold text-gray-900">
-                              {user.fullName}
+                            <p className="font-medium text-[#111111]">
+                              {user.fullName || "Chưa cập nhật"}
                             </p>
-                            <p className="text-xs text-gray-500">
-                              ID: {user.id}
+                            <p className="text-xs text-gray-500 font-light mt-0.5">
+                              ID: {String(user.id).substring(0, 8)}
                             </p>
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-2">
-                          <Icon
-                            icon="solar:letter-bold-duotone"
-                            className="text-gray-400"
-                          />
-                          <span className="text-gray-700">{user.email}</span>
-                        </div>
+                      <td className="px-6 py-4 text-[#111111] font-medium">
+                        {user.email}
+                      </td>
+                      <td className="px-6 py-4 text-gray-600 font-light">
+                        {user.phoneNumber || "—"}
                       </td>
                       <td className="px-6 py-4">
-                        <div className="flex items-center gap-2">
-                          <Icon
-                            icon="solar:phone-bold-duotone"
-                            className="text-gray-400"
-                          />
-                          <span className="text-gray-700">
-                            {user.phoneNumber || "—"}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex gap-1.5">
+                        <div className="flex gap-2">
                           {user.roles && user.roles.length > 0 ? (
                             user.roles.map((role) => (
                               <span
                                 key={role}
-                                className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold ${
+                                className={`inline-block px-3 py-1 text-xs font-medium border uppercase tracking-wider ${
                                   role === "Admin"
-                                    ? "bg-purple-50 text-purple-700 border border-purple-200"
-                                    : "bg-blue-50 text-blue-700 border border-blue-200"
+                                    ? "bg-[#111111] border-[#111111] text-white"
+                                    : "bg-white border-[#EAEAEA] text-[#111111]"
                                 }`}
                               >
-                                <Icon
-                                  icon={
-                                    role === "Admin"
-                                      ? "solar:shield-user-bold"
-                                      : "solar:user-bold"
-                                  }
-                                />
                                 {role}
                               </span>
                             ))
@@ -280,56 +214,33 @@ export default function Users() {
                       </td>
                       <td className="px-6 py-4">
                         <span
-                          className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold ${
+                          className={`inline-block px-3 py-1 text-xs font-medium border uppercase tracking-wider ${
                             user.emailConfirmed
-                              ? "bg-green-50 text-green-700 border border-green-200"
-                              : "bg-yellow-50 text-yellow-700 border border-yellow-200"
+                              ? "bg-[#F8F8F8] border-[#111111] text-[#111111]"
+                              : "bg-[#F8F8F8] border-[#EAEAEA] text-gray-500"
                           }`}
                         >
-                          <Icon
-                            icon={
-                              user.emailConfirmed
-                                ? "solar:check-circle-bold"
-                                : "solar:close-circle-bold"
-                            }
-                          />
-                          {user.emailConfirmed
-                            ? "Đã xác thực"
-                            : "Chưa xác thực"}
+                          {user.emailConfirmed ? "Đã xác thực" : "Chưa xác thực"}
                         </span>
                       </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-2 text-gray-600">
-                          <Icon
-                            icon="solar:calendar-bold-duotone"
-                            className="text-gray-400"
-                          />
-                          <span className="text-sm">
-                            {formatDate(user.createdAt)}
-                          </span>
-                        </div>
+                      <td className="px-6 py-4 text-gray-600 font-light">
+                        {formatDate(user.createdAt)}
                       </td>
                       <td className="px-6 py-4 text-right">
-                        <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="flex items-center justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
                           <button
                             onClick={() => handleEditRoles(user)}
-                            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                            className="text-gray-400 hover:text-[#111111] transition-colors"
                             title="Chỉnh sửa quyền"
                           >
-                            <Icon
-                              icon="solar:shield-user-bold-duotone"
-                              className="text-lg"
-                            />
+                            <Icon icon="solar:shield-user-outline" className="text-lg" />
                           </button>
                           <button
                             onClick={() => handleDelete(user.id)}
-                            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                            className="text-gray-400 hover:text-red-500 transition-colors"
                             title="Xóa người dùng"
                           >
-                            <Icon
-                              icon="solar:trash-bin-trash-bold-duotone"
-                              className="text-lg"
-                            />
+                            <Icon icon="solar:trash-bin-trash-outline" className="text-lg" />
                           </button>
                         </div>
                       </td>

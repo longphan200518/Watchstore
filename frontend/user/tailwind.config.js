@@ -1,9 +1,12 @@
-/** @type {import('tailwindcss').Config} */
+const colors = require("tailwindcss/colors");
+
 export default {
   content: ["./index.html", "./src/**/*.{js,jsx}"],
+  darkMode: "class",
   theme: {
     extend: {
       colors: {
+        amber: colors.zinc,
         // Luxury Color Palette
         luxury: {
           black: "#0A0A0A",
@@ -11,10 +14,6 @@ export default {
           "black-lighter": "#2A2A2A",
           white: "#FFFFFF",
           "white-dark": "#F8F8F8",
-          gold: "#D4AF37",
-          "gold-dark": "#B8941F",
-          platinum: "#C0C0C0",
-          "platinum-light": "#E3E3E3",
           brown: "#4E3B31",
         },
       },

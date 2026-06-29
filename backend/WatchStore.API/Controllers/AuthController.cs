@@ -31,6 +31,17 @@ namespace WatchStore.API.Controllers
         }
 
         /// <summary>
+        /// External login (Google, Facebook)
+        /// </summary>
+        [HttpPost("external-login")]
+        [ProducesResponseType(typeof(ApiResponse<AuthResponseDto>), 200)]
+        public async Task<IActionResult> ExternalLogin([FromBody] ExternalAuthRequestDto request)
+        {
+            var result = await _authService.ExternalLoginAsync(request);
+            return result.Success ? Ok(result) : BadRequest(result);
+        }
+
+        /// <summary>
         /// User registration
         /// </summary>
         [HttpPost("register")]

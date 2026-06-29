@@ -5,10 +5,14 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import "./styles/index.css";
 import "./styles/animations.css";
 
+import { GoogleOAuthProvider } from "@react-oauth/google";
+
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <React.StrictMode>
-    <ErrorBoundary>
-      <App />
-    </ErrorBoundary>
-  </React.StrictMode>
+ <React.StrictMode>
+ <GoogleOAuthProvider clientId="220040450571-qo0mghbchv42nm97ojr009ra2k5therl.apps.googleusercontent.com">
+ <ErrorBoundary>
+ <App />
+ </ErrorBoundary>
+ </GoogleOAuthProvider>
+ </React.StrictMode>,
 );

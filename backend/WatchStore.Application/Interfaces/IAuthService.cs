@@ -9,6 +9,7 @@ namespace WatchStore.Application.Interfaces
         Task<ApiResponse<AuthResponseDto>> LoginAsync(LoginRequestDto request);
         Task<ApiResponse<AuthResponseDto>> AdminLoginAsync(LoginRequestDto request);
         Task<ApiResponse<string>> RegisterAsync(RegisterRequestDto request);
+        Task<ApiResponse<AuthResponseDto>> ExternalLoginAsync(ExternalAuthRequestDto request);
 
         // Email Verification
         Task<ApiResponse<bool>> VerifyEmailAsync(string email, string otp);

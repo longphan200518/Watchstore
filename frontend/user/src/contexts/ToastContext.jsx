@@ -3,38 +3,38 @@ import { createContext, useState, useContext, useCallback } from "react";
 const ToastContext = createContext();
 
 export function ToastProvider({ children }) {
-  const [toasts, setToasts] = useState([]);
+ const [toasts, setToasts] = useState([]);
 
-  const addToast = useCallback((message, type = "info", duration = 3000) => {
-    const id = Date.now();
-    const toast = { id, message, type };
+ const addToast = useCallback((message, type = "info", duration = 3000) => {
+ const id = Date.now();
+ const toast = { id, message, type };
 
-    setToasts((prev) => [...prev, toast]);
+ setToasts((prev) => [...prev, toast]);
 
-    if (duration > 0) {
-      setTimeout(() => {
-        setToasts((prev) => prev.filter((t) => t.id !== id));
-      }, duration);
-    }
+ if (duration > 0) {
+ setTimeout(() => {
+ setToasts((prev) => prev.filter((t) => t.id !== id));
+ }, duration);
+ }
 
-    return id;
-  }, []);
+ return id;
+ }, []);
 
-  const removeToast = useCallback((id) => {
-    setToasts((prev) => prev.filter((t) => t.id !== id));
-  }, []);
+ const removeToast = useCallback((id) => {
+ setToasts((prev) => prev.filter((t) => t.id !== id));
+ }, []);
 
-  return (
-    <ToastContext.Provider value={{ toasts, addToast, removeToast }}>
-      {children}
-    </ToastContext.Provider>
-  );
+ return (
+ <ToastContext.Provider value={{ toasts, addToast, removeToast }}>
+ {children}
+ </ToastContext.Provider>
+ );
 }
 
 export function useToast() {
-  const context = useContext(ToastContext);
-  if (!context) {
-    throw new Error("useToast must be used within ToastProvider");
-  }
-  return context;
+ const context = useContext(ToastContext);
+ if (!context) {
+ throw new Error("useToast must be used within ToastProvider");
+ }
+ return context;
 }

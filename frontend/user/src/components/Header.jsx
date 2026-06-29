@@ -5,14 +5,17 @@ import { useCart } from "../contexts/CartContext";
 import { useWishlist } from "../contexts/WishlistContext";
 import SearchBox from "./SearchBox";
 
-export default function Header({ isDark = false, onThemeToggle = () => {} }) {
+export default function Header() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const isDark = false;
   const [language, setLanguage] = useState("vi");
-  const [megaMenuOpen, setMegaMenuOpen] = useState(null); // 'men', 'women', 'brands', 'collections'
+  const [categories, setCategories] = useState([]);
+  const [brands, setBrands] = useState([]);
+  const [megaMenuOpen, setMegaMenuOpen] = useState(null); // 'categories', 'brands'
   const dropdownRef = useRef(null);
   const megaMenuRef = useRef(null);
   const navigate = useNavigate();
@@ -21,6 +24,15 @@ export default function Header({ isDark = false, onThemeToggle = () => {} }) {
   const { getTotalWishlist, clearWishlist } = useWishlist();
   const cartCount = getTotalItems();
   const wishlistCount = getTotalWishlist();
+
+  useEffect(() => {
+    fetch('http://localhost:5221/api/categories?pageSize=100')
+      .then(res => res.json())
+      .then(res => setCategories(res.data?.items || res.data || []));
+    fetch('http://localhost:5221/api/brands?pageSize=100')
+      .then(res => res.json())
+      .then(res => setBrands(res.data?.items || res.data || []));
+  }, []);
 
   useEffect(() => {
     const savedLang = localStorage.getItem("language") || "vi";
@@ -138,271 +150,38 @@ export default function Header({ isDark = false, onThemeToggle = () => {} }) {
           </div>
 
           <div className="hidden lg:flex items-center gap-10">
-            {/* Nam - Men's Watches */}
+            {/* Tất cả sản phẩm */}
+            <Link
+              to="/products"
+              className={`hover:text-black transition-colors duration-300 text-sm tracking-[0.15em] uppercase font-medium ${isDark ? "text-gray-300" : "text-gray-700"}`}
+            >
+              {language === "vi" ? "Tất Cả Sản Phẩm" : "All Products"}
+            </Link>
+
+            {/* Danh Mục */}
             <div
               className="relative"
-              onMouseEnter={() => setMegaMenuOpen("men")}
+              onMouseEnter={() => setMegaMenuOpen("categories")}
               onMouseLeave={() => setMegaMenuOpen(null)}
             >
               <button
-                className={`hover:text-amber-600 transition-colors duration-300 text-sm tracking-[0.15em] uppercase font-medium ${
-                  isDark ? "text-gray-300" : "text-gray-700"
-                }`}
+                className={`hover:text-black transition-colors duration-300 text-sm tracking-[0.15em] uppercase font-medium ${isDark ? "text-gray-300" : "text-gray-700"}`}
               >
-                {language === "vi" ? "Nam" : "Men"}
+                {language === "vi" ? "Danh Mục" : "Categories"}
               </button>
-              {megaMenuOpen === "men" && (
-                <div className="absolute left-0 top-full w-[600px] pt-6">
-                  <div
-                    className={`border shadow-2xl animate-fade-in ${
-                      isDark
-                        ? "bg-black border-gray-900"
-                        : "bg-white border-gray-200"
-                    }`}
-                  >
-                    <div className="px-8 pb-8 grid grid-cols-2 gap-8">
-                      <div>
-                        <h3
-                          className={`text-xs tracking-[0.2em] uppercase mb-6 font-semibold ${
-                            isDark ? "text-amber-500" : "text-amber-600"
-                          }`}
-                        >
-                          {language === "vi" ? "Danh Mục" : "Categories"}
-                        </h3>
-                        <ul className="space-y-3">
-                          {[
-                            { vi: "Dress Watch", en: "Dress Watch" },
-                            { vi: "Diver Watch", en: "Diver Watch" },
-                            { vi: "Chronograph", en: "Chronograph" },
-                            { vi: "Luxury Line", en: "Luxury Line" },
-                            { vi: "Sport / Casual", en: "Sport / Casual" },
-                          ].map((item, index) => (
-                            <li key={index}>
-                              <Link
-                                to={`/products?category=men-${item.en
-                                  .toLowerCase()
-                                  .replace(/ /g, "-")}`}
-                                className={`text-sm hover:text-amber-600 transition-colors duration-300 ${
-                                  isDark ? "text-gray-400" : "text-gray-600"
-                                }`}
-                                onClick={() => setMegaMenuOpen(null)}
-                              >
-                                {language === "vi" ? item.vi : item.en}
-                              </Link>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                      <div className="flex items-center justify-center">
-                        <div
-                          className={`text-center p-6 border ${
-                            isDark ? "border-gray-900" : "border-gray-200"
-                          }`}
-                        >
-                          <Icon
-                            icon="mdi:watch"
-                            className={`w-16 h-16 mx-auto mb-4 ${
-                              isDark ? "text-amber-500" : "text-amber-600"
-                            }`}
-                          />
-                          <p
-                            className={`text-xs ${
-                              isDark ? "text-gray-400" : "text-gray-600"
-                            }`}
-                          >
-                            {language === "vi"
-                              ? "Khám phá bộ sưu tập"
-                              : "Explore Collection"}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Nữ - Women's Watches */}
-            <div
-              className="relative"
-              onMouseEnter={() => setMegaMenuOpen("women")}
-              onMouseLeave={() => setMegaMenuOpen(null)}
-            >
-              <button
-                className={`hover:text-amber-600 transition-colors duration-300 text-sm tracking-[0.15em] uppercase font-medium ${
-                  isDark ? "text-gray-300" : "text-gray-700"
-                }`}
-              >
-                {language === "vi" ? "Nữ" : "Women"}
-              </button>
-              {megaMenuOpen === "women" && (
-                <div className="absolute left-0 top-full w-[500px] pt-6">
-                  <div
-                    className={`border shadow-2xl animate-fade-in ${
-                      isDark
-                        ? "bg-black border-gray-900"
-                        : "bg-white border-gray-200"
-                    }`}
-                  >
-                    <div className="px-8 pb-8 grid grid-cols-2 gap-8">
-                      <div>
-                        <h3
-                          className={`text-xs tracking-[0.2em] uppercase mb-6 font-semibold ${
-                            isDark ? "text-amber-500" : "text-amber-600"
-                          }`}
-                        >
-                          {language === "vi" ? "Danh Mục" : "Categories"}
-                        </h3>
-                        <ul className="space-y-3">
-                          {[
-                            { vi: "Elegant", en: "Elegant" },
-                            { vi: "Classic", en: "Classic" },
-                            { vi: "Minimalist", en: "Minimalist" },
-                            { vi: "Luxury", en: "Luxury" },
-                          ].map((item, index) => (
-                            <li key={index}>
-                              <Link
-                                to={`/products?category=women-${item.en.toLowerCase()}`}
-                                className={`text-sm hover:text-amber-600 transition-colors duration-300 ${
-                                  isDark ? "text-gray-400" : "text-gray-600"
-                                }`}
-                                onClick={() => setMegaMenuOpen(null)}
-                              >
-                                {item.vi}
-                              </Link>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                      <div className="flex items-center justify-center">
-                        <div
-                          className={`text-center p-6 border ${
-                            isDark ? "border-gray-900" : "border-gray-200"
-                          }`}
-                        >
-                          <Icon
-                            icon="mdi:watch-variant"
-                            className={`w-16 h-16 mx-auto mb-4 ${
-                              isDark ? "text-amber-500" : "text-amber-600"
-                            }`}
-                          />
-                          <p
-                            className={`text-xs ${
-                              isDark ? "text-gray-400" : "text-gray-600"
-                            }`}
-                          >
-                            {language === "vi"
-                              ? "Khám phá bộ sưu tập"
-                              : "Explore Collection"}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Thương hiệu - Brands */}
-            <div
-              className="relative"
-              onMouseEnter={() => setMegaMenuOpen("brands")}
-              onMouseLeave={() => setMegaMenuOpen(null)}
-            >
-              <button
-                className={`hover:text-amber-600 transition-colors duration-300 text-sm tracking-[0.15em] uppercase font-medium ${
-                  isDark ? "text-gray-300" : "text-gray-700"
-                }`}
-              >
-                {language === "vi" ? "Thương Hiệu" : "Brands"}
-              </button>
-              {megaMenuOpen === "brands" && (
-                <div className="absolute left-0 top-full w-[700px] pt-6">
-                  <div
-                    className={`border shadow-2xl animate-fade-in ${
-                      isDark
-                        ? "bg-black border-gray-900"
-                        : "bg-white border-gray-200"
-                    }`}
-                  >
-                    <div className="px-8 pb-8 grid grid-cols-3 gap-8">
-                      {[
-                        ["Rolex", "Omega", "Patek Philippe"],
-                        ["Seiko", "Casio", "Tissot"],
-                        ["Citizen", "Tag Heuer", "Daniel Wellington"],
-                      ].map((column, colIndex) => (
-                        <div key={colIndex}>
-                          <ul className="space-y-3">
-                            {column.map((brand, index) => (
-                              <li key={index}>
-                                <Link
-                                  to={`/products?brand=${brand
-                                    .toLowerCase()
-                                    .replace(/ /g, "-")}`}
-                                  className={`text-sm hover:text-amber-600 transition-colors duration-300 ${
-                                    isDark ? "text-gray-400" : "text-gray-600"
-                                  }`}
-                                  onClick={() => setMegaMenuOpen(null)}
-                                >
-                                  {brand}
-                                </Link>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Bộ sưu tập - Collections */}
-            <div
-              className="relative"
-              onMouseEnter={() => setMegaMenuOpen("collections")}
-              onMouseLeave={() => setMegaMenuOpen(null)}
-            >
-              <Link
-                to="/products"
-                className={`hover:text-amber-600 transition-colors duration-300 text-sm tracking-[0.15em] uppercase font-medium ${
-                  isDark ? "text-gray-300" : "text-gray-700"
-                }`}
-              >
-                {language === "vi" ? "Bộ Sưu Tập" : "Collections"}
-              </Link>
-              {megaMenuOpen === "collections" && (
-                <div className="absolute left-0 top-full w-[500px] pt-6">
-                  <div
-                    className={`border shadow-2xl animate-fade-in ${
-                      isDark
-                        ? "bg-black border-gray-900"
-                        : "bg-white border-gray-200"
-                    }`}
-                  >
-                    <div className="px-8 pb-8">
-                      <ul className="space-y-3">
-                        {[
-                          { vi: "Limited Edition", en: "Limited Edition" },
-                          { vi: "New Arrivals", en: "New Arrivals" },
-                          { vi: "Trending", en: "Trending" },
-                          { vi: "Best Sellers", en: "Best Sellers" },
-                        ].map((item, index) => (
+              {megaMenuOpen === "categories" && (
+                <div className="absolute left-0 top-full w-[400px] pt-6">
+                  <div className={`border shadow-2xl animate-fade-in ${isDark ? "bg-black border-gray-900" : "bg-white border-gray-200"}`}>
+                    <div className="p-8">
+                      <ul className="space-y-4">
+                        {categories.map((item, index) => (
                           <li key={index}>
                             <Link
-                              to={`/products?collection=${item.en
-                                .toLowerCase()
-                                .replace(/ /g, "-")}`}
-                              className={`text-sm hover:text-amber-600 transition-colors duration-300 flex items-center gap-3 ${
-                                isDark ? "text-gray-400" : "text-gray-600"
-                              }`}
+                              to={`/products?categoryId=${item.id}`}
+                              className={`text-sm hover:text-black transition-colors duration-300 block ${isDark ? "text-gray-400" : "text-gray-600"}`}
                               onClick={() => setMegaMenuOpen(null)}
                             >
-                              <Icon
-                                icon="mdi:star"
-                                className="w-4 h-4 text-amber-600"
-                              />
-                              {language === "vi" ? item.vi : item.en}
+                              {item.name}
                             </Link>
                           </li>
                         ))}
@@ -413,15 +192,52 @@ export default function Header({ isDark = false, onThemeToggle = () => {} }) {
               )}
             </div>
 
-            {/* Phụ kiện - Accessories */}
-            <Link
-              to="/products?category=accessories"
-              className={`hover:text-amber-600 transition-colors duration-300 text-sm tracking-[0.15em] uppercase font-medium ${
-                isDark ? "text-gray-300" : "text-gray-700"
-              }`}
+            {/* Thương Hiệu */}
+            <div
+              className="relative"
+              onMouseEnter={() => setMegaMenuOpen("brands")}
+              onMouseLeave={() => setMegaMenuOpen(null)}
             >
-              {language === "vi" ? "Phụ Kiện" : "Accessories"}
-            </Link>
+              <button
+                className={`hover:text-black transition-colors duration-300 text-sm tracking-[0.15em] uppercase font-medium ${isDark ? "text-gray-300" : "text-gray-700"}`}
+              >
+                {language === "vi" ? "Thương Hiệu" : "Brands"}
+              </button>
+              {megaMenuOpen === "brands" && (
+                <div className="absolute left-0 top-full w-[600px] pt-6">
+                  <div className={`border shadow-2xl animate-fade-in ${isDark ? "bg-black border-gray-900" : "bg-white border-gray-200"}`}>
+                    <div className="p-8 grid grid-cols-2 gap-8">
+                      <ul className="space-y-4">
+                        {brands.slice(0, Math.ceil(brands.length / 2)).map((brand, index) => (
+                          <li key={index}>
+                            <Link
+                              to={`/products?brandId=${brand.id}`}
+                              className={`text-sm hover:text-black transition-colors duration-300 block ${isDark ? "text-gray-400" : "text-gray-600"}`}
+                              onClick={() => setMegaMenuOpen(null)}
+                            >
+                              {brand.name}
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                      <ul className="space-y-4">
+                        {brands.slice(Math.ceil(brands.length / 2)).map((brand, index) => (
+                          <li key={index}>
+                            <Link
+                              to={`/products?brandId=${brand.id}`}
+                              className={`text-sm hover:text-black transition-colors duration-300 block ${isDark ? "text-gray-400" : "text-gray-600"}`}
+                              onClick={() => setMegaMenuOpen(null)}
+                            >
+                              {brand.name}
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="flex items-center gap-6">
@@ -519,35 +335,7 @@ export default function Header({ isDark = false, onThemeToggle = () => {} }) {
                         <Icon icon="mdi:package-variant" className="w-5 h-5" />
                         <span>{language === "vi" ? "Đơn hàng" : "Orders"}</span>
                       </Link>
-                      <button
-                        onClick={() => {
-                          onThemeToggle();
-                          setDropdownOpen(false);
-                        }}
-                        className={`w-full flex items-center gap-3 px-4 py-3 hover:text-amber-600 transition-all duration-300 text-sm text-left ${
-                          isDark
-                            ? "text-gray-300 hover:bg-gray-900"
-                            : "text-gray-700 hover:bg-gray-50"
-                        }`}
-                      >
-                        <Icon
-                          icon={
-                            isDark
-                              ? "mdi:white-balance-sunny"
-                              : "mdi:moon-waning-crescent"
-                          }
-                          className="w-5 h-5"
-                        />
-                        <span>
-                          {isDark
-                            ? language === "vi"
-                              ? "Chế độ sáng"
-                              : "Light Mode"
-                            : language === "vi"
-                            ? "Chế độ tối"
-                            : "Dark Mode"}
-                        </span>
-                      </button>
+
                       <button
                         onClick={handleLogout}
                         className={`w-full flex items-center gap-3 px-4 py-3 text-red-500 hover:text-red-600 transition-all duration-300 text-sm text-left ${
@@ -614,13 +402,47 @@ export default function Header({ isDark = false, onThemeToggle = () => {} }) {
 
               <Link
                 to="/products"
-                className={`block py-3 hover:text-amber-600 transition-colors text-sm tracking-[0.15em] uppercase font-medium ${
-                  isDark ? "text-gray-300" : "text-gray-700"
-                }`}
+                className={`block py-3 hover:text-black transition-colors text-sm tracking-[0.15em] uppercase font-medium ${isDark ? "text-gray-300" : "text-gray-700"}`}
                 onClick={() => setMobileMenuOpen(false)}
               >
-                {language === "vi" ? "Bộ Sưu Tập" : "Collections"}
+                {language === "vi" ? "Tất Cả Sản Phẩm" : "All Products"}
               </Link>
+              <div className="py-2">
+                <span className={`block py-2 text-sm tracking-[0.15em] uppercase font-bold border-b ${isDark ? "border-gray-800 text-white" : "border-gray-200 text-black"}`}>
+                  {language === "vi" ? "Danh Mục" : "Categories"}
+                </span>
+                <ul className={`mt-2 pl-4 space-y-2 border-l ${isDark ? "border-gray-800" : "border-gray-100"}`}>
+                  {categories.map((item, idx) => (
+                    <li key={idx}>
+                      <Link
+                        to={`/products?categoryId=${item.id}`}
+                        className={`block py-1 text-sm hover:text-black ${isDark ? "text-gray-400" : "text-gray-600"}`}
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        {item.name}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="py-2">
+                <span className={`block py-2 text-sm tracking-[0.15em] uppercase font-bold border-b ${isDark ? "border-gray-800 text-white" : "border-gray-200 text-black"}`}>
+                  {language === "vi" ? "Thương Hiệu" : "Brands"}
+                </span>
+                <ul className={`mt-2 pl-4 space-y-2 border-l ${isDark ? "border-gray-800" : "border-gray-100"}`}>
+                  {brands.map((brand, idx) => (
+                    <li key={idx}>
+                      <Link
+                        to={`/products?brandId=${brand.id}`}
+                        className={`block py-1 text-sm hover:text-black ${isDark ? "text-gray-400" : "text-gray-600"}`}
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        {brand.name}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
               <Link
                 to="/about"
                 className={`block py-3 hover:text-amber-600 transition-colors text-sm tracking-[0.15em] uppercase font-medium ${

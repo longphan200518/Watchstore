@@ -15,5 +15,8 @@ namespace WatchStore.Domain.Entities
         public virtual ICollection<Watch> Watches { get; set; } = new List<Watch>();
         public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
         public virtual ICollection<Cart> Carts { get; set; } = new List<Cart>();
+        public virtual ICollection<UserAddress> UserAddresses { get; set; } = new List<UserAddress>();
+        public virtual ICollection<SearchHistory> SearchHistories { get; set; } = new List<SearchHistory>();
+        public virtual ICollection<Notification> Notifications { get; set; } = new List<Notification>();
     }
 }

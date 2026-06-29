@@ -3,10 +3,21 @@ export default {
   content: ["./index.html", "./src/**/*.{js,jsx}"],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ["Inter", "sans-serif"],
+        serif: ["Playfair Display", "serif"],
+      },
       colors: {
-        primary: "#1F2937",
-        secondary: "#3B82F6",
-        accent: "#EF4444",
+        luxury: {
+          bg: "#F8F8F8",
+          sidebar: "#111111",
+          card: "#FFFFFF",
+          text: "#111111",
+          border: "#EAEAEA",
+        },
+        primary: "#111111",
+        secondary: "#6B7280",
+        accent: "#000000",
         success: "#10B981",
         warning: "#F59E0B",
       },

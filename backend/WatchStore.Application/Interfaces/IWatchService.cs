@@ -10,5 +10,8 @@ namespace WatchStore.Application.Interfaces
         Task<ApiResponse<WatchDto>> CreateAsync(CreateWatchDto dto, int? sellerId = null);
         Task<ApiResponse<WatchDto>> UpdateAsync(UpdateWatchDto dto);
         Task<ApiResponse<bool>> DeleteAsync(int id);
+        Task<ApiResponse<List<WatchDto>>> GetRelatedWatchesAsync(int id, int limit = 4);
+        Task<ApiResponse<int>> GetWatchSocialProofAsync(int id);
+        Task<ApiResponse<List<WatchDto>>> GetCrossSellWatchesAsync(int id, int limit = 4);
     }
 }

@@ -85,5 +85,29 @@ namespace WatchStore.Application.Features.Categories
 
             return ApiResponse<bool>.SuccessResponse(true, "Category deleted successfully");
         }
+
+        public async Task<ApiResponse<CategoryDto>> UpdateAsync(UpdateCategoryDto dto)
+        {
+            var category = await _categoryRepository.GetQueryable()
+                .Include(c => c.Watches)
+                .FirstOrDefaultAsync(c => c.Id == dto.Id);
+
+            if (category == null)
+                return ApiResponse<CategoryDto>.ErrorResponse("Category not found");
+
+            category.Name = dto.Name;
+            category.Description = dto.Description;
+
+            await _categoryRepository.UpdateAsync(category);
+            await _unitOfWork.SaveChangesAsync();
+
+            return ApiResponse<CategoryDto>.SuccessResponse(new CategoryDto
+            {
+                Id = category.Id,
+                Name = category.Name,
+                Description = category.Description,
+                WatchCount = category.Watches.Count
+            }, "Category updated successfully");
+        }
     }
 }

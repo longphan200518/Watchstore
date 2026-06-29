@@ -55,5 +55,17 @@ namespace WatchStore.API.Controllers
             var result = await _categoryService.DeleteAsync(id);
             return result.Success ? Ok(result) : BadRequest(result);
         }
+
+        /// <summary>Cập nhật danh mục (Admin only)</summary>
+        [HttpPut("{id:int}")]
+        [Authorize(Roles = "Admin")]
+        [ApiExplorerSettings(GroupName = "admin")]
+        public async Task<IActionResult> Update(int id, [FromBody] UpdateCategoryDto dto)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            dto.Id = id;
+            var result = await _categoryService.UpdateAsync(dto);
+            return result.Success ? Ok(result) : BadRequest(result);
+        }
     }
 }

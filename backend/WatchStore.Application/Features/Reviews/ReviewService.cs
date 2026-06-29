@@ -75,7 +75,8 @@ namespace WatchStore.Application.Features.Reviews
                     Title = dto.Title,
                     Content = dto.Content,
                     IsVerified = hasPurchased,
-                    HelpfulCount = 0
+                    HelpfulCount = 0,
+                    ImageUrls = dto.ImageUrls
                 };
 
                 await _reviewRepository.AddAsync(review);
@@ -99,7 +100,8 @@ namespace WatchStore.Application.Features.Reviews
                     Content = review.Content,
                     IsVerified = review.IsVerified,
                     HelpfulCount = review.HelpfulCount,
-                    CreatedAt = review.CreatedAt
+                    CreatedAt = review.CreatedAt,
+                    ImageUrls = review.ImageUrls
                 };
 
                 Logger.LogInformation("Review created successfully with ID {ReviewId}", review.Id);
@@ -139,6 +141,10 @@ namespace WatchStore.Application.Features.Reviews
                 review.Rating = dto.Rating;
                 review.Title = dto.Title;
                 review.Content = dto.Content;
+                if (dto.ImageUrls != null)
+                {
+                    review.ImageUrls = dto.ImageUrls;
+                }
 
                 await _reviewRepository.UpdateAsync(review);
                 await Facade.UnitOfWork.SaveChangesAsync();
@@ -161,7 +167,8 @@ namespace WatchStore.Application.Features.Reviews
                     Content = review.Content,
                     IsVerified = review.IsVerified,
                     HelpfulCount = review.HelpfulCount,
-                    CreatedAt = review.CreatedAt
+                    CreatedAt = review.CreatedAt,
+                    ImageUrls = review.ImageUrls
                 };
 
                 Logger.LogInformation("Review {ReviewId} updated successfully", reviewId);
@@ -231,7 +238,8 @@ namespace WatchStore.Application.Features.Reviews
                     Content = review.Content,
                     IsVerified = review.IsVerified,
                     HelpfulCount = review.HelpfulCount,
-                    CreatedAt = review.CreatedAt
+                    CreatedAt = review.CreatedAt,
+                    ImageUrls = review.ImageUrls
                 };
 
                 return ApiResponse<ReviewDto>.SuccessResponse(reviewDto);
@@ -279,7 +287,8 @@ namespace WatchStore.Application.Features.Reviews
                     Content = r.Content,
                     IsVerified = r.IsVerified,
                     HelpfulCount = r.HelpfulCount,
-                    CreatedAt = r.CreatedAt
+                    CreatedAt = r.CreatedAt,
+                    ImageUrls = r.ImageUrls
                 }).ToList();
 
                 var result = new PagedResponse<ReviewDto>
@@ -336,7 +345,8 @@ namespace WatchStore.Application.Features.Reviews
                     Content = r.Content,
                     IsVerified = r.IsVerified,
                     HelpfulCount = r.HelpfulCount,
-                    CreatedAt = r.CreatedAt
+                    CreatedAt = r.CreatedAt,
+                    ImageUrls = r.ImageUrls
                 }).ToList();
 
                 var result = new PagedResponse<ReviewDto>
@@ -433,7 +443,8 @@ namespace WatchStore.Application.Features.Reviews
                     Content = r.Content,
                     IsVerified = r.IsVerified,
                     HelpfulCount = r.HelpfulCount,
-                    CreatedAt = r.CreatedAt
+                    CreatedAt = r.CreatedAt,
+                    ImageUrls = r.ImageUrls
                 }).ToList();
 
                 var result = new PagedResponse<ReviewDto>

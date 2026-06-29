@@ -1,8 +1,8 @@
 // Admin Coupon API Service
 import apiClient from './apiClient';
 
-const COUPONS_API = '/api/admin/coupons';
-const PUBLIC_COUPONS_API = '/api/coupons';
+const COUPONS_API = '/admin/coupons';
+const PUBLIC_COUPONS_API = '/coupons';
 
 export const couponService = {
   // Get all coupons (admin)

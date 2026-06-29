@@ -5,6 +5,8 @@ using WatchStore.Application.DTOs;
 using WatchStore.Application.Interfaces;
 using WatchStore.Domain.Entities;
 using WatchStore.Domain.Interfaces;
+using Google.Apis.Auth;
+using System.Net.Http.Json;
 
 namespace WatchStore.Application.Features.Auth
 {
@@ -133,6 +135,119 @@ namespace WatchStore.Application.Features.Auth
             };
 
             return ApiResponse<AuthResponseDto>.SuccessResponse(response, "Đăng nhập admin thành công");
+        }
+
+        public async Task<ApiResponse<AuthResponseDto>> ExternalLoginAsync(ExternalAuthRequestDto request)
+        {
+            string email = string.Empty;
+            string name = string.Empty;
+
+            try
+            {
+                if (request.Provider.Equals("Google", StringComparison.OrdinalIgnoreCase))
+                {
+                    // Validate Google Token
+                    var settings = new GoogleJsonWebSignature.ValidationSettings()
+                    {
+                        Audience = new List<string> { _configuration["ExternalAuth:GoogleClientId"] ?? "" }
+                    };
+                    
+                    // We can skip audience validation if using placeholder for testing, but let's keep it robust.
+                    // If GoogleClientId is empty, we might allow it or fail.
+                    var payload = await GoogleJsonWebSignature.ValidateAsync(request.Token, settings);
+                    if (payload == null)
+                        return ApiResponse<AuthResponseDto>.ErrorResponse("Token Google không hợp lệ");
+
+                    email = payload.Email;
+                    name = payload.Name;
+                }
+                else if (request.Provider.Equals("Facebook", StringComparison.OrdinalIgnoreCase))
+                {
+                    // Validate Facebook Token
+                    using var httpClient = new HttpClient();
+                    var verifyUrl = $"https://graph.facebook.com/me?fields=id,name,email&access_token={request.Token}";
+                    var fbResponse = await httpClient.GetAsync(verifyUrl);
+                    if (!fbResponse.IsSuccessStatusCode)
+                        return ApiResponse<AuthResponseDto>.ErrorResponse("Token Facebook không hợp lệ");
+
+                    var fbData = await fbResponse.Content.ReadFromJsonAsync<FacebookUserData>();
+                    if (fbData == null || string.IsNullOrEmpty(fbData.Email))
+                        return ApiResponse<AuthResponseDto>.ErrorResponse("Không thể lấy email từ Facebook");
+
+                    email = fbData.Email;
+                    name = fbData.Name ?? "Facebook User";
+                }
+                else
+                {
+                    return ApiResponse<AuthResponseDto>.ErrorResponse("Nhà cung cấp không được hỗ trợ");
+                }
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse<AuthResponseDto>.ErrorResponse($"Lỗi xác thực: {ex.Message}");
+            }
+
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+            {
+                // Create new user
+                user = new User
+                {
+                    UserName = email,
+                    Email = email,
+                    FullName = name,
+                    EmailConfirmed = true // Trust external provider
+                };
+
+                // Generate a random password for external users
+                var randomPassword = Guid.NewGuid().ToString("N") + "aA1@";
+                var result = await _userManager.CreateAsync(user, randomPassword);
+
+                if (!result.Succeeded)
+                    return ApiResponse<AuthResponseDto>.ErrorResponse("Không thể tạo tài khoản từ đăng nhập ngoài");
+
+                await _userManager.AddToRoleAsync(user, "User");
+            }
+            
+            // Add external login info if not exists (Optional but good practice)
+            var loginInfo = new UserLoginInfo(request.Provider, email, request.Provider);
+            await _userManager.AddLoginAsync(user, loginInfo); // Ignore errors if already linked
+
+            // Generate tokens
+            var roles = await _userManager.GetRolesAsync(user);
+            var token = _jwtService.GenerateToken(user.Id, user.Email!, roles.ToList());
+            var expirationMinutes = _configuration.GetValue<int>("JwtSettings:ExpirationInMinutes");
+
+            var refreshRepo = _unitOfWork.RefreshTokens;
+            var oldTokens = (await refreshRepo.FindAsync(r => r.UserId == user.Id && !r.IsRevoked)).ToList();
+            foreach (var old in oldTokens)
+            {
+                old.IsRevoked = true;
+                old.RevokedAt = DateTime.UtcNow;
+                await refreshRepo.UpdateAsync(old);
+            }
+
+            var newRefresh = await GenerateRefreshTokenAsync(user.Id, true); // Remember by default
+
+            var responseDto = new AuthResponseDto
+            {
+                Token = token,
+                ExpiresAt = DateTime.UtcNow.AddMinutes(expirationMinutes),
+                RefreshToken = newRefresh.Token,
+                RefreshTokenExpiresAt = newRefresh.ExpiresAt,
+                User = new UserDto
+                {
+                    Id = user.Id,
+                    Email = user.Email!,
+                    FullName = user.FullName,
+                    PhoneNumber = user.PhoneNumber,
+                    Address = user.Address,
+                    EmailConfirmed = user.EmailConfirmed,
+                    Roles = roles.ToList()
+                }
+            };
+
+            return ApiResponse<AuthResponseDto>.SuccessResponse(responseDto, $"Đăng nhập {request.Provider} thành công");
         }
 
         public async Task<ApiResponse<string>> RegisterAsync(RegisterRequestDto request)
@@ -475,5 +590,12 @@ namespace WatchStore.Application.Features.Auth
             await _unitOfWork.SaveChangesAsync();
             return refreshToken;
         }
+    }
+
+    public class FacebookUserData
+    {
+        public string Id { get; set; } = string.Empty;
+        public string? Name { get; set; }
+        public string? Email { get; set; }
     }
 }

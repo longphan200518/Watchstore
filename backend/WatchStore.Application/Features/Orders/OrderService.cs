@@ -17,8 +17,9 @@ namespace WatchStore.Application.Features.Orders
         private readonly IRepository<WatchStore.Domain.Entities.Cart> _cartRepository;
         private readonly IRepository<CartItem> _cartItemRepository;
         private readonly IEmailService _emailService;
+        private readonly IAdminNotificationService _adminNotificationService;
 
-        public OrderService(IUnitOfWork unitOfWork, IEmailService emailService)
+        public OrderService(IUnitOfWork unitOfWork, IEmailService emailService, IAdminNotificationService adminNotificationService)
         {
             _unitOfWork = unitOfWork;
             _orderRepository = _unitOfWork.GetRepository<Order>();
@@ -27,6 +28,7 @@ namespace WatchStore.Application.Features.Orders
             _cartRepository = _unitOfWork.GetRepository<WatchStore.Domain.Entities.Cart>();
             _cartItemRepository = _unitOfWork.GetRepository<CartItem>();
             _emailService = emailService;
+            _adminNotificationService = adminNotificationService;
         }
 
         public async Task<ApiResponse<OrderDto>> CreateAsync(CreateOrderDto dto, int userId)
@@ -72,11 +74,13 @@ namespace WatchStore.Application.Features.Orders
                 var order = new Order
                 {
                     UserId = userId,
-                    TotalAmount = totalAmount,
+                    TotalAmount = totalAmount + dto.ShippingFee,
                     Status = OrderStatus.Pending,
                     ShippingAddress = dto.ShippingAddress,
                     PhoneNumber = dto.PhoneNumber,
                     Notes = dto.Notes,
+                    ShippingFee = dto.ShippingFee,
+                    ShippingProvider = dto.ShippingProvider,
                     OrderItems = orderItems
                 };
 
@@ -97,6 +101,17 @@ namespace WatchStore.Application.Features.Orders
 
                 await _unitOfWork.SaveChangesAsync();
                 await _unitOfWork.CommitAsync();
+
+                // Send admin notification via SignalR
+                try 
+                {
+                    await _adminNotificationService.NotifyNewOrderAsync(order.Id, dto.PhoneNumber, order.TotalAmount);
+                } 
+                catch (Exception ex) 
+                {
+                    // Non-blocking error logging
+                    Console.WriteLine($"[SignalR Error] {ex.Message}");
+                }
 
                 // Load order with full details including items, watches, images, and user
                 var orderWithDetails = await _orderRepository.GetQueryable()
@@ -193,6 +208,8 @@ namespace WatchStore.Application.Features.Orders
                     Status = o.Status,
                     ShippingAddress = o.ShippingAddress,
                     Notes = o.Notes,
+                    ShippingFee = o.ShippingFee,
+                    ShippingProvider = o.ShippingProvider,
                     OrderItems = o.OrderItems.Select(oi => new OrderItemDto
                     {
                         Id = oi.Id,
@@ -243,6 +260,8 @@ namespace WatchStore.Application.Features.Orders
                 Status = order.Status,
                 ShippingAddress = order.ShippingAddress,
                 Notes = order.Notes,
+                ShippingFee = order.ShippingFee,
+                ShippingProvider = order.ShippingProvider,
                 OrderItems = order.OrderItems.Select(oi => new OrderItemDto
                 {
                     Id = oi.Id,

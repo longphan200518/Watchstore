@@ -8,6 +8,7 @@ namespace WatchStore.Application.Interfaces
         Task<ApiResponse<List<CategoryDto>>> GetAllAsync();
         Task<ApiResponse<CategoryDto>> GetByIdAsync(int id);
         Task<ApiResponse<CategoryDto>> CreateAsync(CreateCategoryDto dto);
+        Task<ApiResponse<CategoryDto>> UpdateAsync(UpdateCategoryDto dto);
         Task<ApiResponse<bool>> DeleteAsync(int id);
     }
 }

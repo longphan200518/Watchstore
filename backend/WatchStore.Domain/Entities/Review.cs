@@ -13,5 +13,6 @@ namespace WatchStore.Domain.Entities
         public string Content { get; set; } = string.Empty;
         public bool IsVerified { get; set; } = false; // User bought this product
         public int HelpfulCount { get; set; } = 0;
+        public string? ImageUrls { get; set; } // Comma-separated image URLs
     }
 }

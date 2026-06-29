@@ -7,6 +7,7 @@ namespace WatchStore.Application.DTOs
         public int Rating { get; set; } // 1-5
         public string Title { get; set; } = string.Empty;
         public string Content { get; set; } = string.Empty;
+        public string? ImageUrls { get; set; }
     }
 
     // Request DTO for updating review
@@ -15,6 +16,7 @@ namespace WatchStore.Application.DTOs
         public int Rating { get; set; } // 1-5
         public string Title { get; set; } = string.Empty;
         public string Content { get; set; } = string.Empty;
+        public string? ImageUrls { get; set; }
     }
 
     // Response DTO for review
@@ -31,6 +33,7 @@ namespace WatchStore.Application.DTOs
         public bool IsVerified { get; set; }
         public int HelpfulCount { get; set; }
         public DateTime CreatedAt { get; set; }
+        public string? ImageUrls { get; set; }
     }
 
     // Admin-side filtering for reviews

@@ -6,6 +6,8 @@ import Brands from "./pages/Brands";
 import Users from "./pages/Users";
 import Reviews from "./pages/Reviews";
 import Coupons from "./pages/Coupons";
+import Categories from "./pages/Categories";
+import Inventory from "./pages/Inventory";
 import WebsiteSettings from "./pages/WebsiteSettings";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
@@ -81,6 +83,22 @@ export default function App() {
               element={
                 <ProtectedRoute>
                   <WebsiteSettings />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/categories"
+              element={
+                <ProtectedRoute>
+                  <Categories />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/inventory"
+              element={
+                <ProtectedRoute>
+                  <Inventory />
                 </ProtectedRoute>
               }
             />

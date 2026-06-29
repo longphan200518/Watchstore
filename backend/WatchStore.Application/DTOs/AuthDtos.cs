@@ -106,4 +106,13 @@ namespace WatchStore.Application.DTOs
         [Required(ErrorMessage = "Refresh token is required")]
         public string RefreshToken { get; set; } = string.Empty;
     }
+
+    public class ExternalAuthRequestDto
+    {
+        [Required(ErrorMessage = "Provider is required")]
+        public string Provider { get; set; } = string.Empty; // "Google" or "Facebook"
+
+        [Required(ErrorMessage = "Token is required")]
+        public string Token { get; set; } = string.Empty;
+    }
 }

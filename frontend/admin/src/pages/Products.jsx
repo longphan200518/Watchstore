@@ -33,15 +33,6 @@ const statusMap = {
 
 export default function Products() {
   const { showToast } = useToast();
-  const navItems = [
-    { label: "Dashboard", path: "/" },
-    { label: "Quản lý sản phẩm", path: "/products" },
-    { label: "Quản lý đơn hàng", path: "/orders" },
-    { label: "Quản lý thương hiệu", path: "/brands" },
-    { label: "Quản lý người dùng", path: "/users" },
-    { label: "Quản lý đánh giá", path: "/reviews" },
-    { label: "Cài đặt Website", path: "/website-settings" },
-  ];
 
   const [products, setProducts] = useState([]);
   const [brands, setBrands] = useState([]);
@@ -230,8 +221,8 @@ export default function Products() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Sidebar navItems={navItems} />
+    <div className="min-h-screen bg-[#F8F8F8] font-sans">
+      <Sidebar />
 
       {/* Main content */}
       <main className="lg:ml-72 min-h-screen">
@@ -241,26 +232,23 @@ export default function Products() {
           {/* Action Bar */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="px-4 py-2 bg-white rounded-xl border border-gray-200 shadow-sm">
-                <span className="text-sm text-gray-600">Tổng: </span>
-                <span className="text-sm font-bold text-gray-900">
+              <div className="px-4 py-2 bg-white rounded border border-[#EAEAEA]">
+                <span className="text-sm text-gray-500 font-light">Tổng số: </span>
+                <span className="text-sm font-medium text-[#111111]">
                   {products.length}
                 </span>
               </div>
             </div>
             <div className="flex gap-3">
-              <button className="px-4 py-2.5 rounded-xl border border-gray-300 text-sm font-medium text-gray-700 hover:bg-white shadow-sm transition-all duration-200 flex items-center gap-2">
-                <Icon icon="solar:import-bold-duotone" className="text-lg" />
+              <button className="px-5 py-2.5 rounded border border-[#111111] text-sm font-medium text-[#111111] hover:bg-[#111111] hover:text-white transition-colors flex items-center gap-2">
+                <Icon icon="solar:import-outline" className="text-lg" />
                 Nhập CSV
               </button>
               <button
                 onClick={handleAdd}
-                className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-white text-sm font-medium hover:from-amber-600 hover:to-amber-700 shadow-lg shadow-amber-500/30 transition-all duration-200 flex items-center gap-2"
+                className="px-5 py-2.5 rounded bg-[#111111] text-white text-sm font-medium hover:bg-black transition-colors flex items-center gap-2"
               >
-                <Icon
-                  icon="solar:add-circle-bold-duotone"
-                  className="text-lg"
-                />
+                <Icon icon="solar:add-circle-outline" className="text-lg" />
                 Thêm sản phẩm
               </button>
             </div>
@@ -279,13 +267,13 @@ export default function Products() {
                   placeholder="Tìm kiếm sản phẩm..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
+                  className="w-full pl-10 pr-4 py-2.5 border border-[#EAEAEA] rounded bg-white focus:outline-none focus:border-[#111111] transition-colors font-light text-sm"
                 />
               </div>
               <select
                 value={filterBrand}
                 onChange={(e) => setFilterBrand(e.target.value)}
-                className="px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
+                className="px-4 py-2.5 border border-[#EAEAEA] rounded bg-white focus:outline-none focus:border-[#111111] transition-colors font-light text-sm"
               >
                 <option value="">Tất cả thương hiệu</option>
                 {brands.map((brand) => (
@@ -297,7 +285,7 @@ export default function Products() {
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
-                className="px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
+                className="px-4 py-2.5 border border-[#EAEAEA] rounded bg-white focus:outline-none focus:border-[#111111] transition-colors font-light text-sm"
               >
                 <option value="">Tất cả trạng thái</option>
                 {Object.entries(statusMap).map(([key, value]) => (
@@ -309,7 +297,7 @@ export default function Products() {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
+                className="px-4 py-2.5 border border-[#EAEAEA] rounded bg-white focus:outline-none focus:border-[#111111] transition-colors font-light text-sm"
               >
                 <option value="name">Tên A-Z</option>
                 <option value="price-asc">Giá: Thấp → Cao</option>
@@ -338,34 +326,31 @@ export default function Products() {
 
           {/* Products Grid */}
           {!loading && !error && (
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+            <div className="bg-white border border-[#EAEAEA] overflow-hidden">
               <table className="min-w-full">
-                <thead className="bg-gradient-to-r from-gray-50 to-gray-100 text-gray-700">
+                <thead className="bg-[#F8F8F8] border-b border-[#EAEAEA]">
                   <tr>
-                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">
-                      <div className="flex items-center gap-2">
-                        <Icon icon="solar:box-bold-duotone" />
-                        Sản phẩm
-                      </div>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-widest">
+                      Sản phẩm
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-widest">
                       Thương hiệu
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-widest">
                       Giá
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-widest">
                       Tồn kho
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider">
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-widest">
                       Trạng thái
                     </th>
-                    <th className="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider">
+                    <th className="px-6 py-4 text-right text-xs font-medium text-gray-500 uppercase tracking-widest">
                       Hành động
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100">
+                <tbody className="divide-y divide-[#EAEAEA]">
                   {products
                     .filter((p) => {
                       // Search filter
@@ -403,11 +388,11 @@ export default function Products() {
                       return (
                         <tr
                           key={p.id}
-                          className="hover:bg-gray-50/50 transition-colors group"
+                          className="hover:bg-[#F8F8F8] transition-colors group"
                         >
                           <td className="px-6 py-4">
-                            <div className="flex items-center gap-3">
-                              <div className="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden">
+                            <div className="flex items-center gap-4">
+                              <div className="w-12 h-12 bg-[#F8F8F8] border border-[#EAEAEA] flex items-center justify-center overflow-hidden">
                                 {p.images?.[0]?.imageUrl ? (
                                   <img
                                     src={p.images[0].imageUrl}
@@ -415,77 +400,61 @@ export default function Products() {
                                     className="w-full h-full object-cover"
                                   />
                                 ) : (
-                                  <div className="w-full h-full flex items-center justify-center">
-                                    <Icon
-                                      icon="solar:watch-bold-duotone"
-                                      className="text-2xl text-gray-400"
-                                    />
-                                  </div>
+                                  <Icon
+                                    icon="solar:watch-bold"
+                                    className="text-2xl text-gray-300"
+                                  />
                                 )}
                               </div>
                               <div>
-                                <p className="font-semibold text-gray-900">
+                                <p className="font-medium text-[#111111]">
                                   {p.name}
                                 </p>
-                                <p className="text-xs text-gray-500">
+                                <p className="text-xs text-gray-500 font-light mt-0.5">
                                   ID: {p.id}
                                 </p>
                               </div>
                             </div>
                           </td>
                           <td className="px-6 py-4">
-                            <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium">
+                            <span className="text-sm font-medium text-gray-600">
                               {p.brandName}
                             </span>
                           </td>
                           <td className="px-6 py-4">
-                            <span className="text-gray-900 font-bold">
+                            <span className="text-[#111111] font-medium">
                               {formatCurrency(p.price)}
                             </span>
                           </td>
                           <td className="px-6 py-4">
-                            <div className="flex items-center gap-2">
-                              <Icon
-                                icon="solar:box-bold-duotone"
-                                className="text-gray-400"
-                              />
-                              <span className="text-gray-700 font-medium">
-                                {p.stockQuantity}
-                              </span>
-                            </div>
+                            <span className="text-[#111111] font-medium">
+                              {p.stockQuantity}
+                            </span>
                           </td>
                           <td className="px-6 py-4">
                             <span
-                              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold ${statusInfo.color}`}
+                              className={`inline-block px-3 py-1 text-xs font-medium border uppercase tracking-wider ${
+                                p.status === 1 ? "bg-white border-[#111111] text-[#111111]" : "bg-[#F8F8F8] border-[#EAEAEA] text-gray-500"
+                              }`}
                             >
-                              <Icon
-                                icon={statusInfo.icon}
-                                className="text-sm"
-                              />
                               {statusInfo.label}
                             </span>
                           </td>
                           <td className="px-6 py-4 text-right">
-                            <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <div className="flex items-center justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
                               <button
                                 onClick={() => handleEdit(p)}
-                                className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                className="text-gray-400 hover:text-[#111111] transition-colors"
                                 title="Chỉnh sửa"
                               >
-                                <Icon
-                                  icon="solar:pen-bold-duotone"
-                                  className="text-lg"
-                                />
+                                <Icon icon="solar:pen-outline" className="text-lg" />
                               </button>
                               <button
                                 onClick={() => handleDelete(p.id)}
-                                className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                className="text-gray-400 hover:text-red-500 transition-colors"
                                 title="Xóa"
                               >
-                                <Icon
-                                  icon="solar:trash-bin-trash-bold-duotone"
-                                  className="text-lg"
-                                />
+                                <Icon icon="solar:trash-bin-trash-outline" className="text-lg" />
                               </button>
                             </div>
                           </td>

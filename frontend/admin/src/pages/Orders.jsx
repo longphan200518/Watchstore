@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Icon } from "@iconify/react";
-import { getOrders, updateOrderStatus } from "../services/orderService";
+import { getOrders, updateOrderStatus, exportOrdersToExcel } from "../services/orderService";
 import { formatCurrency, formatDate } from "../utils/format";
 import Sidebar from "../components/Sidebar";
 import AdminHeader from "../components/AdminHeader";
@@ -37,15 +37,6 @@ const statusMap = {
 
 export default function Orders() {
   const { showToast } = useToast();
-  const navItems = [
-    { label: "Dashboard", path: "/" },
-    { label: "Quản lý sản phẩm", path: "/products" },
-    { label: "Quản lý đơn hàng", path: "/orders" },
-    { label: "Quản lý thương hiệu", path: "/brands" },
-    { label: "Quản lý người dùng", path: "/users" },
-    { label: "Quản lý đánh giá", path: "/reviews" },
-    { label: "Cài đặt Website", path: "/website-settings" },
-  ];
 
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -107,75 +98,54 @@ export default function Orders() {
     }
   };
 
+  const handleExportExcel = async () => {
+    try {
+      showToast("Đang xuất file Excel...", "success");
+      const blob = await exportOrdersToExcel();
+      const url = window.URL.createObjectURL(new Blob([blob]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", `Orders_${new Date().getTime()}.xlsx`);
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode.removeChild(link);
+      showToast("Xuất Excel thành công!", "success");
+    } catch (error) {
+      showToast("Lỗi khi xuất file Excel", "error");
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Sidebar navItems={navItems} />
+    <div className="min-h-screen bg-[#F8F8F8] font-sans">
+      <Sidebar />
 
       {/* Main content */}
       <main className="lg:ml-72 min-h-screen">
         <AdminHeader title="Quản lý đơn hàng" subtitle="Trang chủ / Đơn hàng" />
 
         <div className="px-4 lg:px-8 pb-8 space-y-6">
-          {/* Stats Overview */}
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-            {[
-              {
-                label: "Chờ xác nhận",
-                count: orders.filter((o) => o.status === 1).length,
-                color: "from-yellow-500 to-amber-500",
-                icon: "solar:clock-circle-bold-duotone",
-              },
-              {
-                label: "Đang xử lý",
-                count: orders.filter((o) => o.status === 2).length,
-                color: "from-blue-500 to-cyan-500",
-                icon: "solar:widget-5-bold-duotone",
-              },
-              {
-                label: "Đang giao",
-                count: orders.filter((o) => o.status === 3).length,
-                color: "from-purple-500 to-pink-500",
-                icon: "solar:delivery-bold-duotone",
-              },
-              {
-                label: "Đã giao",
-                count: orders.filter((o) => o.status === 4).length,
-                color: "from-green-500 to-emerald-500",
-                icon: "solar:check-circle-bold-duotone",
-              },
-              {
-                label: "Đã hủy",
-                count: orders.filter((o) => o.status === 5).length,
-                color: "from-red-500 to-rose-500",
-                icon: "solar:close-circle-bold-duotone",
-              },
-            ].map((stat, idx) => (
-              <div
-                key={idx}
-                className="bg-white rounded-xl border border-gray-200 p-4 hover:shadow-lg transition-shadow"
-              >
-                <div
-                  className={`w-10 h-10 bg-gradient-to-br ${stat.color} rounded-lg flex items-center justify-center mb-3`}
-                >
-                  <Icon icon={stat.icon} className="text-xl text-white" />
-                </div>
-                <p className="text-2xl font-bold text-gray-900">{stat.count}</p>
-                <p className="text-xs text-gray-500 mt-1">{stat.label}</p>
-              </div>
-            ))}
-          </div>
-
-          {/* Action Bar */}
-          <div className="flex items-center justify-between">
-            <div className="px-4 py-2 bg-white rounded-xl border border-gray-200 shadow-sm">
-              <span className="text-sm text-gray-600">Tổng: </span>
-              <span className="text-sm font-bold text-gray-900">
-                {orders.length}
-              </span>
+          {/* Action Bar & Tabs */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-[#EAEAEA] pb-4">
+            <div className="flex gap-6 overflow-x-auto">
+              <button className="pb-4 border-b-2 border-[#111111] text-[#111111] font-medium whitespace-nowrap">
+                Tất cả đơn ({orders.length})
+              </button>
+              <button className="pb-4 border-b-2 border-transparent text-gray-500 hover:text-[#111111] transition-colors whitespace-nowrap">
+                Chờ xác nhận ({orders.filter((o) => o.status === 1).length})
+              </button>
+              <button className="pb-4 border-b-2 border-transparent text-gray-500 hover:text-[#111111] transition-colors whitespace-nowrap">
+                Đang giao ({orders.filter((o) => o.status === 3).length})
+              </button>
+              <button className="pb-4 border-b-2 border-transparent text-gray-500 hover:text-[#111111] transition-colors whitespace-nowrap">
+                Đã hoàn thành ({orders.filter((o) => o.status === 4).length})
+              </button>
             </div>
             <div className="flex gap-3">
-              <button className="px-4 py-2.5 rounded-xl border border-gray-300 text-sm font-medium text-gray-700 hover:bg-white shadow-sm transition-all duration-200 flex items-center gap-2">
-                <Icon icon="solar:export-bold-duotone" className="text-lg" />
+              <button 
+                onClick={handleExportExcel}
+                className="px-5 py-2.5 rounded border border-[#111111] text-sm font-medium text-[#111111] hover:bg-[#111111] hover:text-white transition-colors flex items-center gap-2"
+              >
+                <Icon icon="solar:export-outline" className="text-lg" />
                 Xuất Excel
               </button>
             </div>
@@ -200,77 +170,59 @@ export default function Orders() {
 
           {/* Orders table */}
           {!loading && !error && (
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-              <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-                <div className="flex items-center gap-3">
-                  <span className="text-lg">🧾</span>
-                  <div>
-                    <p className="text-sm text-gray-500">Tổng số đơn</p>
-                    <p className="text-lg font-semibold text-gray-900">
-                      {orders.length} đơn
-                    </p>
-                  </div>
-                </div>
-                <button className="text-sm text-secondary hover:underline">
-                  Bộ lọc nhanh
-                </button>
-              </div>
+            <div className="bg-white border border-[#EAEAEA] overflow-hidden">
               <table className="min-w-full text-sm">
-                <thead className="bg-gray-50 text-gray-600 uppercase text-xs">
+                <thead className="bg-[#F8F8F8] border-b border-[#EAEAEA]">
                   <tr>
-                    <th className="px-6 py-3 text-left">Mã đơn</th>
-                    <th className="px-6 py-3 text-left">Khách hàng</th>
-                    <th className="px-6 py-3 text-left">Tổng tiền</th>
-                    <th className="px-6 py-3 text-left">Ngày giờ</th>
-                    <th className="px-6 py-3 text-left">Trạng thái</th>
-                    <th className="px-6 py-3 text-right">Hành động</th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-widest">Mã đơn</th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-widest">Khách hàng</th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-widest">Tổng tiền</th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-widest">Ngày giờ</th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-widest">Trạng thái</th>
+                    <th className="px-6 py-4 text-right text-xs font-medium text-gray-500 uppercase tracking-widest">Hành động</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100">
+                <tbody className="divide-y divide-[#EAEAEA]">
                   {orders.map((o) => {
                     const statusInfo = statusMap[o.status] || statusMap[1];
                     return (
-                      <tr key={o.id} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 font-semibold text-gray-900">
+                      <tr key={o.id} className="hover:bg-[#F8F8F8] transition-colors group">
+                        <td className="px-6 py-4 font-medium text-[#111111]">
                           #{o.id}
                         </td>
-                        <td className="px-6 py-4 text-gray-800">
+                        <td className="px-6 py-4 text-gray-600">
                           {o.customerName}
                         </td>
-                        <td className="px-6 py-4 text-gray-900 font-semibold">
+                        <td className="px-6 py-4 text-[#111111] font-medium">
                           {formatCurrency(o.totalAmount)}
                         </td>
-                        <td className="px-6 py-4 text-gray-600">
+                        <td className="px-6 py-4 text-gray-500 font-light">
                           {formatDate(o.orderDate)}
                         </td>
                         <td className="px-6 py-4">
                           <span
-                            className={`px-3 py-1 rounded-full text-xs font-semibold ${statusInfo.color}`}
+                            className={`inline-block px-3 py-1 text-xs font-medium border uppercase tracking-wider ${
+                              o.status === 4 ? "bg-white border-[#111111] text-[#111111]" : "bg-[#F8F8F8] border-[#EAEAEA] text-gray-500"
+                            }`}
                           >
                             {statusInfo.label}
                           </span>
                         </td>
                         <td className="px-6 py-4 text-right">
-                          <div className="flex items-center justify-end gap-2">
+                          <div className="flex items-center justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
                             <button
                               onClick={() => handleViewDetail(o)}
-                              className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                              className="text-gray-400 hover:text-[#111111] transition-colors"
                               title="Xem chi tiết"
                             >
-                              <Icon
-                                icon="solar:eye-bold-duotone"
-                                className="text-lg"
-                              />
+                              <Icon icon="solar:eye-outline" className="text-lg" />
                             </button>
                             <button
                               onClick={() => handleUpdateStatus(o)}
-                              className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                              className="text-gray-400 hover:text-[#111111] transition-colors"
                               title="Cập nhật trạng thái"
                             >
-                              <Icon
-                                icon="solar:restart-bold-duotone"
-                                className="text-lg"
-                              />
+                              <Icon icon="solar:restart-outline" className="text-lg" />
                             </button>
                           </div>
                         </td>

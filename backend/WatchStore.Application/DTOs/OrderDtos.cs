@@ -13,6 +13,8 @@ namespace WatchStore.Application.DTOs
         public OrderStatus Status { get; set; }
         public string? ShippingAddress { get; set; }
         public string? Notes { get; set; }
+        public decimal ShippingFee { get; set; }
+        public string ShippingProvider { get; set; } = string.Empty;
         public List<OrderItemDto> OrderItems { get; set; } = new();
         public DateTime CreatedAt { get; set; }
     }
@@ -44,6 +46,9 @@ namespace WatchStore.Application.DTOs
         public List<CreateOrderItemDto> OrderItems { get; set; } = new();
 
         public string PaymentMethod { get; set; } = "COD";
+
+        public decimal ShippingFee { get; set; } = 0;
+        public string ShippingProvider { get; set; } = "Free";
     }
 
     public class CreateOrderItemDto

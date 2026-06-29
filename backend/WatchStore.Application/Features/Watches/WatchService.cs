@@ -6,6 +6,7 @@ using WatchStore.Application.Interfaces;
 using WatchStore.Common.Constants;
 using WatchStore.Common.Extensions;
 using WatchStore.Domain.Entities;
+using WatchStore.Domain.Enums;
 using WatchStore.Domain.Interfaces;
 
 namespace WatchStore.Application.Features.Watches
@@ -36,7 +37,10 @@ namespace WatchStore.Application.Features.Watches
                     .Include(w => w.Images)
                     .WhereIf(!filter.SearchTerm.IsNullOrEmpty(), w =>
                         w.Name.ToLower().Contains(filter.SearchTerm!.ToLower()) ||
-                        (w.Description != null && w.Description.ToLower().Contains(filter.SearchTerm!.ToLower())))
+                        (w.Description != null && w.Description.ToLower().Contains(filter.SearchTerm!.ToLower())) ||
+                        (w.Brand != null && w.Brand.Name.ToLower().Contains(filter.SearchTerm!.ToLower())) ||
+                        (w.Category != null && w.Category.Name.ToLower().Contains(filter.SearchTerm!.ToLower())) ||
+                        (w.Movement != null && w.Movement.ToLower().Contains(filter.SearchTerm!.ToLower())))
                     .WhereIf(filter.BrandId.HasValue, w => w.BrandId == filter.BrandId!.Value)
                     .WhereIf(filter.CategoryId.HasValue, w => w.CategoryId == filter.CategoryId!.Value)
                     .WhereIf(filter.MinPrice.HasValue, w => w.Price >= filter.MinPrice!.Value)
@@ -298,6 +302,106 @@ namespace WatchStore.Application.Features.Watches
                     return LogAndReturnError<bool>($"Error deleting watch {id}", ex);
                 }
             }, "DeleteWatch");
+        }
+        public async Task<ApiResponse<List<WatchDto>>> GetRelatedWatchesAsync(int id, int limit = 4)
+        {
+            try
+            {
+                var watch = await _watchRepository.GetByIdAsync(id);
+                if (watch == null)
+                    return ApiResponse<List<WatchDto>>.ErrorResponse("Watch not found");
+
+                // Tiêu chí sản phẩm liên quan: Cùng Brand hoặc Cùng Category
+                var query = _watchRepository.GetQueryable()
+                    .Include(w => w.Brand)
+                    .Include(w => w.Category)
+                    .Include(w => w.Images)
+                    .Where(w => w.Id != id && (w.BrandId == watch.BrandId || w.CategoryId == watch.CategoryId))
+                    .OrderByDescending(w => w.BrandId == watch.BrandId) // Ưu tiên cùng brand
+                    .ThenByDescending(w => w.CreatedAt)
+                    .Take(limit);
+
+                var relatedWatches = await query.ToListAsync();
+                var dtos = relatedWatches.Select(MapToDto).ToList();
+
+                return ApiResponse<List<WatchDto>>.SuccessResponse(dtos);
+            }
+            catch (Exception ex)
+            {
+                return LogAndReturnError<List<WatchDto>>($"Error getting related watches for ID {id}", ex);
+            }
+        }
+
+        public async Task<ApiResponse<int>> GetWatchSocialProofAsync(int id)
+        {
+            try
+            {
+                var cacheKey = $"social_proof_{id}";
+                var count = await ExecuteWithCache(cacheKey, async () =>
+                {
+                    var sevenDaysAgo = DateTime.UtcNow.AddDays(-7);
+                    
+                    // Lấy IRepository của OrderItem thông qua UnitOfWork (vì _watchRepository không thể query OrderItem trực tiếp dễ dàng)
+                    var orderItemRepo = Facade.UnitOfWork.GetRepository<OrderItem>();
+                    
+                    var purchases = await orderItemRepo.GetQueryable()
+                        .Include(oi => oi.Order)
+                        .Where(oi => oi.WatchId == id && 
+                                     oi.Order.Status != OrderStatus.Pending && 
+                                     oi.Order.Status != OrderStatus.Cancelled &&
+                                     oi.Order.CreatedAt >= sevenDaysAgo)
+                        .SumAsync(oi => oi.Quantity);
+
+                    // Nếu DB ít dữ liệu quá, return fake data để demo UI
+                    if (purchases == 0)
+                    {
+                        var random = new Random(id); // Dùng ID làm seed để luôn ra số cố định cho mỗi watch
+                        return random.Next(5, 50);
+                    }
+
+                    return purchases;
+                }, 30); // Cache 30 mins
+
+                return ApiResponse<int>.SuccessResponse(count);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Error getting social proof for watch {Id}", id);
+                return ApiResponse<int>.SuccessResponse(0); // Lỗi thì trả về 0 để UI không sập
+            }
+        }
+
+        public async Task<ApiResponse<List<WatchDto>>> GetCrossSellWatchesAsync(int id, int limit = 4)
+        {
+            try
+            {
+                var cacheKey = $"cross_sell_{id}_{limit}";
+
+                var dtos = await ExecuteWithCache(cacheKey, async () =>
+                {
+                    var watch = await _watchRepository.GetByIdAsync(id);
+                    if (watch == null) return new List<WatchDto>();
+
+                    // Lấy các sản phẩm bán chạy nhất cùng category
+                    var crossSells = await _watchRepository.GetQueryable()
+                        .Include(w => w.Brand)
+                        .Include(w => w.Category)
+                        .Include(w => w.Images)
+                        .Include(w => w.OrderItems) // Include để đếm số lần mua
+                        .Where(w => w.Id != id && w.CategoryId == watch.CategoryId && w.Status == WatchStatus.Available)
+                        .OrderByDescending(w => w.OrderItems.Sum(oi => oi.Quantity))
+                        .Take(limit)
+                        .ToListAsync();
+
+                    return crossSells.Select(w => MapToDto(w)).ToList();
+                }, 60);
+
+                return ApiResponse<List<WatchDto>>.SuccessResponse(dtos);
+            }
+            catch (Exception ex)
+            {
+                return LogAndReturnError<List<WatchDto>>($"Error getting cross-sell watches for ID {id}", ex);
+            }
         }
 
         // Helper method to map Watch entity to DTO
